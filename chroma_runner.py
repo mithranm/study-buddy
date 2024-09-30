@@ -1,6 +1,7 @@
 import chromadb
 from chromadb.utils import embedding_functions
 import os
+import document_textractor as textractor
 
 # Initialize a persistent client
 client = chromadb.PersistentClient(path="./chroma_db")

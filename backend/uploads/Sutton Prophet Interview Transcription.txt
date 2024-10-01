@@ -1,0 +1,263 @@
+So, all right, would you like to introduce yourself?
+
+I'm Sutton Profit, the CEO of Walmart.
+
+All right, then.
+
+So Mr. Sutton, based off the case pending against Mr. Frey, we actually had to ask you a couple of questions.
+
+So can you give me some background information about who you are?
+
+I'm a Harvard graduate.
+
+You can always tell a Harvard man, but you can't tell him anything.
+
+I feel like I have the ability to build whatever I want and shape anything.
+
+That's why I've been so successful.
+
+All right, then.
+
+So how would you describe the situation that is currently happening?
+
+So one of our competitors started using an open-source software to do their business.
+
+And so we heard how fast they did it, how easily they did it.
+
+So we decided to look into it.
+
+We never had any issues with open-source in the past.
+
+And if there were issues before, the developer of the software jumped in to help fix things.
+
+So we were looking to Freemax, the software that Frey designed, and there were some issues.
+
+And that's kind of why we're litigating this whole issue.
+
+Very well.
+
+When you decided to use the software that Mr. Frey developed, did you come into communications with him?
+
+So when we saw the software, we saw the developer was an applicant for one of the scholarships that we provide for people.
+
+It's known as the Walmart scholarship.
+
+And so we recognized his name from that.
+
+And so we thought it would be a good business idea.
+
+So there was a trade-off where if Mr. Frey put in a customer's page that listed Walmart, that would give him some benefit as well as us using his software.
+
+All right then.
+
+So you decided to use the Freemax software program because you were interested in how it worked.
+
+Did Mr. Frey state anything regarding his functionality about Freemax before your company deployed it?
+
+So not from Frey directly, but on the website for Freemax, it's designed to help you grow your business and that uses statistical analysis to maximize profits and optimize pricing.
+
+But that's the only form of statement we got from Frey before using the software.
+
+So when the error occurred and caused your company's sales to go down, did Mr. Frey ever attempt to try to fix or assist resolving the issue?
+
+We reached out to Mr. Frey whenever the issue occurred.
+
+We explained that it's in his best interest because we know we're listed on his website.
+
+And so any issues with our company would tie back into him because of the tie on his customer page, but he never put out a fix.
+
+So we hired someone.
+
+So would you say that there was an exchange of services between your company and Mr. Frey?
+
+And if there was, can you say the terms of that exchange?
+
+So I would say there was, because obviously we're using his software.
+
+But on his side, we offered for him to put us as one of his customers, like one of his users of his software, which being a student at Stanford, we thought it would be a good idea to be looking for, you know, it would give him benefits on his resume, on his portfolio, et cetera.
+
+All right.
+
+Erika, do you want to go into the questions when we continue with the questions?
+
+Can you explain how you first learned about Freemax?
+
+Yeah, it was on TV, actually.
+
+It was on the Money Channel when the host was talking about how a new e-commerce website was launched in less than a year.
+
+And so we saw how fast and how easily they built their website.
+
+So we looked into how they did it, and it turns out it was Mr. Frey's software.
+
+Do you have any, Mohamed?
+
+Okay, so when you said that when the exchange is when you use Mr. Frey's software, and you offered to be listed as one of his, say, customer, or you said that you offered to be listed as one of his customers?
+
+Yeah.
+
+So did Mr. Frey acknowledge that he would list you as a customer on his website?
+
+Yes, ever since that conversation with Frey, we've been listed, you know, as one of his customers.
+
+All right.
+
+Then did Mr. Frey ever ask you to agree to any limitations on the software's performance or on the software's liability?
+
+I did mention something about certain parts not being fully tested, but he did assure me that if there were any major issues, he would try to fix them.
+
+All right.
+
+Did Mr. Frey mention...
+
+Oh, sorry.
+
+No, you're good.
+
+Okay.
+
+He did offer...
+
+So when he did offer to fix the program, he fixed the issue, but he never got on it.
+
+Yes.
+
+This was back when we reached out to him about using his software and being listed as one of his customers.
+
+All right.
+
+Then did Mr. Frey mention anything about his interactions with Savannah.com?
+
+I don't recall.
+
+All right, then.
+
+So what was the purpose of using Freemax in AllMart's online store?
+
+Wait, one more time.
+
+What level of software testing did you perform any software testing or some test runs on the software before implementing it into your company?
+
+No, because our competitor Savannah.com was obviously using the same software, so why would they use a defective software is our reasoning.
+
+Very well.
+
+What would you say would be the purpose of using Freemax in AllMart's online store?
+
+Like I said before, the description for the software was designed to help us grow.
+
+Growth is good.
+
+Money is good.
+
+I like money.
+
+Of course, everyone does.
+
+Right.
+
+So optimizing pricing and maximizing profits is a big plus.
+
+All right, so it was being used to manage your pricing of your products?
+
+Yeah, it was handling our e-commerce.
+
+All right, then.
+
+Did you have any reason to believe that this purpose that Freemax had would not perform as expected on this?
+
+Did you have any reason to believe that Freemax would be able to do this since your rival company is using the same software?
+
+Did you believe that your software could perform just as well as your competitors?
+
+Let's see.
+
+We expected the software to do what it was described as doing, and it ended up crashing our main program at one point, which did not really help improve sales or grow anything.
+
+All right, and for my final question, and I would like to remind you, Mr. Sutton, that this is a very crucial question that might be able to turn this case around.
+
+Do you think, do you believe, do you have any proof to say that Mr. Frey was a seller of this software?
+
+A seller in, I guess it depends on how you define seller.
+
+So open source is, you know, it's free.
+
+So a seller, would you say that, I was thinking more of an exchange.
+
+You offer something to him, he offers something to you.
+
+And was there like essentially an exchange of goods or into the fact where he offered you his program, his software, and you offered him something back as well?
+
+Did you, you did say that, you did mention before that he was, you recognized him from what he, from one of your scholarships, correct?
+
+Yes, that's correct.
+
+So could, so he did get into that scholarship, correct?
+
+That was funded by you, correct?
+
+Yes, we did award him a scholarship, and I notified him this also in the meeting that we had, or the conversation we had.
+
+Okay, but would you, okay, but with all that, with all that, would you, could you say confidently that Mr. Frey was a seller to his, to his software program?
+
+Because most people, when they have something that is useful to others, they usually give it out in exchange for something else in return.
+
+So could you say that Mr. Frey sold or if he, or say sell, sell his software to you in exchange?
+
+I would, I would argue yes, because we're, you know, we're essentially trading use of his software for our company name or company brands as, as I guess, vouching for him on his website as one of his sellers.
+
+All right then, Mr. Frey, I do not believe I have any more, does my associate have any more questions for him?
+
+I have everything that's asked from what you just said.
+
+All right then, thank you, Mr. Frey, I'm sorry, sorry, thank you, Mr. Steltenham for your time.
+
+If I may, actually, so the, the issue that I mentioned earlier, the crashing, we, we did estimate that to be about five to 10,000 per month in a decrease in sales.
+
+And then I did briefly mention the, we did hire an expert to look at the software after, you know, after Mr. Frey did not uphold his.
+
+Was that, was that expert able to say, was able, able to fix or least try to mitigate damages?
+
+Well, so, you know, experts are very expensive, you know, so on top of the monthly decrease, we also, we're also down 15,000 for just the expert consultation, but they were not able to fix it, which is why we're litigating with Mr. Frey.
+
+But according to the expert, you know, the, the only person that can fix it is Mr. Frey.
+
+So he essentially holds, he's essentially the one who's holding, he's holding your hostage in a sense.
+
+Yes, you know, you could put it like that.
+
+All right, is there anything else you would like to mention, Mr. Sutton?
+
+Well, before you had the, the conversation with Mr. Frey, there's, you know, he promised us that if there were any major issues, he would try to fix them and, you know, he never fulfilled that promise.
+
+Has he?
+
+Right, right.
+
+And we hired an expert, they were not able to fix it and also we're down, I know, thousands of dollars.
+
+Quick question.
+
+Was any of this conversation, was there any contract written or was it all verbal?
+
+Was there any contracts or agreements made or was it all done verbally?
+
+To my knowledge, it's all word of mouth.
+
+Nothing was, nothing was.
+
+So nothing, nothing set in stone, it was just a matter of he said, she said.
+
+Right.
+
+All right, Mr. Frey, I mean, Mr. Sutton, I would like to thank you for your time and is there anything else that you'd like to mention?
+
+Or if my associate has anything to ask?
+
+I think that's everything for me.
+
+If you have any other questions, just reach out.
+
+Very well.
+
+Thank you. you

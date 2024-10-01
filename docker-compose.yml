@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./backend:/app
+      - ./data/chroma_db:/app/data/chroma_db
+      - ./data/raw-documents:/app/data/raw-documents
+    env_file:
+      - ./backend/.env
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "9091:9091"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    env_file:
+      - ./frontend/.env

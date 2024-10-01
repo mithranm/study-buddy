@@ -3,8 +3,22 @@ import os
 from pathlib import Path
 import pypdf
 import markdown
+
 output_dir = "./documents"
+
 # Basic skeleton of the method. We need to modify this. xlsx, html, docx file.
+def file_to_markdown(file_path):
+    try:
+        file_name, file_extension = os.path.splitext(file_path)
+        if file_extension.lower() == ".pdf":
+            return pdf_to_markdown(file_path)
+        else:
+            return f"Unsupported file type: {file_extension}"
+    except FileNotFoundError:
+        return f"File not found: {file_path}"
+    except Exception as e:
+        return f"An error occurred: {str(e)}"
+
 def pdf_to_markdown(pdf_path):
     # Create output directory if it doesn't exist
     Path(output_dir).mkdir(parents=True, exist_ok=True)

@@ -91,6 +91,20 @@ def search_documents():
 
 @app.route('/documents', methods=['GET'])
 def list_documents():
+    """
+    Retrieve all documents and return it back to the frontend in json format to be displayed on the screen.
+
+    Args:
+        None
+        
+    Returns:
+        tuple: a json file that contains data and http code
+        if sucessful: sends a json of the files.
+        if backend not ready: ({error: Backend is not fully initialized yet}, 503).
+    
+    Raises:
+        None
+    """
     if not (nltk_ready and chroma_ready):
         return jsonify({'error': 'Backend is not fully initialized yet'}), 503
     files = os.listdir(UPLOAD_FOLDER)
@@ -116,11 +130,6 @@ def delete_document(filename):
 
     Raises:
         None
-
-    Note:
-        This function checks if the NLTK and Chroma backends are ready before
-        proceeding with the deletion. It uses the global UPLOAD_FOLDER path to
-        locate the file.
     """
     if not (nltk_ready and chroma_ready):
         return jsonify({'error': 'Backend is not fully initialized yet'}), 503

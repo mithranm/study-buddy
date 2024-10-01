@@ -50,6 +50,9 @@ def initialize_backend():
 # Start initialization in a separate thread
 threading.Thread(target=initialize_backend, daemon=True).start()
 
+# ----- API END POINTS -----
+
+# 
 @app.route('/status', methods=['GET'])
 def get_status():
     return jsonify({

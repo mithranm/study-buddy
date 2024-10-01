@@ -19,5 +19,17 @@ COPY . .
 # Add the src directory to PYTHONPATH
 ENV PYTHONPATH=/app:$PYTHONPATH
 
+# Setting up write permissions for /app
+RUN chmod -R 777 /app
+
+# Install pydoc
+RUN pip install pydoc-markdown
+
+# Make app/docs
+RUN mkdir -p /app/docs
+
+# Generate docs
+RUN pydoc-markdown -I /app/src > /app/docs/api.md
+
 # Run the application
 CMD ["python", "src/main.py"]

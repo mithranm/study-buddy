@@ -98,6 +98,30 @@ def list_documents():
 
 @app.route('/documents/<filename>', methods=['DELETE'])
 def delete_document(filename):
+    """
+    Delete a document and its associated chunks from the system.
+
+    This function handles HTTP DELETE requests to remove a specific document
+    identified by its filename. It also removes the corresponding document
+    chunks from the Chroma vector store.
+
+    Args:
+        filename (str): The name of the file to be deleted.
+
+    Returns:
+        tuple: A tuple containing a JSON response and an HTTP status code.
+            - If successful: ({'message': 'Document deleted successfully'}, 200)
+            - If backend not ready: ({'error': 'Backend is not fully initialized yet'}, 503)
+            - If file not found: ({'error': 'Document not found'}, 404)
+
+    Raises:
+        None
+
+    Note:
+        This function checks if the NLTK and Chroma backends are ready before
+        proceeding with the deletion. It uses the global UPLOAD_FOLDER path to
+        locate the file.
+    """
     if not (nltk_ready and chroma_ready):
         return jsonify({'error': 'Backend is not fully initialized yet'}), 503
     file_path = os.path.join(UPLOAD_FOLDER, filename)

@@ -18,7 +18,6 @@ services:
     volumes:
       - ./frontend:/app
       - /app/node_modules
-      - ./local_docs:/app/docs
     depends_on:
       - backend
     env_file:

@@ -1,6 +1,7 @@
 import os
 import fnmatch
 import sys
+import re
 
 def parse_gitignore(gitignore_file):
     if os.path.exists(gitignore_file):
@@ -19,6 +20,21 @@ def is_git_ignored_by_default(path):
     name = os.path.basename(path)
     return any(fnmatch.fnmatch(name, pattern) for pattern in ignored_patterns)
 
+def pattern_to_regex(pattern):
+    pattern = pattern.replace('.', r'\.')  # Escape dots
+    pattern = pattern.replace('**', '.*')  # Convert ** to .*
+    pattern = pattern.replace('*', '[^/]*')  # Convert * to [^/]*
+    pattern = pattern.replace('?', '.')  # Convert ? to .
+    if pattern.startswith('/'):
+        pattern = '^' + pattern[1:]  # Anchor at start if pattern starts with /
+    else:
+        pattern = '(^|/)' + pattern  # Match at start or after /
+    if pattern.endswith('/'):
+        pattern += '.*'  # Match anything after trailing /
+    else:
+        pattern += '(/.*)?$'  # Optionally match / and anything after
+    return re.compile(pattern)
+
 def should_ignore(path, base_path, ignore_patterns, script_path):
     if path == script_path:
         return True
@@ -28,12 +44,7 @@ def should_ignore(path, base_path, ignore_patterns, script_path):
     rel_path = os.path.relpath(path, base_path)
     
     for pattern in ignore_patterns:
-        if pattern.startswith('/'):
-            pattern = pattern[1:]
-        if pattern.endswith('/'):
-            if os.path.isdir(path) and (fnmatch.fnmatch(rel_path, pattern) or fnmatch.fnmatch(rel_path + '/', pattern)):
-                return True
-        elif fnmatch.fnmatch(rel_path, pattern) or fnmatch.fnmatch(os.path.basename(path), pattern):
+        if pattern.search(rel_path):
             return True
     return False
 
@@ -48,6 +59,7 @@ def generate_directory_tree(root_dir, base_path=None, prefix="", is_last=True, i
         base_path = root_dir
         gitignore_path = os.path.join(root_dir, '.gitignore')
         ignore_patterns = parse_gitignore(gitignore_path)
+        ignore_patterns = [pattern_to_regex(p) for p in ignore_patterns]
 
     if root_dir != base_path:
         if not is_last:
@@ -57,7 +69,11 @@ def generate_directory_tree(root_dir, base_path=None, prefix="", is_last=True, i
             tree += prefix + "└── " + os.path.basename(root_dir) + "\n"
             prefix += "    "
 
-    files = os.listdir(root_dir)
+    try:
+        files = os.listdir(root_dir)
+    except PermissionError:
+        return tree + prefix + "Permission denied\n"
+
     files = [f for f in files if not should_ignore(os.path.join(root_dir, f), base_path, ignore_patterns, script_path)]
     files = sorted(files, key=lambda f: (os.path.isfile(os.path.join(root_dir, f)), f))
     

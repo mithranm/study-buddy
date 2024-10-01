@@ -10,7 +10,7 @@ CORS(app)
 
 CHROMA_DB_PATH = os.getenv('CHROMA_DB_PATH')
 RAW_DOCUMENTS_PATH = os.getenv('RAW_DOCUMENTS_PATH')
-
+UPLOAD_FOLDER = os.getenv('UPLOAD_FOLDER')
 # Initialize Chroma client
 client = chromadb.PersistentClient(path=CHROMA_DB_PATH)
 embedding_function = embedding_functions.DefaultEmbeddingFunction()
@@ -19,7 +19,7 @@ collection = client.get_or_create_collection(
     embedding_function=embedding_function
 )
 
-UPLOAD_FOLDER = './uploads'
+
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 

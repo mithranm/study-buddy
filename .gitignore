@@ -16,8 +16,12 @@ pip-delete-this-directory.txt
 *.egg-info/
 .eggs/
 
+# Explicitly ignore backend Python cache
+/backend/**/__pycache__/
+/backend/**/*.py[cod]
+
 # Poetry
-poetry.lock
+/backend/poetry.lock
 
 # React
 /frontend/node_modules
@@ -43,9 +47,18 @@ poetry.lock
 # Chroma
 /data/chroma_db/
 
+# Raw documents
+/data/raw-documents/
+
+# Uploads
+/backend/uploads/
+
 # General
 .env
 *.log
 
 # Docker
 .dockerignore
+
+# Uploads
+/backend/uploads/

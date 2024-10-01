@@ -79,6 +79,18 @@ def upload_file():
 
 @app.route('/search', methods=['POST'])
 def search_documents():
+    """
+    Search through submitted files to find the best matches for the given query. WE MIGHT GET RID OF THIS ENDPOINT LATER.
+
+    This function handles all POST requests to the '/search' endpoint.
+    
+    Args:
+        None
+    Returns:
+        tuple - a json of the data and the http code
+        if successful: returns the results of the prompt it was given with a status code of 200
+
+    """
     if not (nltk_ready and chroma_ready):
         return jsonify({'error': 'Backend is not fully initialized yet'}), 503
     collection = get_collection()
@@ -94,12 +106,13 @@ def list_documents():
     """
     Retrieve all documents and return it back to the frontend in json format to be displayed on the screen.
 
+    This function handles all GET requests to '/documents' endpoint.
+
     Args:
         None
-        
     Returns:
         tuple: a json file that contains data and http code
-        if sucessful: sends a json of the files.
+        if successful: sends a json of the files submitted with the http code 200.
         if backend not ready: ({error: Backend is not fully initialized yet}, 503).
     
     Raises:

@@ -1,3 +1,5 @@
+import os
+from nltk.tokenize import sent_tokenize
 def chunk_document(content, chunk_size=1000, overlap=200):
     sentences = sent_tokenize(content)
     chunks = []

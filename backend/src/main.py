@@ -18,19 +18,24 @@ nltk_ready = False
 chroma_ready = False
 initialization_error = None
 
+# Initialize embedding function and Chroma client at module level
+embedding_function = embedding_functions.DefaultEmbeddingFunction()
+chroma_client = chromadb.PersistentClient(path=CHROMA_DB_PATH)
+collection = None
+
 def initialize_backend():
     global nltk_ready, chroma_ready, initialization_error, collection
     try:
         # Initialize NLTK
         nltk.download('punkt', quiet=True)
+        nltk.download('punkt_tab', quiet=True)
         nltk_ready = True
 
-        # Initialize Chroma
-        client = chromadb.PersistentClient(path=CHROMA_DB_PATH)
-        embedding_function = embedding_functions.DefaultEmbeddingFunction()
-        collection = client.get_or_create_collection(
+        # Initialize Chroma collection
+        collection = chroma_client.get_or_create_collection(
             name="documents",
-            embedding_function=embedding_function
+            embedding_function=embedding_function,
+            metadata={"hnsw:space": "cosine", "hnsw:construction_ef": 100, "hnsw:search_ef": 10}
         )
         chroma_ready = True
     except Exception as e:
@@ -68,14 +73,22 @@ def chunk_document(content, chunk_size=1000, overlap=200):
     
     return chunks
 
-def embed_document(file_path):
-    with open(file_path, 'r') as file:
-        content = file.read()
-    chunks = chunk_document(content)
+def embed_documents(file_paths):
+    all_chunks = []
+    all_ids = []
+    all_metadatas = []
+    for file_path in file_paths:
+        with open(file_path, 'r') as file:
+            content = file.read()
+        chunks = chunk_document(content)
+        all_chunks.extend(chunks)
+        all_ids.extend([f"{os.path.basename(file_path)}_{i}" for i in range(len(chunks))])
+        all_metadatas.extend([{"source": file_path} for _ in chunks])
+    
     collection.add(
-        documents=chunks,
-        ids=[f"{os.path.basename(file_path)}_{i}" for i in range(len(chunks))],
-        metadatas=[{"source": file_path} for _ in chunks]
+        documents=all_chunks,
+        ids=all_ids,
+        metadatas=all_metadatas
     )
 
 @app.route('/upload', methods=['POST'])
@@ -90,7 +103,7 @@ def upload_file():
     if file:
         filename = os.path.join(UPLOAD_FOLDER, file.filename)
         file.save(filename)
-        embed_document(filename)
+        embed_documents([filename])  # Call embed_documents with a list containing the filename
         return jsonify({'message': 'File uploaded and embedded successfully'}), 200
 
 @app.route('/search', methods=['POST'])

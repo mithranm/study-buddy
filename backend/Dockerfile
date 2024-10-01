@@ -10,4 +10,4 @@ RUN poetry config virtualenvs.create false \
 
 COPY . .
 
-CMD ["poetry", "run", "flask", "run", "--host=0.0.0.0"]
+CMD ["python", "-m", "src.main"]

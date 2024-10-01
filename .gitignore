@@ -51,7 +51,10 @@ pip-delete-this-directory.txt
 /data/raw-documents/
 
 # Uploads
-/backend/uploads/
+/backend/chroma_db/
+
+# Chroma
+
 
 # General
 .env

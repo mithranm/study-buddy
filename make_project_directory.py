@@ -1,7 +1,6 @@
 import os
-import fnmatch
-import sys
 import re
+import fnmatch
 
 def parse_gitignore(gitignore_file):
     if os.path.exists(gitignore_file):
@@ -21,18 +20,21 @@ def is_git_ignored_by_default(path):
     return any(fnmatch.fnmatch(name, pattern) for pattern in ignored_patterns)
 
 def pattern_to_regex(pattern):
-    pattern = pattern.replace('.', r'\.')  # Escape dots
-    pattern = pattern.replace('**', '.*')  # Convert ** to .*
-    pattern = pattern.replace('*', '[^/]*')  # Convert * to [^/]*
-    pattern = pattern.replace('?', '.')  # Convert ? to .
     if pattern.startswith('/'):
-        pattern = '^' + pattern[1:]  # Anchor at start if pattern starts with /
+        pattern = '^' + pattern[1:]
     else:
-        pattern = '(^|/)' + pattern  # Match at start or after /
+        pattern = '(^|/|.*/)' + pattern
+    
+    pattern = pattern.replace('.', r'\.')
+    pattern = pattern.replace('**', '.*')
+    pattern = pattern.replace('*', '[^/]*')
+    pattern = pattern.replace('?', '.')
+    
     if pattern.endswith('/'):
-        pattern += '.*'  # Match anything after trailing /
+        pattern += '.*'
     else:
-        pattern += '(/.*)?$'  # Optionally match / and anything after
+        pattern += '(/.*)?$'
+    
     return re.compile(pattern)
 
 def should_ignore(path, base_path, ignore_patterns, script_path):
@@ -42,9 +44,16 @@ def should_ignore(path, base_path, ignore_patterns, script_path):
         return True
     
     rel_path = os.path.relpath(path, base_path)
+    name = os.path.basename(path)
+
+    # Special cases
+    if name == '.venv' or name == 'venv':
+        return True
+    if name == '__pycache__' or name.endswith('.pyc'):
+        return True
     
     for pattern in ignore_patterns:
-        if pattern.search(rel_path):
+        if pattern.search(rel_path) or pattern.search('/' + rel_path):
             return True
     return False
 

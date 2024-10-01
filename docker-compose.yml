@@ -7,8 +7,6 @@ services:
       - "9090:9090"
     volumes:
       - ./backend:/app
-      - ./data/chroma_db:/app/chroma_db
-      - ./data/raw-documents:/app/raw-documents
       - ./backend/uploads:/app/uploads
     env_file:
       - ./backend/.env

@@ -11,4 +11,4 @@ renderer:
   descriptive_module_title: true
   add_method_class_prefix: true
   add_member_class_prefix: true
-  filename: ./docs/api.md
+  filename: ../docs/api.md

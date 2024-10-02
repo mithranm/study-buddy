@@ -25,7 +25,7 @@ def setup_logging():
     ch.setLevel(logging.DEBUG)
     
     # Create file handler and set level to debug
-    log_file = 'test_log.txt'
+    log_file = 'test_main.log'
     fh = logging.FileHandler(log_file, mode='w')
     fh.setLevel(logging.DEBUG)
     
@@ -262,31 +262,6 @@ class FlaskAppTestCase(unittest.TestCase):
         self.assertEqual(response.status_code, 400)
         data = json.loads(response.data)
         self.assertIn('error', data)
-
-    # def test_entire_system(self):
-    #     logger.info("Testing entire system: file upload and chat")
-    #     test_file = 'test_essay.txt'
-
-    #     # Upload File
-    #     response = self.client.post('/upload',
-    #         content_type='multipart/form-data',
-    #         data={'file': (io.BytesIO(self.essay_content.encode('utf-8')), test_file)})
-
-    #     self.assertEqual(response.status_code, 200)
-    #     data = json.loads(response.data)
-    #     self.assertEqual(data['message'], 'File uploaded and embedded successfully')
-
-    #     expected_file_path = os.path.join(self.temp_uploads, test_file)
-    #     self.assertTrue(os.path.exists(expected_file_path))
-
-    #     # Chat
-    #     response = self.client.post('/chat', json={'prompt': 'What do the sources say?'})
-
-    #     self.assertEqual(response.status_code, 200)
-    #     data = json.loads(response.data)
-    #     self.assertIn('message', data)
-    #     logger.info('Message From Ollama: %s', data['message'])
-    #     self.assertIsNotNone(data['message'])
 
 if __name__ == '__main__':
     unittest.main()

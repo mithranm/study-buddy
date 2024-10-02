@@ -15,6 +15,9 @@ from src.main import create_app
 # Import vector_db to reset globals if needed
 from src import vector_db
 
+# Import get_collection if needed
+from src.vector_db import get_collection
+
 # Set up logging
 def setup_logging():
     logger = logging.getLogger(__name__)
@@ -25,7 +28,7 @@ def setup_logging():
     ch.setLevel(logging.DEBUG)
     
     # Create file handler and set level to debug
-    log_file = 'test_log.txt'
+    log_file = 'test_integration.log'
     fh = logging.FileHandler(log_file, mode='w')
     fh.setLevel(logging.DEBUG)
     
@@ -48,11 +51,13 @@ logger = setup_logging()
 class IntegrationTestCase(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        # Start patches for nltk.download and vector_db.get_collection
+        # Start patches for nltk.download only
         cls.patcher_nltk = patch('src.main.nltk.download', return_value=None)
-        cls.patcher_vector_db = patch('src.main.vector_db.get_collection', return_value=MagicMock())
         cls.mock_nltk_download = cls.patcher_nltk.start()
-        cls.mock_vector_db_get_collection = cls.patcher_vector_db.start()
+        
+        # Removed the patch for vector_db.get_collection
+        # cls.patcher_vector_db = patch('src.main.vector_db.get_collection', return_value=MagicMock())
+        # cls.mock_vector_db_get_collection = cls.patcher_vector_db.start()
         
         # Create a temporary directory for all tests
         cls.temp_dir = tempfile.mkdtemp()
@@ -62,7 +67,7 @@ class IntegrationTestCase(unittest.TestCase):
     def tearDownClass(cls):
         # Stop all patches
         cls.patcher_nltk.stop()
-        cls.patcher_vector_db.stop()
+        # cls.patcher_vector_db.stop()  # Already removed
         
         # Remove temporary directory
         logger.info(f"Removing temporary directory: {cls.temp_dir}")
@@ -97,6 +102,9 @@ class IntegrationTestCase(unittest.TestCase):
         # Reset ChromaDB client and embedding function to ensure test isolation
         vector_db.chroma_client = None
         vector_db.embedding_function = None
+
+        # Initialize the ChromaDB collection with the temporary path
+        get_collection()
 
         # Predefined essay content
         self.essay_content = """
@@ -140,8 +148,17 @@ class IntegrationTestCase(unittest.TestCase):
         self.assertEqual(upload_response.status_code, 200)
         self.assertIn('File uploaded and embedded successfully', upload_response.get_data(as_text=True))
         
+        # Optionally, verify that vectors are stored
+        collection = get_collection()
+        count = collection.count()
+        logger.info(f"Number of vectors in collection after upload: {count}")
+        self.assertGreater(count, 0, "ChromaDB should have at least one vector after embedding.")
+        
         search_response = self.client.post('/search', json={'query': 'sustainable development'})
         logger.info(search_response)
+        self.assertEqual(search_response.status_code, 200)
+        self.assertIn('documents', search_response.get_json())
+        
         # Step 2: Initiate Chat
         prompt = 'What do the sources say about sustainable development?'
         chat_response = self.client.post('/chat', json={'prompt': prompt})

@@ -7,6 +7,8 @@ import tempfile
 from unittest.mock import patch, MagicMock
 import logging
 import sys
+import chromadb
+from chromadb.config import Settings
 
 # Import the app factory function
 from src.main import create_app
@@ -52,6 +54,7 @@ class FlaskAppTestCase(unittest.TestCase):
         shutil.rmtree(cls.temp_dir, ignore_errors=True)
 
     def setUp(self):
+        self.temp_dir = tempfile.mkdtemp()
         self.temp_chroma_db = os.path.join(self.temp_dir, 'chroma_db')
         self.temp_raw_documents = os.path.join(self.temp_dir, 'raw-documents')
         self.temp_uploads = os.path.join(self.temp_dir, 'uploads')
@@ -92,6 +95,8 @@ class FlaskAppTestCase(unittest.TestCase):
 
         In conclusion, sustainable development is not just an environmental issue, but a comprehensive approach to creating a better world. It balances economic growth, environmental protection, and social progress. As we move forward, it is crucial that governments, businesses, and individuals embrace sustainable practices to ensure a prosperous and healthy future for all.
         """
+        
+        
 
     def tearDown(self):
         logger.info("Tearing down test case")
@@ -140,11 +145,6 @@ class FlaskAppTestCase(unittest.TestCase):
         self.assertTrue(os.path.exists(expected_file_path))
         mock_chunker.embed_documents.assert_called_once()
 
-        logger.info("Displaying search function results")
-        response = self.client.post('/search') # TODO HERE!
-        self.assertEqual(response.status_code, 200)
-        logger.info(f"Search response: {response.json}")
-
     def test_upload_file_no_file(self):
         logger.info("Testing file upload with no file")
         response = self.client.post('/upload', 
@@ -168,14 +168,13 @@ class FlaskAppTestCase(unittest.TestCase):
     @patch('src.main.vector_db')
     def test_search_documents_success(self, mock_vector_db):
         logger.info("Testing successful document search")
-        mock_vector_db.search_documents.return_value = json.dumps({'results': ['test result']}), 200
+        mock_vector_db.search_documents.return_value = {'documents': [['test result']]}, 200
         
         response = self.client.post('/search', json={'query': 'test query'})
         
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
-        self.assertIn('results', data)
-        self.assertEqual(data['results'], ['test result'])
+        self.assertEqual(data['documents'], [['test result']])
 
     def test_search_documents_no_query(self):
         logger.info("Testing document search with no query")
@@ -224,25 +223,46 @@ class FlaskAppTestCase(unittest.TestCase):
         data = json.loads(response.data)
         self.assertEqual(data['error'], 'Document not found')
 
-    @patch('src.main.vector_db')
-    def test_generate_success(self, mock_vector_db):
-        logger.info("Testing successful generation")
-        mock_vector_db.generate.return_value = json.dumps({'response': 'Generated content'}), 200
-        
-        response = self.client.post('/generate', json={'prompt': 'Test prompt'})
+    @patch('src.main.vector_db.search_documents')
+    def test_chat_success(self, mock_search):
+        mock_search.return_value = {'documents': [['test result 1', 'test result 2']]}, 200
+        response = self.client.post('/chat', json={'prompt': 'What do the sources say?'})
         
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
-        self.assertIn('response', data)
-        self.assertEqual(data['response'], 'Generated content')
+        self.assertIn('message', data)
+        logger.info('Response From Ollama: %s', data['message'])
 
-    def test_generate_no_prompt(self):
+    def test_chat_no_prompt(self):
         logger.info("Testing generation with no prompt")
-        response = self.client.post('/generate', json={})
+        response = self.client.post('/chat', json={})
         
         self.assertEqual(response.status_code, 400)
         data = json.loads(response.data)
         self.assertIn('error', data)
+        
+    def test_entire_system(self):
+        logger.info("Testing successful file upload")
+        test_file = 'test_essay.txt'
+
+        response = self.client.post('/upload',
+            content_type='multipart/form-data',
+            data={'file': (io.BytesIO(self.essay_content.encode('utf-8')), test_file)})
+
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(data['message'], 'File uploaded and embedded successfully')
+
+        expected_file_path = os.path.join(self.temp_uploads, test_file)
+        self.assertTrue(os.path.exists(expected_file_path))
+
+        response = self.client.post('/chat', json={'prompt': 'What do the sources say?'})
+
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertIn('message', data)
+        logger.info('message From Ollama: %s', data['message'])
+        self.assertIsNotNone(data['message'])
 
 if __name__ == '__main__':
     unittest.main()

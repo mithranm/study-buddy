@@ -1,0 +1,10 @@
+curl http://localhost:11434/api/generate \
+  -X POST \
+  -H "Content-Type: application/json" \
+  -d '{
+        "model": "llama3.2:3b",
+        "prompt": "Your prompt text here",
+        "stream": false
+      }'
+
+{"model":"llama3.2:3b","created_at":"2024-10-02T17:53:41.286268Z","response":"It seems like you forgot to include the prompt text. Please go ahead and provide the text, and I'll be happy to assist you.","done":true,"done_reason":"stop","context":[128006,9125,128007,271,38766,1303,33025,2696,25,6790,220,2366,18,271,128009,128006,882,128007,271,7927,10137,1495,1618,128009,128006,78191,128007,271,2181,5084,1093,499,29695,311,2997,279,10137,1495,13,5321,733,8469,323,3493,279,1495,11,323,358,3358,387,6380,311,7945,499,13],"total_duration":5278195417,"load_duration":4616196750,"prompt_eval_count":29,"prompt_eval_duration":102974000,"eval_count":29,"eval_duration":554080000}

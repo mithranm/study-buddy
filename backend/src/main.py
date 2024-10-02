@@ -1,10 +1,12 @@
-from flask import Flask, request, jsonify
-from flask_cors import CORS
 import os
 import nltk
 import threading
 import ollama
 import logging
+import traceback
+import sys
+from flask import Flask, request, jsonify
+from flask_cors import CORS
 
 # Project python files.
 from . import document_chunker as chunker
@@ -24,10 +26,16 @@ def create_app(test_config=None):
         # Load the test config if passed in
         app.config.from_mapping(test_config)
 
-    # Ensure CHROMA_DB_PATH is set in the config
-    app.config.setdefault('CHROMA_DB_PATH', '/app/chroma_db')
-    app.config.setdefault('UPLOAD_FOLDER', '/app/uploads')
-    app.config.setdefault('RAW_DOCUMENTS_PATH', '/app/raw-documents')
+    # Set default paths based on whether we're in Docker or not
+    if os.path.exists('/.dockerenv'):
+        base_path = '/app'
+    else:
+        base_path = os.path.dirname(os.path.abspath(__file__))
+
+    # Set default configurations
+    app.config.setdefault('CHROMA_DB_PATH', os.path.join(base_path, 'chroma_db'))
+    app.config.setdefault('UPLOAD_FOLDER', os.path.join(base_path, 'uploads'))
+    app.config.setdefault('RAW_DOCUMENTS_PATH', os.path.join(base_path, 'raw-documents'))
 
     # Log all app configurations
     for key, value in app.config.items():
@@ -53,7 +61,6 @@ def create_app(test_config=None):
     def initialize_backend():
         with app.app_context():
             try:
-                
                 # Initialize NLTK
                 nltk.download('punkt', quiet=True)
                 nltk.download('punkt_tab', quiet=True)
@@ -120,10 +127,12 @@ def create_app(test_config=None):
             tuple - a json of the data and the http code
             if backend not ready: returns ({'error': 'Backend is not fully initialized yet'}), 503)
         """
-        
         if not is_ready():
             return jsonify({'error': 'Backend is not fully initialized yet'}), 503
-        return vector_db.search_documents()
+        query = request.json.get('query')
+        if not query:
+            return jsonify({'error': 'No query provided'}), 400
+        return vector_db.search_documents(query)
 
     @app.route('/documents', methods=['GET'])
     def list_documents():
@@ -180,11 +189,41 @@ def create_app(test_config=None):
         else:
             return jsonify({'error': 'Document not found'}), 404
 
-    @app.route('/generate', methods=['POST'])
-    def generate_wrapper():
+    @app.route('/chat', methods=['POST'])
+    def chat_wrapper():
+        """
+        chat an LLM response from the prompt in the request body and chunks from documents already uploaded.
+
+        Args:
+            None
+
+        Returns:
+            tuple: A tuple containing a JSON response and an HTTP status code.
+        Raises:
+            None
+        """
+        print("chat called")
         if not is_ready():
             return jsonify({'error': 'Backend is not fully initialized yet'}), 503
-        return vector_db.generate()
+        
+        prompt = request.json.get('prompt')
+        if not prompt:
+            return jsonify({'error': 'No prompt given'}), 400
+        
+        try:
+            print("running search documents")
+            search_results, http_code = vector_db.search_documents(prompt)
+            if http_code != 200:
+                print("search failed")
+                return jsonify({'error': 'Search failed'}), http_code
+            print("running chat")
+            # Call chat with the search results and prompt
+            return vector_db.chat(search_results, prompt)
+        except Exception as e:
+            print("Exception chat")
+            traceback.print_exc(file=sys.stderr)
+            return jsonify({'error': f'Exception in chat process: {str(e)}'}), 500
+
 
     return app
 

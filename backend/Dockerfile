@@ -17,7 +17,7 @@ RUN poetry config virtualenvs.create false \
 COPY . .
 
 # Set PYTHONPATH to include the app directory
-ENV PYTHONPATH=/app:$PYTHONPATH
+ENV PYTHONPATH=/app
 
 # Expose the port the app runs on
 EXPOSE 9090

@@ -19,6 +19,8 @@ pip-delete-this-directory.txt
 # Explicitly ignore backend Python cache
 /backend/**/__pycache__/
 /backend/**/*.py[cod]
+/backend/**/chroma_db/
+/backend/**/uploads/
 
 # Poetry
 /backend/poetry.lock

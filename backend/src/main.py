@@ -69,12 +69,16 @@ def create_app(test_config=None):
                 # Initialize Chroma collection
                 vector_db.get_collection()
                 app.chroma_ready = True
+            except LookupError as le:
+                app.initialization_error = f"NLTK LookupError: {str(le)}"
+                logger.error(f"Initialization error: {str(le)}")
             except Exception as e:
-                app.initialization_error = str(e)
+                app.initialization_error = f"General Initialization Error: {str(e)}"
                 logger.error(f"Initialization error: {str(e)}")
 
     # Start initialization in a separate thread
-    threading.Thread(target=initialize_backend, daemon=True).start()
+    #threading.Thread(target=initialize_backend, daemon=True).start()
+    initialize_backend()
 
     @app.route('/status', methods=['GET'])
     def get_status():

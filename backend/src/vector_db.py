@@ -77,8 +77,8 @@ def search_documents(query):
         if successful: returns the results of the prompt it was given with a status code of 200
     """
     if not query:
-        return None, 400
-    
+        return jsonify({'error': 'No query given.'}), 400
+    logger.debug(f"Searching documents with query: {query}")
     collection = get_collection()
     results = collection.query(
         query_texts=[query],

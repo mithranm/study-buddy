@@ -5,6 +5,7 @@ from chromadb.utils import embedding_functions
 import os
 import nltk
 import threading
+import requests
 
 # Project python files.
 import document_chunker as chunker
@@ -14,6 +15,8 @@ CORS(app)
 
 CHROMA_DB_PATH = os.getenv('CHROMA_DB_PATH', '/app/chroma_db')
 UPLOAD_FOLDER = os.getenv('UPLOAD_FOLDER', '/app/uploads')
+OLLAMA_URL = 'http://ollama:11434'
+OLLAMA_MODEL = 'llama3.2:3b'
 
 # Global variables to track initialization status
 nltk_ready = False
@@ -63,6 +66,20 @@ def get_status():
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
+    """
+    Uploads a file that is chosen by the user.
+
+    This function handles all POST request to the '/upload' endpoint.
+
+    Args:
+        None
+    Returns:
+        tuple - a json of the message and the http code
+        if successful: ({'message': 'File uploaded and embedded sucessfully'}, 200)
+        if backend not ready: ({'error': 'Backend is not fully initialized yet'}, 503)
+        if theres no file to upload: ({'error': 'No file part'}, 400)
+        if filename is empty: ({'error': 'No selected file'}, 400)
+    """
     if not (nltk_ready and chroma_ready):
         return jsonify({'error': 'Backend is not fully initialized yet'}), 503
     if 'file' not in request.files:
@@ -83,7 +100,7 @@ def search_documents():
     Search through submitted files to find the best matches for the given query. WE MIGHT GET RID OF THIS ENDPOINT LATER.
 
     This function handles all POST requests to the '/search' endpoint.
-    
+
     Args:
         None
     Returns:

@@ -1,0 +1,23 @@
+FROM ollama/ollama:latest
+
+# Install any additional dependencies if needed
+RUN apt-get update && apt-get install -y \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set up a working directory
+WORKDIR /app
+
+# Expose the default Ollama port
+EXPOSE 11434
+
+# Create a startup script
+RUN echo '#!/bin/sh' > /start.sh && \
+    echo 'ollama serve &' >> /start.sh && \
+    echo 'sleep 10' >> /start.sh && \
+    echo 'ollama pull llama3.2:3b' >> /start.sh && \
+    echo 'wait' >> /start.sh && \
+    chmod +x /start.sh
+
+# Set the entrypoint to run the startup script
+ENTRYPOINT ["/start.sh"]

@@ -12,5 +12,6 @@ RUN poetry config virtualenvs.create false \
 COPY . .
 # Add the src directory to PYTHONPATH
 ENV PYTHONPATH=/app:$PYTHONPATH
+
 # Run the application
 CMD ["python", "src/main.py"]

@@ -7,7 +7,6 @@ import ollama
 import logging
 
 # Project python files.
-# Project python files.
 from . import document_chunker as chunker
 from . import vector_db
 
@@ -16,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 def create_app(test_config=None):
     app = Flask(__name__)
-    CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
+    CORS(app)
 
     if test_config is None:
         # Load the instance config, if it exists, when not testing
@@ -43,9 +42,6 @@ def create_app(test_config=None):
     except Exception as e:
         logger.error(f"Error creating directories: {str(e)}")
 
-    # Ensure the upload folder exists
-    os.makedirs(app.config.get('UPLOAD_FOLDER', '/app/uploads'), exist_ok=True)
-
     # Global variables to track initialization status
     app.nltk_ready = False
     app.chroma_ready = False
@@ -55,20 +51,20 @@ def create_app(test_config=None):
         return app.nltk_ready and app.chroma_ready
 
     def initialize_backend():
-        try:
-            # Initialize ollama
-            # ollama.pull('llama3.2:3b') BUG HERE
-            
-            # Initialize NLTK
-            nltk.download('punkt', quiet=True)
-            nltk.download('punkt_tab', quiet=True)
-            app.nltk_ready = True
+        with app.app_context():
+            try:
+                
+                # Initialize NLTK
+                nltk.download('punkt', quiet=True)
+                nltk.download('punkt_tab', quiet=True)
+                app.nltk_ready = True
 
-            # Initialize Chroma collection
-            vector_db.get_collection()
-            app.chroma_ready = True
-        except Exception as e:
-            app.initialization_error = str(e)
+                # Initialize Chroma collection
+                vector_db.get_collection()
+                app.chroma_ready = True
+            except Exception as e:
+                app.initialization_error = str(e)
+                logger.error(f"Initialization error: {str(e)}")
 
     # Start initialization in a separate thread
     threading.Thread(target=initialize_backend, daemon=True).start()

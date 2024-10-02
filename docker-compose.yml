@@ -9,8 +9,6 @@ services:
       - ./backend:/app
     environment:
       - FLASK_ENV=development
-    networks:
-      - app-network
 
   frontend:
     build: ./frontend
@@ -19,13 +17,5 @@ services:
     volumes:
       - ./frontend:/app
       - /app/node_modules
-    environment:
-      - REACT_APP_BACKEND_URL=http://localhost:9090
     depends_on:
       - backend
-    networks:
-      - app-network
-
-networks:
-  app-network:
-    driver: bridge

@@ -87,11 +87,6 @@ def search_documents(query):
     
     return results, 200
 
-import time
-import requests
-from flask import jsonify
-import json  # Ensure json is imported
-
 def chat(search_results, prompt):
     """
     Calls Ollama endpoint api/chat with text chunk + prompt given by user.
@@ -102,7 +97,11 @@ def chat(search_results, prompt):
 
     Return:
         tuple - contains a json and a http code.
-        if successful: pass a json filled with Ollama results with the http code 200
+        if successful: return a json filled with Ollama results with the http code 200
+        if ollama timeout: return ({'error': 'Ollama request timed out. The model might be taking too long to chat a response.'}), 504)
+        if HTTPerror: return ({'error': 'Ollama request timed out. The model might be taking too long to chat a response.'}), 400 (maybe?))
+        if RequestException: return ({'error': 'Ollama request timed out. The model might be taking too long to chat a response.'}), 500)
+        
     """
     logger.info("Starting chat function")
     logger.info(f"Search results: {search_results}")

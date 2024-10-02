@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 def create_app(test_config=None):
     app = Flask(__name__)
-    CORS(app)
+    CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 
     if test_config is None:
         # Load the instance config, if it exists, when not testing
@@ -57,7 +57,7 @@ def create_app(test_config=None):
     def initialize_backend():
         try:
             # Initialize ollama
-            ollama.pull('llama3.2:3b')
+            # ollama.pull('llama3.2:3b') BUG HERE
             
             # Initialize NLTK
             nltk.download('punkt', quiet=True)

@@ -66,10 +66,10 @@ def generate(search_results, prompt):
         if successful: pass a json filled with ollama results with the http code 200
     """
     
-    response = ollama.chat(model='llama3.2:3b', messages=[
-    {
-        'role': 'user',
-        'content': 'Why is the sky blue?',
-    },
-    ])
-    return jsonify(response['message']), 200
+    # response = ollama.chat(model='llama3.2:3b', messages=[
+    # {
+    #     'role': 'user',
+    #     'content': 'Why is the sky blue?',
+    # },
+    # ])
+    # return jsonify(response['message']), 200

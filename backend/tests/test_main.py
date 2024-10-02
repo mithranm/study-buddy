@@ -6,13 +6,39 @@ import shutil
 import tempfile
 from unittest.mock import patch, MagicMock
 import logging
+import sys
 
 # Import the app factory function
 from src.main import create_app
 
 # Set up logging
-logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger(__name__)
+def setup_logging():
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.DEBUG)
+    
+    # Create console handler and set level to debug
+    ch = logging.StreamHandler(sys.stdout)
+    ch.setLevel(logging.DEBUG)
+    
+    # Create file handler and set level to debug
+    log_file = 'test_log.txt'
+    fh = logging.FileHandler(log_file, mode='w')
+    fh.setLevel(logging.DEBUG)
+    
+    # Create formatter
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    
+    # Add formatter to handlers
+    ch.setFormatter(formatter)
+    fh.setFormatter(formatter)
+    
+    # Add handlers to logger
+    logger.addHandler(ch)
+    logger.addHandler(fh)
+    
+    return logger
+
+logger = setup_logging()
 
 class FlaskAppTestCase(unittest.TestCase):
     @classmethod
@@ -52,6 +78,21 @@ class FlaskAppTestCase(unittest.TestCase):
         self.app.nltk_ready = True
         self.app.chroma_ready = True
 
+        # Predefined essay content
+        self.essay_content = """
+        The Importance of Sustainable Development
+
+        Sustainable development has become a crucial concept in the 21st century as we face unprecedented environmental challenges. It refers to development that meets the needs of the present without compromising the ability of future generations to meet their own needs. This essay will explore the importance of sustainable development and its impact on our world.
+
+        First and foremost, sustainable development is essential for environmental preservation. Our planet's resources are finite, and unsustainable practices have led to issues such as deforestation, pollution, and climate change. By adopting sustainable practices, we can reduce our environmental footprint and protect ecosystems for future generations.
+
+        Secondly, sustainable development is crucial for economic stability. While traditional economic models often prioritize short-term gains, sustainable development focuses on long-term economic health. This approach can lead to the creation of new industries, such as renewable energy, and can help ensure the longevity of existing industries by promoting responsible resource management.
+
+        Lastly, sustainable development is vital for social equity. It aims to improve the quality of life for all people, including those in developing countries and marginalized communities. By promoting access to education, healthcare, and clean resources, sustainable development can help reduce poverty and inequality on a global scale.
+
+        In conclusion, sustainable development is not just an environmental issue, but a comprehensive approach to creating a better world. It balances economic growth, environmental protection, and social progress. As we move forward, it is crucial that governments, businesses, and individuals embrace sustainable practices to ensure a prosperous and healthy future for all.
+        """
+
     def tearDown(self):
         logger.info("Tearing down test case")
         for dir_path in [self.temp_chroma_db, self.temp_raw_documents, self.temp_uploads]:
@@ -84,20 +125,25 @@ class FlaskAppTestCase(unittest.TestCase):
     def test_upload_file_success(self, mock_chunker, mock_vector_db):
         logger.info("Testing successful file upload")
         mock_vector_db.get_collection.return_value = MagicMock()
-        test_file_content = b'Test content'
-        test_file = 'test_file.txt'
+        test_file = 'test_essay.txt'
         
         response = self.client.post('/upload', 
-                                    content_type='multipart/form-data',
-                                    data={'file': (io.BytesIO(test_file_content), test_file)})
+            content_type='multipart/form-data',
+            data={'file': (io.BytesIO(self.essay_content.encode('utf-8')), test_file)})
 
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
         self.assertEqual(data['message'], 'File uploaded and embedded successfully')
+
         
         expected_file_path = os.path.join(self.temp_uploads, test_file)
         self.assertTrue(os.path.exists(expected_file_path))
         mock_chunker.embed_documents.assert_called_once()
+
+        logger.info("Displaying search function results")
+        response2 = self.client.post('/search')
+        self.assertEqual(response2.status_code, 200)
+        logger.info(f"Search response: {response2.json}")
 
     def test_upload_file_no_file(self):
         logger.info("Testing file upload with no file")

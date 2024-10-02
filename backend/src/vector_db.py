@@ -50,6 +50,7 @@ def search_documents():
         query_texts=[query],
         n_results=5
     )
+    print(jsonify(results))
     return jsonify(results)
 
 def generate(search_results, prompt):
@@ -71,5 +72,4 @@ def generate(search_results, prompt):
         'content': 'Why is the sky blue?',
     },
     ])
-    print(response['message']['content'])
     return jsonify(response['message']), 200

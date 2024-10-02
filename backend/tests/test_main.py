@@ -141,9 +141,9 @@ class FlaskAppTestCase(unittest.TestCase):
         mock_chunker.embed_documents.assert_called_once()
 
         logger.info("Displaying search function results")
-        response2 = self.client.post('/search')
-        self.assertEqual(response2.status_code, 200)
-        logger.info(f"Search response: {response2.json}")
+        response = self.client.post('/search') # TODO HERE!
+        self.assertEqual(response.status_code, 200)
+        logger.info(f"Search response: {response.json}")
 
     def test_upload_file_no_file(self):
         logger.info("Testing file upload with no file")

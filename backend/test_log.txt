@@ -1,361 +1,361 @@
-2024-10-01 22:33:23,708 - tests.test_main - INFO - Created temporary directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl
-2024-10-01 22:33:23,709 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/chroma_db
-2024-10-01 22:33:23,709 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/raw-documents
-2024-10-01 22:33:23,709 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/uploads
-2024-10-01 22:33:23,709 - tests.test_main - INFO - Creating app with test configuration
-2024-10-01 22:33:23,714 - tests.test_main - DEBUG - App config: DEBUG = False
-2024-10-01 22:33:23,714 - tests.test_main - DEBUG - App config: TESTING = True
-2024-10-01 22:33:23,715 - tests.test_main - DEBUG - App config: PROPAGATE_EXCEPTIONS = None
-2024-10-01 22:33:23,715 - tests.test_main - DEBUG - App config: SECRET_KEY = None
-2024-10-01 22:33:23,715 - tests.test_main - DEBUG - App config: PERMANENT_SESSION_LIFETIME = 31 days, 0:00:00
-2024-10-01 22:33:23,715 - tests.test_main - DEBUG - App config: USE_X_SENDFILE = False
-2024-10-01 22:33:23,715 - tests.test_main - DEBUG - App config: SERVER_NAME = None
-2024-10-01 22:33:23,715 - tests.test_main - DEBUG - App config: APPLICATION_ROOT = /
-2024-10-01 22:33:23,715 - tests.test_main - DEBUG - App config: SESSION_COOKIE_NAME = session
-2024-10-01 22:33:23,715 - tests.test_main - DEBUG - App config: SESSION_COOKIE_DOMAIN = None
-2024-10-01 22:33:23,715 - tests.test_main - DEBUG - App config: SESSION_COOKIE_PATH = None
-2024-10-01 22:33:23,715 - tests.test_main - DEBUG - App config: SESSION_COOKIE_HTTPONLY = True
-2024-10-01 22:33:23,715 - tests.test_main - DEBUG - App config: SESSION_COOKIE_SECURE = False
-2024-10-01 22:33:23,715 - tests.test_main - DEBUG - App config: SESSION_COOKIE_SAMESITE = None
-2024-10-01 22:33:23,715 - tests.test_main - DEBUG - App config: SESSION_REFRESH_EACH_REQUEST = True
-2024-10-01 22:33:23,715 - tests.test_main - DEBUG - App config: MAX_CONTENT_LENGTH = None
-2024-10-01 22:33:23,715 - tests.test_main - DEBUG - App config: SEND_FILE_MAX_AGE_DEFAULT = None
-2024-10-01 22:33:23,715 - tests.test_main - DEBUG - App config: TRAP_BAD_REQUEST_ERRORS = None
-2024-10-01 22:33:23,715 - tests.test_main - DEBUG - App config: TRAP_HTTP_EXCEPTIONS = False
-2024-10-01 22:33:23,715 - tests.test_main - DEBUG - App config: EXPLAIN_TEMPLATE_LOADING = False
-2024-10-01 22:33:23,715 - tests.test_main - DEBUG - App config: PREFERRED_URL_SCHEME = http
-2024-10-01 22:33:23,715 - tests.test_main - DEBUG - App config: TEMPLATES_AUTO_RELOAD = None
-2024-10-01 22:33:23,715 - tests.test_main - DEBUG - App config: MAX_COOKIE_SIZE = 4093
-2024-10-01 22:33:23,715 - tests.test_main - DEBUG - App config: CHROMA_DB_PATH = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/chroma_db
-2024-10-01 22:33:23,715 - tests.test_main - DEBUG - App config: RAW_DOCUMENTS_PATH = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/raw-documents
-2024-10-01 22:33:23,715 - tests.test_main - DEBUG - App config: UPLOAD_FOLDER = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/uploads
-2024-10-01 22:33:23,716 - tests.test_main - INFO - Testing successful document deletion
-2024-10-01 22:33:23,718 - tests.test_main - INFO - Tearing down test case
-2024-10-01 22:33:23,719 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/chroma_db
-2024-10-01 22:33:23,719 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/raw-documents
-2024-10-01 22:33:23,719 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/uploads
-2024-10-01 22:33:23,719 - tests.test_main - INFO - Creating app with test configuration
-2024-10-01 22:33:23,721 - tests.test_main - DEBUG - App config: DEBUG = False
-2024-10-01 22:33:23,721 - tests.test_main - DEBUG - App config: TESTING = True
-2024-10-01 22:33:23,721 - tests.test_main - DEBUG - App config: PROPAGATE_EXCEPTIONS = None
-2024-10-01 22:33:23,721 - tests.test_main - DEBUG - App config: SECRET_KEY = None
-2024-10-01 22:33:23,721 - tests.test_main - DEBUG - App config: PERMANENT_SESSION_LIFETIME = 31 days, 0:00:00
-2024-10-01 22:33:23,721 - tests.test_main - DEBUG - App config: USE_X_SENDFILE = False
-2024-10-01 22:33:23,721 - tests.test_main - DEBUG - App config: SERVER_NAME = None
-2024-10-01 22:33:23,721 - tests.test_main - DEBUG - App config: APPLICATION_ROOT = /
-2024-10-01 22:33:23,721 - tests.test_main - DEBUG - App config: SESSION_COOKIE_NAME = session
-2024-10-01 22:33:23,721 - tests.test_main - DEBUG - App config: SESSION_COOKIE_DOMAIN = None
-2024-10-01 22:33:23,721 - tests.test_main - DEBUG - App config: SESSION_COOKIE_PATH = None
-2024-10-01 22:33:23,721 - tests.test_main - DEBUG - App config: SESSION_COOKIE_HTTPONLY = True
-2024-10-01 22:33:23,721 - tests.test_main - DEBUG - App config: SESSION_COOKIE_SECURE = False
-2024-10-01 22:33:23,722 - tests.test_main - DEBUG - App config: SESSION_COOKIE_SAMESITE = None
-2024-10-01 22:33:23,722 - tests.test_main - DEBUG - App config: SESSION_REFRESH_EACH_REQUEST = True
-2024-10-01 22:33:23,722 - tests.test_main - DEBUG - App config: MAX_CONTENT_LENGTH = None
-2024-10-01 22:33:23,722 - tests.test_main - DEBUG - App config: SEND_FILE_MAX_AGE_DEFAULT = None
-2024-10-01 22:33:23,722 - tests.test_main - DEBUG - App config: TRAP_BAD_REQUEST_ERRORS = None
-2024-10-01 22:33:23,722 - tests.test_main - DEBUG - App config: TRAP_HTTP_EXCEPTIONS = False
-2024-10-01 22:33:23,722 - tests.test_main - DEBUG - App config: EXPLAIN_TEMPLATE_LOADING = False
-2024-10-01 22:33:23,722 - tests.test_main - DEBUG - App config: PREFERRED_URL_SCHEME = http
-2024-10-01 22:33:23,722 - tests.test_main - DEBUG - App config: TEMPLATES_AUTO_RELOAD = None
-2024-10-01 22:33:23,722 - tests.test_main - DEBUG - App config: MAX_COOKIE_SIZE = 4093
-2024-10-01 22:33:23,722 - tests.test_main - DEBUG - App config: CHROMA_DB_PATH = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/chroma_db
-2024-10-01 22:33:23,722 - tests.test_main - DEBUG - App config: RAW_DOCUMENTS_PATH = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/raw-documents
-2024-10-01 22:33:23,722 - tests.test_main - DEBUG - App config: UPLOAD_FOLDER = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/uploads
-2024-10-01 22:33:23,722 - tests.test_main - INFO - Testing deletion of non-existent document
-2024-10-01 22:33:23,723 - tests.test_main - INFO - Tearing down test case
-2024-10-01 22:33:23,724 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/chroma_db
-2024-10-01 22:33:23,724 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/raw-documents
-2024-10-01 22:33:23,724 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/uploads
-2024-10-01 22:33:23,724 - tests.test_main - INFO - Creating app with test configuration
-2024-10-01 22:33:23,726 - tests.test_main - DEBUG - App config: DEBUG = False
-2024-10-01 22:33:23,726 - tests.test_main - DEBUG - App config: TESTING = True
-2024-10-01 22:33:23,726 - tests.test_main - DEBUG - App config: PROPAGATE_EXCEPTIONS = None
-2024-10-01 22:33:23,726 - tests.test_main - DEBUG - App config: SECRET_KEY = None
-2024-10-01 22:33:23,726 - tests.test_main - DEBUG - App config: PERMANENT_SESSION_LIFETIME = 31 days, 0:00:00
-2024-10-01 22:33:23,726 - tests.test_main - DEBUG - App config: USE_X_SENDFILE = False
-2024-10-01 22:33:23,726 - tests.test_main - DEBUG - App config: SERVER_NAME = None
-2024-10-01 22:33:23,726 - tests.test_main - DEBUG - App config: APPLICATION_ROOT = /
-2024-10-01 22:33:23,726 - tests.test_main - DEBUG - App config: SESSION_COOKIE_NAME = session
-2024-10-01 22:33:23,726 - tests.test_main - DEBUG - App config: SESSION_COOKIE_DOMAIN = None
-2024-10-01 22:33:23,726 - tests.test_main - DEBUG - App config: SESSION_COOKIE_PATH = None
-2024-10-01 22:33:23,726 - tests.test_main - DEBUG - App config: SESSION_COOKIE_HTTPONLY = True
-2024-10-01 22:33:23,727 - tests.test_main - DEBUG - App config: SESSION_COOKIE_SECURE = False
-2024-10-01 22:33:23,727 - tests.test_main - DEBUG - App config: SESSION_COOKIE_SAMESITE = None
-2024-10-01 22:33:23,727 - tests.test_main - DEBUG - App config: SESSION_REFRESH_EACH_REQUEST = True
-2024-10-01 22:33:23,727 - tests.test_main - DEBUG - App config: MAX_CONTENT_LENGTH = None
-2024-10-01 22:33:23,727 - tests.test_main - DEBUG - App config: SEND_FILE_MAX_AGE_DEFAULT = None
-2024-10-01 22:33:23,727 - tests.test_main - DEBUG - App config: TRAP_BAD_REQUEST_ERRORS = None
-2024-10-01 22:33:23,727 - tests.test_main - DEBUG - App config: TRAP_HTTP_EXCEPTIONS = False
-2024-10-01 22:33:23,727 - tests.test_main - DEBUG - App config: EXPLAIN_TEMPLATE_LOADING = False
-2024-10-01 22:33:23,727 - tests.test_main - DEBUG - App config: PREFERRED_URL_SCHEME = http
-2024-10-01 22:33:23,727 - tests.test_main - DEBUG - App config: TEMPLATES_AUTO_RELOAD = None
-2024-10-01 22:33:23,727 - tests.test_main - DEBUG - App config: MAX_COOKIE_SIZE = 4093
-2024-10-01 22:33:23,727 - tests.test_main - DEBUG - App config: CHROMA_DB_PATH = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/chroma_db
-2024-10-01 22:33:23,727 - tests.test_main - DEBUG - App config: RAW_DOCUMENTS_PATH = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/raw-documents
-2024-10-01 22:33:23,727 - tests.test_main - DEBUG - App config: UPLOAD_FOLDER = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/uploads
-2024-10-01 22:33:23,727 - tests.test_main - INFO - Testing generation with no prompt
-2024-10-01 22:33:23,728 - tests.test_main - INFO - Tearing down test case
-2024-10-01 22:33:23,859 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/chroma_db
-2024-10-01 22:33:23,860 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/raw-documents
-2024-10-01 22:33:23,860 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/uploads
-2024-10-01 22:33:23,860 - tests.test_main - INFO - Creating app with test configuration
-2024-10-01 22:33:23,862 - tests.test_main - DEBUG - App config: DEBUG = False
-2024-10-01 22:33:23,862 - tests.test_main - DEBUG - App config: TESTING = True
-2024-10-01 22:33:23,862 - tests.test_main - DEBUG - App config: PROPAGATE_EXCEPTIONS = None
-2024-10-01 22:33:23,862 - tests.test_main - DEBUG - App config: SECRET_KEY = None
-2024-10-01 22:33:23,862 - tests.test_main - DEBUG - App config: PERMANENT_SESSION_LIFETIME = 31 days, 0:00:00
-2024-10-01 22:33:23,862 - tests.test_main - DEBUG - App config: USE_X_SENDFILE = False
-2024-10-01 22:33:23,862 - tests.test_main - DEBUG - App config: SERVER_NAME = None
-2024-10-01 22:33:23,862 - tests.test_main - DEBUG - App config: APPLICATION_ROOT = /
-2024-10-01 22:33:23,862 - tests.test_main - DEBUG - App config: SESSION_COOKIE_NAME = session
-2024-10-01 22:33:23,863 - tests.test_main - DEBUG - App config: SESSION_COOKIE_DOMAIN = None
-2024-10-01 22:33:23,863 - tests.test_main - DEBUG - App config: SESSION_COOKIE_PATH = None
-2024-10-01 22:33:23,863 - tests.test_main - DEBUG - App config: SESSION_COOKIE_HTTPONLY = True
-2024-10-01 22:33:23,863 - tests.test_main - DEBUG - App config: SESSION_COOKIE_SECURE = False
-2024-10-01 22:33:23,863 - tests.test_main - DEBUG - App config: SESSION_COOKIE_SAMESITE = None
-2024-10-01 22:33:23,863 - tests.test_main - DEBUG - App config: SESSION_REFRESH_EACH_REQUEST = True
-2024-10-01 22:33:23,863 - tests.test_main - DEBUG - App config: MAX_CONTENT_LENGTH = None
-2024-10-01 22:33:23,863 - tests.test_main - DEBUG - App config: SEND_FILE_MAX_AGE_DEFAULT = None
-2024-10-01 22:33:23,863 - tests.test_main - DEBUG - App config: TRAP_BAD_REQUEST_ERRORS = None
-2024-10-01 22:33:23,863 - tests.test_main - DEBUG - App config: TRAP_HTTP_EXCEPTIONS = False
-2024-10-01 22:33:23,863 - tests.test_main - DEBUG - App config: EXPLAIN_TEMPLATE_LOADING = False
-2024-10-01 22:33:23,863 - tests.test_main - DEBUG - App config: PREFERRED_URL_SCHEME = http
-2024-10-01 22:33:23,863 - tests.test_main - DEBUG - App config: TEMPLATES_AUTO_RELOAD = None
-2024-10-01 22:33:23,863 - tests.test_main - DEBUG - App config: MAX_COOKIE_SIZE = 4093
-2024-10-01 22:33:23,863 - tests.test_main - DEBUG - App config: CHROMA_DB_PATH = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/chroma_db
-2024-10-01 22:33:23,863 - tests.test_main - DEBUG - App config: RAW_DOCUMENTS_PATH = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/raw-documents
-2024-10-01 22:33:23,863 - tests.test_main - DEBUG - App config: UPLOAD_FOLDER = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/uploads
-2024-10-01 22:33:23,864 - tests.test_main - INFO - Testing successful generation
-2024-10-01 22:33:23,864 - tests.test_main - INFO - Tearing down test case
-2024-10-01 22:33:23,865 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/chroma_db
-2024-10-01 22:33:23,865 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/raw-documents
-2024-10-01 22:33:23,865 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/uploads
-2024-10-01 22:33:23,865 - tests.test_main - INFO - Creating app with test configuration
-2024-10-01 22:33:23,867 - tests.test_main - DEBUG - App config: DEBUG = False
-2024-10-01 22:33:23,867 - tests.test_main - DEBUG - App config: TESTING = True
-2024-10-01 22:33:23,867 - tests.test_main - DEBUG - App config: PROPAGATE_EXCEPTIONS = None
-2024-10-01 22:33:23,867 - tests.test_main - DEBUG - App config: SECRET_KEY = None
-2024-10-01 22:33:23,867 - tests.test_main - DEBUG - App config: PERMANENT_SESSION_LIFETIME = 31 days, 0:00:00
-2024-10-01 22:33:23,867 - tests.test_main - DEBUG - App config: USE_X_SENDFILE = False
-2024-10-01 22:33:23,868 - tests.test_main - DEBUG - App config: SERVER_NAME = None
-2024-10-01 22:33:23,868 - tests.test_main - DEBUG - App config: APPLICATION_ROOT = /
-2024-10-01 22:33:23,868 - tests.test_main - DEBUG - App config: SESSION_COOKIE_NAME = session
-2024-10-01 22:33:23,868 - tests.test_main - DEBUG - App config: SESSION_COOKIE_DOMAIN = None
-2024-10-01 22:33:23,868 - tests.test_main - DEBUG - App config: SESSION_COOKIE_PATH = None
-2024-10-01 22:33:23,868 - tests.test_main - DEBUG - App config: SESSION_COOKIE_HTTPONLY = True
-2024-10-01 22:33:23,868 - tests.test_main - DEBUG - App config: SESSION_COOKIE_SECURE = False
-2024-10-01 22:33:23,868 - tests.test_main - DEBUG - App config: SESSION_COOKIE_SAMESITE = None
-2024-10-01 22:33:23,868 - tests.test_main - DEBUG - App config: SESSION_REFRESH_EACH_REQUEST = True
-2024-10-01 22:33:23,868 - tests.test_main - DEBUG - App config: MAX_CONTENT_LENGTH = None
-2024-10-01 22:33:23,868 - tests.test_main - DEBUG - App config: SEND_FILE_MAX_AGE_DEFAULT = None
-2024-10-01 22:33:23,868 - tests.test_main - DEBUG - App config: TRAP_BAD_REQUEST_ERRORS = None
-2024-10-01 22:33:23,868 - tests.test_main - DEBUG - App config: TRAP_HTTP_EXCEPTIONS = False
-2024-10-01 22:33:23,868 - tests.test_main - DEBUG - App config: EXPLAIN_TEMPLATE_LOADING = False
-2024-10-01 22:33:23,868 - tests.test_main - DEBUG - App config: PREFERRED_URL_SCHEME = http
-2024-10-01 22:33:23,868 - tests.test_main - DEBUG - App config: TEMPLATES_AUTO_RELOAD = None
-2024-10-01 22:33:23,868 - tests.test_main - DEBUG - App config: MAX_COOKIE_SIZE = 4093
-2024-10-01 22:33:23,868 - tests.test_main - DEBUG - App config: CHROMA_DB_PATH = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/chroma_db
-2024-10-01 22:33:23,868 - tests.test_main - DEBUG - App config: RAW_DOCUMENTS_PATH = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/raw-documents
-2024-10-01 22:33:23,868 - tests.test_main - DEBUG - App config: UPLOAD_FOLDER = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/uploads
-2024-10-01 22:33:23,868 - tests.test_main - INFO - Testing successful document listing
-2024-10-01 22:33:23,869 - tests.test_main - INFO - Tearing down test case
-2024-10-01 22:33:23,869 - tests.test_main - INFO - Removed: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/uploads/file1.txt
-2024-10-01 22:33:23,870 - tests.test_main - INFO - Removed: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/uploads/file3.docx
-2024-10-01 22:33:23,870 - tests.test_main - INFO - Removed: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/uploads/file2.pdf
-2024-10-01 22:33:23,870 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/chroma_db
-2024-10-01 22:33:23,871 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/raw-documents
-2024-10-01 22:33:23,871 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/uploads
-2024-10-01 22:33:23,871 - tests.test_main - INFO - Creating app with test configuration
-2024-10-01 22:33:23,873 - tests.test_main - DEBUG - App config: DEBUG = False
-2024-10-01 22:33:23,873 - tests.test_main - DEBUG - App config: TESTING = True
-2024-10-01 22:33:23,873 - tests.test_main - DEBUG - App config: PROPAGATE_EXCEPTIONS = None
-2024-10-01 22:33:23,873 - tests.test_main - DEBUG - App config: SECRET_KEY = None
-2024-10-01 22:33:23,873 - tests.test_main - DEBUG - App config: PERMANENT_SESSION_LIFETIME = 31 days, 0:00:00
-2024-10-01 22:33:23,873 - tests.test_main - DEBUG - App config: USE_X_SENDFILE = False
-2024-10-01 22:33:23,873 - tests.test_main - DEBUG - App config: SERVER_NAME = None
-2024-10-01 22:33:23,873 - tests.test_main - DEBUG - App config: APPLICATION_ROOT = /
-2024-10-01 22:33:23,873 - tests.test_main - DEBUG - App config: SESSION_COOKIE_NAME = session
-2024-10-01 22:33:23,873 - tests.test_main - DEBUG - App config: SESSION_COOKIE_DOMAIN = None
-2024-10-01 22:33:23,873 - tests.test_main - DEBUG - App config: SESSION_COOKIE_PATH = None
-2024-10-01 22:33:23,873 - tests.test_main - DEBUG - App config: SESSION_COOKIE_HTTPONLY = True
-2024-10-01 22:33:23,873 - tests.test_main - DEBUG - App config: SESSION_COOKIE_SECURE = False
-2024-10-01 22:33:23,874 - tests.test_main - DEBUG - App config: SESSION_COOKIE_SAMESITE = None
-2024-10-01 22:33:23,874 - tests.test_main - DEBUG - App config: SESSION_REFRESH_EACH_REQUEST = True
-2024-10-01 22:33:23,874 - tests.test_main - DEBUG - App config: MAX_CONTENT_LENGTH = None
-2024-10-01 22:33:23,874 - tests.test_main - DEBUG - App config: SEND_FILE_MAX_AGE_DEFAULT = None
-2024-10-01 22:33:23,874 - tests.test_main - DEBUG - App config: TRAP_BAD_REQUEST_ERRORS = None
-2024-10-01 22:33:23,874 - tests.test_main - DEBUG - App config: TRAP_HTTP_EXCEPTIONS = False
-2024-10-01 22:33:23,874 - tests.test_main - DEBUG - App config: EXPLAIN_TEMPLATE_LOADING = False
-2024-10-01 22:33:23,874 - tests.test_main - DEBUG - App config: PREFERRED_URL_SCHEME = http
-2024-10-01 22:33:23,874 - tests.test_main - DEBUG - App config: TEMPLATES_AUTO_RELOAD = None
-2024-10-01 22:33:23,874 - tests.test_main - DEBUG - App config: MAX_COOKIE_SIZE = 4093
-2024-10-01 22:33:23,874 - tests.test_main - DEBUG - App config: CHROMA_DB_PATH = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/chroma_db
-2024-10-01 22:33:23,874 - tests.test_main - DEBUG - App config: RAW_DOCUMENTS_PATH = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/raw-documents
-2024-10-01 22:33:23,874 - tests.test_main - DEBUG - App config: UPLOAD_FOLDER = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/uploads
-2024-10-01 22:33:23,874 - tests.test_main - INFO - Testing document search with no query
-2024-10-01 22:33:24,043 - tests.test_main - INFO - Tearing down test case
-2024-10-01 22:33:24,044 - tests.test_main - INFO - Removed: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/chroma_db/chroma.sqlite3
-2024-10-01 22:33:24,138 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/chroma_db
-2024-10-01 22:33:24,138 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/raw-documents
-2024-10-01 22:33:24,138 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/uploads
-2024-10-01 22:33:24,138 - tests.test_main - INFO - Creating app with test configuration
-2024-10-01 22:33:24,140 - tests.test_main - DEBUG - App config: DEBUG = False
-2024-10-01 22:33:24,140 - tests.test_main - DEBUG - App config: TESTING = True
-2024-10-01 22:33:24,141 - tests.test_main - DEBUG - App config: PROPAGATE_EXCEPTIONS = None
-2024-10-01 22:33:24,141 - tests.test_main - DEBUG - App config: SECRET_KEY = None
-2024-10-01 22:33:24,141 - tests.test_main - DEBUG - App config: PERMANENT_SESSION_LIFETIME = 31 days, 0:00:00
-2024-10-01 22:33:24,141 - tests.test_main - DEBUG - App config: USE_X_SENDFILE = False
-2024-10-01 22:33:24,141 - tests.test_main - DEBUG - App config: SERVER_NAME = None
-2024-10-01 22:33:24,141 - tests.test_main - DEBUG - App config: APPLICATION_ROOT = /
-2024-10-01 22:33:24,141 - tests.test_main - DEBUG - App config: SESSION_COOKIE_NAME = session
-2024-10-01 22:33:24,141 - tests.test_main - DEBUG - App config: SESSION_COOKIE_DOMAIN = None
-2024-10-01 22:33:24,141 - tests.test_main - DEBUG - App config: SESSION_COOKIE_PATH = None
-2024-10-01 22:33:24,141 - tests.test_main - DEBUG - App config: SESSION_COOKIE_HTTPONLY = True
-2024-10-01 22:33:24,141 - tests.test_main - DEBUG - App config: SESSION_COOKIE_SECURE = False
-2024-10-01 22:33:24,141 - tests.test_main - DEBUG - App config: SESSION_COOKIE_SAMESITE = None
-2024-10-01 22:33:24,141 - tests.test_main - DEBUG - App config: SESSION_REFRESH_EACH_REQUEST = True
-2024-10-01 22:33:24,141 - tests.test_main - DEBUG - App config: MAX_CONTENT_LENGTH = None
-2024-10-01 22:33:24,141 - tests.test_main - DEBUG - App config: SEND_FILE_MAX_AGE_DEFAULT = None
-2024-10-01 22:33:24,141 - tests.test_main - DEBUG - App config: TRAP_BAD_REQUEST_ERRORS = None
-2024-10-01 22:33:24,141 - tests.test_main - DEBUG - App config: TRAP_HTTP_EXCEPTIONS = False
-2024-10-01 22:33:24,141 - tests.test_main - DEBUG - App config: EXPLAIN_TEMPLATE_LOADING = False
-2024-10-01 22:33:24,142 - tests.test_main - DEBUG - App config: PREFERRED_URL_SCHEME = http
-2024-10-01 22:33:24,142 - tests.test_main - DEBUG - App config: TEMPLATES_AUTO_RELOAD = None
-2024-10-01 22:33:24,142 - tests.test_main - DEBUG - App config: MAX_COOKIE_SIZE = 4093
-2024-10-01 22:33:24,142 - tests.test_main - DEBUG - App config: CHROMA_DB_PATH = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/chroma_db
-2024-10-01 22:33:24,142 - tests.test_main - DEBUG - App config: RAW_DOCUMENTS_PATH = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/raw-documents
-2024-10-01 22:33:24,142 - tests.test_main - DEBUG - App config: UPLOAD_FOLDER = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/uploads
-2024-10-01 22:33:24,142 - tests.test_main - INFO - Testing successful document search
-2024-10-01 22:33:24,143 - tests.test_main - INFO - Tearing down test case
-2024-10-01 22:33:24,144 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/chroma_db
-2024-10-01 22:33:24,144 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/raw-documents
-2024-10-01 22:33:24,144 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/uploads
-2024-10-01 22:33:24,144 - tests.test_main - INFO - Creating app with test configuration
-2024-10-01 22:33:24,146 - tests.test_main - DEBUG - App config: DEBUG = False
-2024-10-01 22:33:24,146 - tests.test_main - DEBUG - App config: TESTING = True
-2024-10-01 22:33:24,146 - tests.test_main - DEBUG - App config: PROPAGATE_EXCEPTIONS = None
-2024-10-01 22:33:24,146 - tests.test_main - DEBUG - App config: SECRET_KEY = None
-2024-10-01 22:33:24,146 - tests.test_main - DEBUG - App config: PERMANENT_SESSION_LIFETIME = 31 days, 0:00:00
-2024-10-01 22:33:24,146 - tests.test_main - DEBUG - App config: USE_X_SENDFILE = False
-2024-10-01 22:33:24,146 - tests.test_main - DEBUG - App config: SERVER_NAME = None
-2024-10-01 22:33:24,146 - tests.test_main - DEBUG - App config: APPLICATION_ROOT = /
-2024-10-01 22:33:24,146 - tests.test_main - DEBUG - App config: SESSION_COOKIE_NAME = session
-2024-10-01 22:33:24,146 - tests.test_main - DEBUG - App config: SESSION_COOKIE_DOMAIN = None
-2024-10-01 22:33:24,146 - tests.test_main - DEBUG - App config: SESSION_COOKIE_PATH = None
-2024-10-01 22:33:24,147 - tests.test_main - DEBUG - App config: SESSION_COOKIE_HTTPONLY = True
-2024-10-01 22:33:24,147 - tests.test_main - DEBUG - App config: SESSION_COOKIE_SECURE = False
-2024-10-01 22:33:24,147 - tests.test_main - DEBUG - App config: SESSION_COOKIE_SAMESITE = None
-2024-10-01 22:33:24,147 - tests.test_main - DEBUG - App config: SESSION_REFRESH_EACH_REQUEST = True
-2024-10-01 22:33:24,147 - tests.test_main - DEBUG - App config: MAX_CONTENT_LENGTH = None
-2024-10-01 22:33:24,147 - tests.test_main - DEBUG - App config: SEND_FILE_MAX_AGE_DEFAULT = None
-2024-10-01 22:33:24,147 - tests.test_main - DEBUG - App config: TRAP_BAD_REQUEST_ERRORS = None
-2024-10-01 22:33:24,147 - tests.test_main - DEBUG - App config: TRAP_HTTP_EXCEPTIONS = False
-2024-10-01 22:33:24,147 - tests.test_main - DEBUG - App config: EXPLAIN_TEMPLATE_LOADING = False
-2024-10-01 22:33:24,147 - tests.test_main - DEBUG - App config: PREFERRED_URL_SCHEME = http
-2024-10-01 22:33:24,147 - tests.test_main - DEBUG - App config: TEMPLATES_AUTO_RELOAD = None
-2024-10-01 22:33:24,147 - tests.test_main - DEBUG - App config: MAX_COOKIE_SIZE = 4093
-2024-10-01 22:33:24,147 - tests.test_main - DEBUG - App config: CHROMA_DB_PATH = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/chroma_db
-2024-10-01 22:33:24,147 - tests.test_main - DEBUG - App config: RAW_DOCUMENTS_PATH = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/raw-documents
-2024-10-01 22:33:24,147 - tests.test_main - DEBUG - App config: UPLOAD_FOLDER = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/uploads
-2024-10-01 22:33:24,148 - tests.test_main - INFO - Testing status endpoint
-2024-10-01 22:33:24,148 - tests.test_main - INFO - Tearing down test case
-2024-10-01 22:33:24,149 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/chroma_db
-2024-10-01 22:33:24,149 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/raw-documents
-2024-10-01 22:33:24,149 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/uploads
-2024-10-01 22:33:24,149 - tests.test_main - INFO - Creating app with test configuration
-2024-10-01 22:33:24,151 - tests.test_main - DEBUG - App config: DEBUG = False
-2024-10-01 22:33:24,151 - tests.test_main - DEBUG - App config: TESTING = True
-2024-10-01 22:33:24,151 - tests.test_main - DEBUG - App config: PROPAGATE_EXCEPTIONS = None
-2024-10-01 22:33:24,151 - tests.test_main - DEBUG - App config: SECRET_KEY = None
-2024-10-01 22:33:24,151 - tests.test_main - DEBUG - App config: PERMANENT_SESSION_LIFETIME = 31 days, 0:00:00
-2024-10-01 22:33:24,151 - tests.test_main - DEBUG - App config: USE_X_SENDFILE = False
-2024-10-01 22:33:24,151 - tests.test_main - DEBUG - App config: SERVER_NAME = None
-2024-10-01 22:33:24,151 - tests.test_main - DEBUG - App config: APPLICATION_ROOT = /
-2024-10-01 22:33:24,152 - tests.test_main - DEBUG - App config: SESSION_COOKIE_NAME = session
-2024-10-01 22:33:24,152 - tests.test_main - DEBUG - App config: SESSION_COOKIE_DOMAIN = None
-2024-10-01 22:33:24,152 - tests.test_main - DEBUG - App config: SESSION_COOKIE_PATH = None
-2024-10-01 22:33:24,152 - tests.test_main - DEBUG - App config: SESSION_COOKIE_HTTPONLY = True
-2024-10-01 22:33:24,152 - tests.test_main - DEBUG - App config: SESSION_COOKIE_SECURE = False
-2024-10-01 22:33:24,152 - tests.test_main - DEBUG - App config: SESSION_COOKIE_SAMESITE = None
-2024-10-01 22:33:24,152 - tests.test_main - DEBUG - App config: SESSION_REFRESH_EACH_REQUEST = True
-2024-10-01 22:33:24,152 - tests.test_main - DEBUG - App config: MAX_CONTENT_LENGTH = None
-2024-10-01 22:33:24,152 - tests.test_main - DEBUG - App config: SEND_FILE_MAX_AGE_DEFAULT = None
-2024-10-01 22:33:24,152 - tests.test_main - DEBUG - App config: TRAP_BAD_REQUEST_ERRORS = None
-2024-10-01 22:33:24,152 - tests.test_main - DEBUG - App config: TRAP_HTTP_EXCEPTIONS = False
-2024-10-01 22:33:24,152 - tests.test_main - DEBUG - App config: EXPLAIN_TEMPLATE_LOADING = False
-2024-10-01 22:33:24,152 - tests.test_main - DEBUG - App config: PREFERRED_URL_SCHEME = http
-2024-10-01 22:33:24,152 - tests.test_main - DEBUG - App config: TEMPLATES_AUTO_RELOAD = None
-2024-10-01 22:33:24,152 - tests.test_main - DEBUG - App config: MAX_COOKIE_SIZE = 4093
-2024-10-01 22:33:24,152 - tests.test_main - DEBUG - App config: CHROMA_DB_PATH = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/chroma_db
-2024-10-01 22:33:24,152 - tests.test_main - DEBUG - App config: RAW_DOCUMENTS_PATH = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/raw-documents
-2024-10-01 22:33:24,152 - tests.test_main - DEBUG - App config: UPLOAD_FOLDER = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/uploads
-2024-10-01 22:33:24,152 - tests.test_main - INFO - Testing file upload with empty filename
-2024-10-01 22:33:24,154 - tests.test_main - INFO - Tearing down test case
-2024-10-01 22:33:24,154 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/chroma_db
-2024-10-01 22:33:24,155 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/raw-documents
-2024-10-01 22:33:24,155 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/uploads
-2024-10-01 22:33:24,155 - tests.test_main - INFO - Creating app with test configuration
-2024-10-01 22:33:24,156 - tests.test_main - DEBUG - App config: DEBUG = False
-2024-10-01 22:33:24,156 - tests.test_main - DEBUG - App config: TESTING = True
-2024-10-01 22:33:24,156 - tests.test_main - DEBUG - App config: PROPAGATE_EXCEPTIONS = None
-2024-10-01 22:33:24,157 - tests.test_main - DEBUG - App config: SECRET_KEY = None
-2024-10-01 22:33:24,157 - tests.test_main - DEBUG - App config: PERMANENT_SESSION_LIFETIME = 31 days, 0:00:00
-2024-10-01 22:33:24,157 - tests.test_main - DEBUG - App config: USE_X_SENDFILE = False
-2024-10-01 22:33:24,157 - tests.test_main - DEBUG - App config: SERVER_NAME = None
-2024-10-01 22:33:24,157 - tests.test_main - DEBUG - App config: APPLICATION_ROOT = /
-2024-10-01 22:33:24,157 - tests.test_main - DEBUG - App config: SESSION_COOKIE_NAME = session
-2024-10-01 22:33:24,157 - tests.test_main - DEBUG - App config: SESSION_COOKIE_DOMAIN = None
-2024-10-01 22:33:24,157 - tests.test_main - DEBUG - App config: SESSION_COOKIE_PATH = None
-2024-10-01 22:33:24,157 - tests.test_main - DEBUG - App config: SESSION_COOKIE_HTTPONLY = True
-2024-10-01 22:33:24,157 - tests.test_main - DEBUG - App config: SESSION_COOKIE_SECURE = False
-2024-10-01 22:33:24,157 - tests.test_main - DEBUG - App config: SESSION_COOKIE_SAMESITE = None
-2024-10-01 22:33:24,157 - tests.test_main - DEBUG - App config: SESSION_REFRESH_EACH_REQUEST = True
-2024-10-01 22:33:24,157 - tests.test_main - DEBUG - App config: MAX_CONTENT_LENGTH = None
-2024-10-01 22:33:24,157 - tests.test_main - DEBUG - App config: SEND_FILE_MAX_AGE_DEFAULT = None
-2024-10-01 22:33:24,157 - tests.test_main - DEBUG - App config: TRAP_BAD_REQUEST_ERRORS = None
-2024-10-01 22:33:24,157 - tests.test_main - DEBUG - App config: TRAP_HTTP_EXCEPTIONS = False
-2024-10-01 22:33:24,157 - tests.test_main - DEBUG - App config: EXPLAIN_TEMPLATE_LOADING = False
-2024-10-01 22:33:24,157 - tests.test_main - DEBUG - App config: PREFERRED_URL_SCHEME = http
-2024-10-01 22:33:24,157 - tests.test_main - DEBUG - App config: TEMPLATES_AUTO_RELOAD = None
-2024-10-01 22:33:24,157 - tests.test_main - DEBUG - App config: MAX_COOKIE_SIZE = 4093
-2024-10-01 22:33:24,157 - tests.test_main - DEBUG - App config: CHROMA_DB_PATH = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/chroma_db
-2024-10-01 22:33:24,157 - tests.test_main - DEBUG - App config: RAW_DOCUMENTS_PATH = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/raw-documents
-2024-10-01 22:33:24,158 - tests.test_main - DEBUG - App config: UPLOAD_FOLDER = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/uploads
-2024-10-01 22:33:24,158 - tests.test_main - INFO - Testing file upload with no file
-2024-10-01 22:33:24,158 - tests.test_main - INFO - Tearing down test case
-2024-10-01 22:33:24,159 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/chroma_db
-2024-10-01 22:33:24,159 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/raw-documents
-2024-10-01 22:33:24,159 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/uploads
-2024-10-01 22:33:24,160 - tests.test_main - INFO - Creating app with test configuration
-2024-10-01 22:33:24,161 - tests.test_main - DEBUG - App config: DEBUG = False
-2024-10-01 22:33:24,162 - tests.test_main - DEBUG - App config: TESTING = True
-2024-10-01 22:33:24,162 - tests.test_main - DEBUG - App config: PROPAGATE_EXCEPTIONS = None
-2024-10-01 22:33:24,162 - tests.test_main - DEBUG - App config: SECRET_KEY = None
-2024-10-01 22:33:24,162 - tests.test_main - DEBUG - App config: PERMANENT_SESSION_LIFETIME = 31 days, 0:00:00
-2024-10-01 22:33:24,162 - tests.test_main - DEBUG - App config: USE_X_SENDFILE = False
-2024-10-01 22:33:24,162 - tests.test_main - DEBUG - App config: SERVER_NAME = None
-2024-10-01 22:33:24,162 - tests.test_main - DEBUG - App config: APPLICATION_ROOT = /
-2024-10-01 22:33:24,162 - tests.test_main - DEBUG - App config: SESSION_COOKIE_NAME = session
-2024-10-01 22:33:24,162 - tests.test_main - DEBUG - App config: SESSION_COOKIE_DOMAIN = None
-2024-10-01 22:33:24,162 - tests.test_main - DEBUG - App config: SESSION_COOKIE_PATH = None
-2024-10-01 22:33:24,162 - tests.test_main - DEBUG - App config: SESSION_COOKIE_HTTPONLY = True
-2024-10-01 22:33:24,162 - tests.test_main - DEBUG - App config: SESSION_COOKIE_SECURE = False
-2024-10-01 22:33:24,162 - tests.test_main - DEBUG - App config: SESSION_COOKIE_SAMESITE = None
-2024-10-01 22:33:24,162 - tests.test_main - DEBUG - App config: SESSION_REFRESH_EACH_REQUEST = True
-2024-10-01 22:33:24,162 - tests.test_main - DEBUG - App config: MAX_CONTENT_LENGTH = None
-2024-10-01 22:33:24,162 - tests.test_main - DEBUG - App config: SEND_FILE_MAX_AGE_DEFAULT = None
-2024-10-01 22:33:24,162 - tests.test_main - DEBUG - App config: TRAP_BAD_REQUEST_ERRORS = None
-2024-10-01 22:33:24,162 - tests.test_main - DEBUG - App config: TRAP_HTTP_EXCEPTIONS = False
-2024-10-01 22:33:24,162 - tests.test_main - DEBUG - App config: EXPLAIN_TEMPLATE_LOADING = False
-2024-10-01 22:33:24,162 - tests.test_main - DEBUG - App config: PREFERRED_URL_SCHEME = http
-2024-10-01 22:33:24,162 - tests.test_main - DEBUG - App config: TEMPLATES_AUTO_RELOAD = None
-2024-10-01 22:33:24,162 - tests.test_main - DEBUG - App config: MAX_COOKIE_SIZE = 4093
-2024-10-01 22:33:24,162 - tests.test_main - DEBUG - App config: CHROMA_DB_PATH = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/chroma_db
-2024-10-01 22:33:24,163 - tests.test_main - DEBUG - App config: RAW_DOCUMENTS_PATH = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/raw-documents
-2024-10-01 22:33:24,163 - tests.test_main - DEBUG - App config: UPLOAD_FOLDER = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/uploads
-2024-10-01 22:33:24,163 - tests.test_main - INFO - Testing successful file upload
-2024-10-01 22:33:24,166 - tests.test_main - INFO - Displaying search function results
-2024-10-01 22:33:24,167 - tests.test_main - INFO - Search response: None
-2024-10-01 22:33:24,167 - tests.test_main - INFO - Tearing down test case
-2024-10-01 22:33:24,167 - tests.test_main - INFO - Removed: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl/uploads/test_essay.txt
-2024-10-01 22:33:24,167 - tests.test_main - INFO - Removing temporary directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmph6ibarxl
+2024-10-01 23:40:40,673 - tests.test_main - INFO - Created temporary directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl
+2024-10-01 23:40:40,674 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/chroma_db
+2024-10-01 23:40:40,674 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/raw-documents
+2024-10-01 23:40:40,674 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/uploads
+2024-10-01 23:40:40,674 - tests.test_main - INFO - Creating app with test configuration
+2024-10-01 23:40:40,679 - tests.test_main - DEBUG - App config: DEBUG = False
+2024-10-01 23:40:40,679 - tests.test_main - DEBUG - App config: TESTING = True
+2024-10-01 23:40:40,679 - tests.test_main - DEBUG - App config: PROPAGATE_EXCEPTIONS = None
+2024-10-01 23:40:40,679 - tests.test_main - DEBUG - App config: SECRET_KEY = None
+2024-10-01 23:40:40,679 - tests.test_main - DEBUG - App config: PERMANENT_SESSION_LIFETIME = 31 days, 0:00:00
+2024-10-01 23:40:40,679 - tests.test_main - DEBUG - App config: USE_X_SENDFILE = False
+2024-10-01 23:40:40,679 - tests.test_main - DEBUG - App config: SERVER_NAME = None
+2024-10-01 23:40:40,679 - tests.test_main - DEBUG - App config: APPLICATION_ROOT = /
+2024-10-01 23:40:40,679 - tests.test_main - DEBUG - App config: SESSION_COOKIE_NAME = session
+2024-10-01 23:40:40,679 - tests.test_main - DEBUG - App config: SESSION_COOKIE_DOMAIN = None
+2024-10-01 23:40:40,679 - tests.test_main - DEBUG - App config: SESSION_COOKIE_PATH = None
+2024-10-01 23:40:40,679 - tests.test_main - DEBUG - App config: SESSION_COOKIE_HTTPONLY = True
+2024-10-01 23:40:40,679 - tests.test_main - DEBUG - App config: SESSION_COOKIE_SECURE = False
+2024-10-01 23:40:40,679 - tests.test_main - DEBUG - App config: SESSION_COOKIE_SAMESITE = None
+2024-10-01 23:40:40,679 - tests.test_main - DEBUG - App config: SESSION_REFRESH_EACH_REQUEST = True
+2024-10-01 23:40:40,679 - tests.test_main - DEBUG - App config: MAX_CONTENT_LENGTH = None
+2024-10-01 23:40:40,679 - tests.test_main - DEBUG - App config: SEND_FILE_MAX_AGE_DEFAULT = None
+2024-10-01 23:40:40,679 - tests.test_main - DEBUG - App config: TRAP_BAD_REQUEST_ERRORS = None
+2024-10-01 23:40:40,679 - tests.test_main - DEBUG - App config: TRAP_HTTP_EXCEPTIONS = False
+2024-10-01 23:40:40,679 - tests.test_main - DEBUG - App config: EXPLAIN_TEMPLATE_LOADING = False
+2024-10-01 23:40:40,679 - tests.test_main - DEBUG - App config: PREFERRED_URL_SCHEME = http
+2024-10-01 23:40:40,679 - tests.test_main - DEBUG - App config: TEMPLATES_AUTO_RELOAD = None
+2024-10-01 23:40:40,680 - tests.test_main - DEBUG - App config: MAX_COOKIE_SIZE = 4093
+2024-10-01 23:40:40,680 - tests.test_main - DEBUG - App config: CHROMA_DB_PATH = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/chroma_db
+2024-10-01 23:40:40,680 - tests.test_main - DEBUG - App config: RAW_DOCUMENTS_PATH = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/raw-documents
+2024-10-01 23:40:40,680 - tests.test_main - DEBUG - App config: UPLOAD_FOLDER = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/uploads
+2024-10-01 23:40:40,680 - tests.test_main - INFO - Testing successful document deletion
+2024-10-01 23:40:40,684 - tests.test_main - INFO - Tearing down test case
+2024-10-01 23:40:40,685 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/chroma_db
+2024-10-01 23:40:40,685 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/raw-documents
+2024-10-01 23:40:40,686 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/uploads
+2024-10-01 23:40:40,686 - tests.test_main - INFO - Creating app with test configuration
+2024-10-01 23:40:40,688 - tests.test_main - DEBUG - App config: DEBUG = False
+2024-10-01 23:40:40,688 - tests.test_main - DEBUG - App config: TESTING = True
+2024-10-01 23:40:40,688 - tests.test_main - DEBUG - App config: PROPAGATE_EXCEPTIONS = None
+2024-10-01 23:40:40,688 - tests.test_main - DEBUG - App config: SECRET_KEY = None
+2024-10-01 23:40:40,688 - tests.test_main - DEBUG - App config: PERMANENT_SESSION_LIFETIME = 31 days, 0:00:00
+2024-10-01 23:40:40,688 - tests.test_main - DEBUG - App config: USE_X_SENDFILE = False
+2024-10-01 23:40:40,688 - tests.test_main - DEBUG - App config: SERVER_NAME = None
+2024-10-01 23:40:40,688 - tests.test_main - DEBUG - App config: APPLICATION_ROOT = /
+2024-10-01 23:40:40,688 - tests.test_main - DEBUG - App config: SESSION_COOKIE_NAME = session
+2024-10-01 23:40:40,688 - tests.test_main - DEBUG - App config: SESSION_COOKIE_DOMAIN = None
+2024-10-01 23:40:40,688 - tests.test_main - DEBUG - App config: SESSION_COOKIE_PATH = None
+2024-10-01 23:40:40,688 - tests.test_main - DEBUG - App config: SESSION_COOKIE_HTTPONLY = True
+2024-10-01 23:40:40,688 - tests.test_main - DEBUG - App config: SESSION_COOKIE_SECURE = False
+2024-10-01 23:40:40,688 - tests.test_main - DEBUG - App config: SESSION_COOKIE_SAMESITE = None
+2024-10-01 23:40:40,688 - tests.test_main - DEBUG - App config: SESSION_REFRESH_EACH_REQUEST = True
+2024-10-01 23:40:40,688 - tests.test_main - DEBUG - App config: MAX_CONTENT_LENGTH = None
+2024-10-01 23:40:40,688 - tests.test_main - DEBUG - App config: SEND_FILE_MAX_AGE_DEFAULT = None
+2024-10-01 23:40:40,688 - tests.test_main - DEBUG - App config: TRAP_BAD_REQUEST_ERRORS = None
+2024-10-01 23:40:40,688 - tests.test_main - DEBUG - App config: TRAP_HTTP_EXCEPTIONS = False
+2024-10-01 23:40:40,689 - tests.test_main - DEBUG - App config: EXPLAIN_TEMPLATE_LOADING = False
+2024-10-01 23:40:40,689 - tests.test_main - DEBUG - App config: PREFERRED_URL_SCHEME = http
+2024-10-01 23:40:40,689 - tests.test_main - DEBUG - App config: TEMPLATES_AUTO_RELOAD = None
+2024-10-01 23:40:40,689 - tests.test_main - DEBUG - App config: MAX_COOKIE_SIZE = 4093
+2024-10-01 23:40:40,689 - tests.test_main - DEBUG - App config: CHROMA_DB_PATH = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/chroma_db
+2024-10-01 23:40:40,689 - tests.test_main - DEBUG - App config: RAW_DOCUMENTS_PATH = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/raw-documents
+2024-10-01 23:40:40,689 - tests.test_main - DEBUG - App config: UPLOAD_FOLDER = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/uploads
+2024-10-01 23:40:40,689 - tests.test_main - INFO - Testing deletion of non-existent document
+2024-10-01 23:40:40,689 - tests.test_main - INFO - Tearing down test case
+2024-10-01 23:40:40,690 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/chroma_db
+2024-10-01 23:40:40,691 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/raw-documents
+2024-10-01 23:40:40,691 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/uploads
+2024-10-01 23:40:40,691 - tests.test_main - INFO - Creating app with test configuration
+2024-10-01 23:40:40,692 - tests.test_main - DEBUG - App config: DEBUG = False
+2024-10-01 23:40:40,692 - tests.test_main - DEBUG - App config: TESTING = True
+2024-10-01 23:40:40,693 - tests.test_main - DEBUG - App config: PROPAGATE_EXCEPTIONS = None
+2024-10-01 23:40:40,693 - tests.test_main - DEBUG - App config: SECRET_KEY = None
+2024-10-01 23:40:40,693 - tests.test_main - DEBUG - App config: PERMANENT_SESSION_LIFETIME = 31 days, 0:00:00
+2024-10-01 23:40:40,693 - tests.test_main - DEBUG - App config: USE_X_SENDFILE = False
+2024-10-01 23:40:40,693 - tests.test_main - DEBUG - App config: SERVER_NAME = None
+2024-10-01 23:40:40,693 - tests.test_main - DEBUG - App config: APPLICATION_ROOT = /
+2024-10-01 23:40:40,693 - tests.test_main - DEBUG - App config: SESSION_COOKIE_NAME = session
+2024-10-01 23:40:40,693 - tests.test_main - DEBUG - App config: SESSION_COOKIE_DOMAIN = None
+2024-10-01 23:40:40,693 - tests.test_main - DEBUG - App config: SESSION_COOKIE_PATH = None
+2024-10-01 23:40:40,693 - tests.test_main - DEBUG - App config: SESSION_COOKIE_HTTPONLY = True
+2024-10-01 23:40:40,693 - tests.test_main - DEBUG - App config: SESSION_COOKIE_SECURE = False
+2024-10-01 23:40:40,693 - tests.test_main - DEBUG - App config: SESSION_COOKIE_SAMESITE = None
+2024-10-01 23:40:40,693 - tests.test_main - DEBUG - App config: SESSION_REFRESH_EACH_REQUEST = True
+2024-10-01 23:40:40,693 - tests.test_main - DEBUG - App config: MAX_CONTENT_LENGTH = None
+2024-10-01 23:40:40,693 - tests.test_main - DEBUG - App config: SEND_FILE_MAX_AGE_DEFAULT = None
+2024-10-01 23:40:40,693 - tests.test_main - DEBUG - App config: TRAP_BAD_REQUEST_ERRORS = None
+2024-10-01 23:40:40,693 - tests.test_main - DEBUG - App config: TRAP_HTTP_EXCEPTIONS = False
+2024-10-01 23:40:40,693 - tests.test_main - DEBUG - App config: EXPLAIN_TEMPLATE_LOADING = False
+2024-10-01 23:40:40,693 - tests.test_main - DEBUG - App config: PREFERRED_URL_SCHEME = http
+2024-10-01 23:40:40,693 - tests.test_main - DEBUG - App config: TEMPLATES_AUTO_RELOAD = None
+2024-10-01 23:40:40,693 - tests.test_main - DEBUG - App config: MAX_COOKIE_SIZE = 4093
+2024-10-01 23:40:40,693 - tests.test_main - DEBUG - App config: CHROMA_DB_PATH = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/chroma_db
+2024-10-01 23:40:40,693 - tests.test_main - DEBUG - App config: RAW_DOCUMENTS_PATH = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/raw-documents
+2024-10-01 23:40:40,693 - tests.test_main - DEBUG - App config: UPLOAD_FOLDER = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/uploads
+2024-10-01 23:40:40,693 - tests.test_main - INFO - Testing generation with no prompt
+2024-10-01 23:40:40,694 - tests.test_main - INFO - Tearing down test case
+2024-10-01 23:40:40,847 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/chroma_db
+2024-10-01 23:40:40,847 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/raw-documents
+2024-10-01 23:40:40,847 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/uploads
+2024-10-01 23:40:40,847 - tests.test_main - INFO - Creating app with test configuration
+2024-10-01 23:40:40,849 - tests.test_main - DEBUG - App config: DEBUG = False
+2024-10-01 23:40:40,850 - tests.test_main - DEBUG - App config: TESTING = True
+2024-10-01 23:40:40,850 - tests.test_main - DEBUG - App config: PROPAGATE_EXCEPTIONS = None
+2024-10-01 23:40:40,850 - tests.test_main - DEBUG - App config: SECRET_KEY = None
+2024-10-01 23:40:40,850 - tests.test_main - DEBUG - App config: PERMANENT_SESSION_LIFETIME = 31 days, 0:00:00
+2024-10-01 23:40:40,850 - tests.test_main - DEBUG - App config: USE_X_SENDFILE = False
+2024-10-01 23:40:40,850 - tests.test_main - DEBUG - App config: SERVER_NAME = None
+2024-10-01 23:40:40,850 - tests.test_main - DEBUG - App config: APPLICATION_ROOT = /
+2024-10-01 23:40:40,850 - tests.test_main - DEBUG - App config: SESSION_COOKIE_NAME = session
+2024-10-01 23:40:40,850 - tests.test_main - DEBUG - App config: SESSION_COOKIE_DOMAIN = None
+2024-10-01 23:40:40,850 - tests.test_main - DEBUG - App config: SESSION_COOKIE_PATH = None
+2024-10-01 23:40:40,850 - tests.test_main - DEBUG - App config: SESSION_COOKIE_HTTPONLY = True
+2024-10-01 23:40:40,850 - tests.test_main - DEBUG - App config: SESSION_COOKIE_SECURE = False
+2024-10-01 23:40:40,850 - tests.test_main - DEBUG - App config: SESSION_COOKIE_SAMESITE = None
+2024-10-01 23:40:40,850 - tests.test_main - DEBUG - App config: SESSION_REFRESH_EACH_REQUEST = True
+2024-10-01 23:40:40,851 - tests.test_main - DEBUG - App config: MAX_CONTENT_LENGTH = None
+2024-10-01 23:40:40,851 - tests.test_main - DEBUG - App config: SEND_FILE_MAX_AGE_DEFAULT = None
+2024-10-01 23:40:40,851 - tests.test_main - DEBUG - App config: TRAP_BAD_REQUEST_ERRORS = None
+2024-10-01 23:40:40,851 - tests.test_main - DEBUG - App config: TRAP_HTTP_EXCEPTIONS = False
+2024-10-01 23:40:40,851 - tests.test_main - DEBUG - App config: EXPLAIN_TEMPLATE_LOADING = False
+2024-10-01 23:40:40,851 - tests.test_main - DEBUG - App config: PREFERRED_URL_SCHEME = http
+2024-10-01 23:40:40,851 - tests.test_main - DEBUG - App config: TEMPLATES_AUTO_RELOAD = None
+2024-10-01 23:40:40,851 - tests.test_main - DEBUG - App config: MAX_COOKIE_SIZE = 4093
+2024-10-01 23:40:40,851 - tests.test_main - DEBUG - App config: CHROMA_DB_PATH = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/chroma_db
+2024-10-01 23:40:40,851 - tests.test_main - DEBUG - App config: RAW_DOCUMENTS_PATH = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/raw-documents
+2024-10-01 23:40:40,851 - tests.test_main - DEBUG - App config: UPLOAD_FOLDER = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/uploads
+2024-10-01 23:40:40,851 - tests.test_main - INFO - Testing successful generation
+2024-10-01 23:40:40,852 - tests.test_main - INFO - Tearing down test case
+2024-10-01 23:40:40,853 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/chroma_db
+2024-10-01 23:40:40,853 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/raw-documents
+2024-10-01 23:40:40,853 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/uploads
+2024-10-01 23:40:40,853 - tests.test_main - INFO - Creating app with test configuration
+2024-10-01 23:40:40,855 - tests.test_main - DEBUG - App config: DEBUG = False
+2024-10-01 23:40:40,855 - tests.test_main - DEBUG - App config: TESTING = True
+2024-10-01 23:40:40,855 - tests.test_main - DEBUG - App config: PROPAGATE_EXCEPTIONS = None
+2024-10-01 23:40:40,855 - tests.test_main - DEBUG - App config: SECRET_KEY = None
+2024-10-01 23:40:40,855 - tests.test_main - DEBUG - App config: PERMANENT_SESSION_LIFETIME = 31 days, 0:00:00
+2024-10-01 23:40:40,855 - tests.test_main - DEBUG - App config: USE_X_SENDFILE = False
+2024-10-01 23:40:40,855 - tests.test_main - DEBUG - App config: SERVER_NAME = None
+2024-10-01 23:40:40,855 - tests.test_main - DEBUG - App config: APPLICATION_ROOT = /
+2024-10-01 23:40:40,855 - tests.test_main - DEBUG - App config: SESSION_COOKIE_NAME = session
+2024-10-01 23:40:40,856 - tests.test_main - DEBUG - App config: SESSION_COOKIE_DOMAIN = None
+2024-10-01 23:40:40,856 - tests.test_main - DEBUG - App config: SESSION_COOKIE_PATH = None
+2024-10-01 23:40:40,856 - tests.test_main - DEBUG - App config: SESSION_COOKIE_HTTPONLY = True
+2024-10-01 23:40:40,856 - tests.test_main - DEBUG - App config: SESSION_COOKIE_SECURE = False
+2024-10-01 23:40:40,856 - tests.test_main - DEBUG - App config: SESSION_COOKIE_SAMESITE = None
+2024-10-01 23:40:40,856 - tests.test_main - DEBUG - App config: SESSION_REFRESH_EACH_REQUEST = True
+2024-10-01 23:40:40,856 - tests.test_main - DEBUG - App config: MAX_CONTENT_LENGTH = None
+2024-10-01 23:40:40,856 - tests.test_main - DEBUG - App config: SEND_FILE_MAX_AGE_DEFAULT = None
+2024-10-01 23:40:40,856 - tests.test_main - DEBUG - App config: TRAP_BAD_REQUEST_ERRORS = None
+2024-10-01 23:40:40,856 - tests.test_main - DEBUG - App config: TRAP_HTTP_EXCEPTIONS = False
+2024-10-01 23:40:40,856 - tests.test_main - DEBUG - App config: EXPLAIN_TEMPLATE_LOADING = False
+2024-10-01 23:40:40,856 - tests.test_main - DEBUG - App config: PREFERRED_URL_SCHEME = http
+2024-10-01 23:40:40,856 - tests.test_main - DEBUG - App config: TEMPLATES_AUTO_RELOAD = None
+2024-10-01 23:40:40,856 - tests.test_main - DEBUG - App config: MAX_COOKIE_SIZE = 4093
+2024-10-01 23:40:40,856 - tests.test_main - DEBUG - App config: CHROMA_DB_PATH = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/chroma_db
+2024-10-01 23:40:40,856 - tests.test_main - DEBUG - App config: RAW_DOCUMENTS_PATH = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/raw-documents
+2024-10-01 23:40:40,856 - tests.test_main - DEBUG - App config: UPLOAD_FOLDER = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/uploads
+2024-10-01 23:40:40,856 - tests.test_main - INFO - Testing successful document listing
+2024-10-01 23:40:40,857 - tests.test_main - INFO - Tearing down test case
+2024-10-01 23:40:40,857 - tests.test_main - INFO - Removed: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/uploads/file1.txt
+2024-10-01 23:40:40,857 - tests.test_main - INFO - Removed: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/uploads/file3.docx
+2024-10-01 23:40:40,858 - tests.test_main - INFO - Removed: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/uploads/file2.pdf
+2024-10-01 23:40:40,858 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/chroma_db
+2024-10-01 23:40:40,859 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/raw-documents
+2024-10-01 23:40:40,859 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/uploads
+2024-10-01 23:40:40,859 - tests.test_main - INFO - Creating app with test configuration
+2024-10-01 23:40:40,861 - tests.test_main - DEBUG - App config: DEBUG = False
+2024-10-01 23:40:40,861 - tests.test_main - DEBUG - App config: TESTING = True
+2024-10-01 23:40:40,861 - tests.test_main - DEBUG - App config: PROPAGATE_EXCEPTIONS = None
+2024-10-01 23:40:40,861 - tests.test_main - DEBUG - App config: SECRET_KEY = None
+2024-10-01 23:40:40,861 - tests.test_main - DEBUG - App config: PERMANENT_SESSION_LIFETIME = 31 days, 0:00:00
+2024-10-01 23:40:40,861 - tests.test_main - DEBUG - App config: USE_X_SENDFILE = False
+2024-10-01 23:40:40,861 - tests.test_main - DEBUG - App config: SERVER_NAME = None
+2024-10-01 23:40:40,861 - tests.test_main - DEBUG - App config: APPLICATION_ROOT = /
+2024-10-01 23:40:40,861 - tests.test_main - DEBUG - App config: SESSION_COOKIE_NAME = session
+2024-10-01 23:40:40,861 - tests.test_main - DEBUG - App config: SESSION_COOKIE_DOMAIN = None
+2024-10-01 23:40:40,861 - tests.test_main - DEBUG - App config: SESSION_COOKIE_PATH = None
+2024-10-01 23:40:40,861 - tests.test_main - DEBUG - App config: SESSION_COOKIE_HTTPONLY = True
+2024-10-01 23:40:40,861 - tests.test_main - DEBUG - App config: SESSION_COOKIE_SECURE = False
+2024-10-01 23:40:40,861 - tests.test_main - DEBUG - App config: SESSION_COOKIE_SAMESITE = None
+2024-10-01 23:40:40,861 - tests.test_main - DEBUG - App config: SESSION_REFRESH_EACH_REQUEST = True
+2024-10-01 23:40:40,862 - tests.test_main - DEBUG - App config: MAX_CONTENT_LENGTH = None
+2024-10-01 23:40:40,862 - tests.test_main - DEBUG - App config: SEND_FILE_MAX_AGE_DEFAULT = None
+2024-10-01 23:40:40,862 - tests.test_main - DEBUG - App config: TRAP_BAD_REQUEST_ERRORS = None
+2024-10-01 23:40:40,862 - tests.test_main - DEBUG - App config: TRAP_HTTP_EXCEPTIONS = False
+2024-10-01 23:40:40,862 - tests.test_main - DEBUG - App config: EXPLAIN_TEMPLATE_LOADING = False
+2024-10-01 23:40:40,862 - tests.test_main - DEBUG - App config: PREFERRED_URL_SCHEME = http
+2024-10-01 23:40:40,862 - tests.test_main - DEBUG - App config: TEMPLATES_AUTO_RELOAD = None
+2024-10-01 23:40:40,862 - tests.test_main - DEBUG - App config: MAX_COOKIE_SIZE = 4093
+2024-10-01 23:40:40,862 - tests.test_main - DEBUG - App config: CHROMA_DB_PATH = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/chroma_db
+2024-10-01 23:40:40,862 - tests.test_main - DEBUG - App config: RAW_DOCUMENTS_PATH = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/raw-documents
+2024-10-01 23:40:40,862 - tests.test_main - DEBUG - App config: UPLOAD_FOLDER = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/uploads
+2024-10-01 23:40:40,862 - tests.test_main - INFO - Testing document search with no query
+2024-10-01 23:40:41,150 - tests.test_main - INFO - Tearing down test case
+2024-10-01 23:40:41,151 - tests.test_main - INFO - Removed: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/chroma_db/chroma.sqlite3
+2024-10-01 23:40:41,258 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/chroma_db
+2024-10-01 23:40:41,259 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/raw-documents
+2024-10-01 23:40:41,259 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/uploads
+2024-10-01 23:40:41,259 - tests.test_main - INFO - Creating app with test configuration
+2024-10-01 23:40:41,261 - tests.test_main - DEBUG - App config: DEBUG = False
+2024-10-01 23:40:41,261 - tests.test_main - DEBUG - App config: TESTING = True
+2024-10-01 23:40:41,261 - tests.test_main - DEBUG - App config: PROPAGATE_EXCEPTIONS = None
+2024-10-01 23:40:41,261 - tests.test_main - DEBUG - App config: SECRET_KEY = None
+2024-10-01 23:40:41,261 - tests.test_main - DEBUG - App config: PERMANENT_SESSION_LIFETIME = 31 days, 0:00:00
+2024-10-01 23:40:41,261 - tests.test_main - DEBUG - App config: USE_X_SENDFILE = False
+2024-10-01 23:40:41,261 - tests.test_main - DEBUG - App config: SERVER_NAME = None
+2024-10-01 23:40:41,261 - tests.test_main - DEBUG - App config: APPLICATION_ROOT = /
+2024-10-01 23:40:41,261 - tests.test_main - DEBUG - App config: SESSION_COOKIE_NAME = session
+2024-10-01 23:40:41,261 - tests.test_main - DEBUG - App config: SESSION_COOKIE_DOMAIN = None
+2024-10-01 23:40:41,262 - tests.test_main - DEBUG - App config: SESSION_COOKIE_PATH = None
+2024-10-01 23:40:41,262 - tests.test_main - DEBUG - App config: SESSION_COOKIE_HTTPONLY = True
+2024-10-01 23:40:41,262 - tests.test_main - DEBUG - App config: SESSION_COOKIE_SECURE = False
+2024-10-01 23:40:41,262 - tests.test_main - DEBUG - App config: SESSION_COOKIE_SAMESITE = None
+2024-10-01 23:40:41,262 - tests.test_main - DEBUG - App config: SESSION_REFRESH_EACH_REQUEST = True
+2024-10-01 23:40:41,262 - tests.test_main - DEBUG - App config: MAX_CONTENT_LENGTH = None
+2024-10-01 23:40:41,262 - tests.test_main - DEBUG - App config: SEND_FILE_MAX_AGE_DEFAULT = None
+2024-10-01 23:40:41,262 - tests.test_main - DEBUG - App config: TRAP_BAD_REQUEST_ERRORS = None
+2024-10-01 23:40:41,262 - tests.test_main - DEBUG - App config: TRAP_HTTP_EXCEPTIONS = False
+2024-10-01 23:40:41,262 - tests.test_main - DEBUG - App config: EXPLAIN_TEMPLATE_LOADING = False
+2024-10-01 23:40:41,262 - tests.test_main - DEBUG - App config: PREFERRED_URL_SCHEME = http
+2024-10-01 23:40:41,262 - tests.test_main - DEBUG - App config: TEMPLATES_AUTO_RELOAD = None
+2024-10-01 23:40:41,262 - tests.test_main - DEBUG - App config: MAX_COOKIE_SIZE = 4093
+2024-10-01 23:40:41,262 - tests.test_main - DEBUG - App config: CHROMA_DB_PATH = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/chroma_db
+2024-10-01 23:40:41,262 - tests.test_main - DEBUG - App config: RAW_DOCUMENTS_PATH = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/raw-documents
+2024-10-01 23:40:41,262 - tests.test_main - DEBUG - App config: UPLOAD_FOLDER = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/uploads
+2024-10-01 23:40:41,262 - tests.test_main - INFO - Testing successful document search
+2024-10-01 23:40:41,263 - tests.test_main - INFO - Tearing down test case
+2024-10-01 23:40:41,264 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/chroma_db
+2024-10-01 23:40:41,265 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/raw-documents
+2024-10-01 23:40:41,265 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/uploads
+2024-10-01 23:40:41,265 - tests.test_main - INFO - Creating app with test configuration
+2024-10-01 23:40:41,266 - tests.test_main - DEBUG - App config: DEBUG = False
+2024-10-01 23:40:41,266 - tests.test_main - DEBUG - App config: TESTING = True
+2024-10-01 23:40:41,266 - tests.test_main - DEBUG - App config: PROPAGATE_EXCEPTIONS = None
+2024-10-01 23:40:41,266 - tests.test_main - DEBUG - App config: SECRET_KEY = None
+2024-10-01 23:40:41,267 - tests.test_main - DEBUG - App config: PERMANENT_SESSION_LIFETIME = 31 days, 0:00:00
+2024-10-01 23:40:41,267 - tests.test_main - DEBUG - App config: USE_X_SENDFILE = False
+2024-10-01 23:40:41,267 - tests.test_main - DEBUG - App config: SERVER_NAME = None
+2024-10-01 23:40:41,267 - tests.test_main - DEBUG - App config: APPLICATION_ROOT = /
+2024-10-01 23:40:41,267 - tests.test_main - DEBUG - App config: SESSION_COOKIE_NAME = session
+2024-10-01 23:40:41,267 - tests.test_main - DEBUG - App config: SESSION_COOKIE_DOMAIN = None
+2024-10-01 23:40:41,267 - tests.test_main - DEBUG - App config: SESSION_COOKIE_PATH = None
+2024-10-01 23:40:41,267 - tests.test_main - DEBUG - App config: SESSION_COOKIE_HTTPONLY = True
+2024-10-01 23:40:41,267 - tests.test_main - DEBUG - App config: SESSION_COOKIE_SECURE = False
+2024-10-01 23:40:41,267 - tests.test_main - DEBUG - App config: SESSION_COOKIE_SAMESITE = None
+2024-10-01 23:40:41,267 - tests.test_main - DEBUG - App config: SESSION_REFRESH_EACH_REQUEST = True
+2024-10-01 23:40:41,267 - tests.test_main - DEBUG - App config: MAX_CONTENT_LENGTH = None
+2024-10-01 23:40:41,267 - tests.test_main - DEBUG - App config: SEND_FILE_MAX_AGE_DEFAULT = None
+2024-10-01 23:40:41,267 - tests.test_main - DEBUG - App config: TRAP_BAD_REQUEST_ERRORS = None
+2024-10-01 23:40:41,268 - tests.test_main - DEBUG - App config: TRAP_HTTP_EXCEPTIONS = False
+2024-10-01 23:40:41,268 - tests.test_main - DEBUG - App config: EXPLAIN_TEMPLATE_LOADING = False
+2024-10-01 23:40:41,268 - tests.test_main - DEBUG - App config: PREFERRED_URL_SCHEME = http
+2024-10-01 23:40:41,268 - tests.test_main - DEBUG - App config: TEMPLATES_AUTO_RELOAD = None
+2024-10-01 23:40:41,268 - tests.test_main - DEBUG - App config: MAX_COOKIE_SIZE = 4093
+2024-10-01 23:40:41,268 - tests.test_main - DEBUG - App config: CHROMA_DB_PATH = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/chroma_db
+2024-10-01 23:40:41,268 - tests.test_main - DEBUG - App config: RAW_DOCUMENTS_PATH = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/raw-documents
+2024-10-01 23:40:41,268 - tests.test_main - DEBUG - App config: UPLOAD_FOLDER = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/uploads
+2024-10-01 23:40:41,268 - tests.test_main - INFO - Testing status endpoint
+2024-10-01 23:40:41,269 - tests.test_main - INFO - Tearing down test case
+2024-10-01 23:40:41,270 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/chroma_db
+2024-10-01 23:40:41,270 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/raw-documents
+2024-10-01 23:40:41,270 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/uploads
+2024-10-01 23:40:41,270 - tests.test_main - INFO - Creating app with test configuration
+2024-10-01 23:40:41,272 - tests.test_main - DEBUG - App config: DEBUG = False
+2024-10-01 23:40:41,272 - tests.test_main - DEBUG - App config: TESTING = True
+2024-10-01 23:40:41,272 - tests.test_main - DEBUG - App config: PROPAGATE_EXCEPTIONS = None
+2024-10-01 23:40:41,272 - tests.test_main - DEBUG - App config: SECRET_KEY = None
+2024-10-01 23:40:41,272 - tests.test_main - DEBUG - App config: PERMANENT_SESSION_LIFETIME = 31 days, 0:00:00
+2024-10-01 23:40:41,273 - tests.test_main - DEBUG - App config: USE_X_SENDFILE = False
+2024-10-01 23:40:41,273 - tests.test_main - DEBUG - App config: SERVER_NAME = None
+2024-10-01 23:40:41,273 - tests.test_main - DEBUG - App config: APPLICATION_ROOT = /
+2024-10-01 23:40:41,273 - tests.test_main - DEBUG - App config: SESSION_COOKIE_NAME = session
+2024-10-01 23:40:41,273 - tests.test_main - DEBUG - App config: SESSION_COOKIE_DOMAIN = None
+2024-10-01 23:40:41,273 - tests.test_main - DEBUG - App config: SESSION_COOKIE_PATH = None
+2024-10-01 23:40:41,273 - tests.test_main - DEBUG - App config: SESSION_COOKIE_HTTPONLY = True
+2024-10-01 23:40:41,273 - tests.test_main - DEBUG - App config: SESSION_COOKIE_SECURE = False
+2024-10-01 23:40:41,273 - tests.test_main - DEBUG - App config: SESSION_COOKIE_SAMESITE = None
+2024-10-01 23:40:41,273 - tests.test_main - DEBUG - App config: SESSION_REFRESH_EACH_REQUEST = True
+2024-10-01 23:40:41,273 - tests.test_main - DEBUG - App config: MAX_CONTENT_LENGTH = None
+2024-10-01 23:40:41,273 - tests.test_main - DEBUG - App config: SEND_FILE_MAX_AGE_DEFAULT = None
+2024-10-01 23:40:41,273 - tests.test_main - DEBUG - App config: TRAP_BAD_REQUEST_ERRORS = None
+2024-10-01 23:40:41,273 - tests.test_main - DEBUG - App config: TRAP_HTTP_EXCEPTIONS = False
+2024-10-01 23:40:41,273 - tests.test_main - DEBUG - App config: EXPLAIN_TEMPLATE_LOADING = False
+2024-10-01 23:40:41,273 - tests.test_main - DEBUG - App config: PREFERRED_URL_SCHEME = http
+2024-10-01 23:40:41,273 - tests.test_main - DEBUG - App config: TEMPLATES_AUTO_RELOAD = None
+2024-10-01 23:40:41,273 - tests.test_main - DEBUG - App config: MAX_COOKIE_SIZE = 4093
+2024-10-01 23:40:41,273 - tests.test_main - DEBUG - App config: CHROMA_DB_PATH = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/chroma_db
+2024-10-01 23:40:41,273 - tests.test_main - DEBUG - App config: RAW_DOCUMENTS_PATH = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/raw-documents
+2024-10-01 23:40:41,273 - tests.test_main - DEBUG - App config: UPLOAD_FOLDER = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/uploads
+2024-10-01 23:40:41,273 - tests.test_main - INFO - Testing file upload with empty filename
+2024-10-01 23:40:41,274 - tests.test_main - INFO - Tearing down test case
+2024-10-01 23:40:41,276 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/chroma_db
+2024-10-01 23:40:41,276 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/raw-documents
+2024-10-01 23:40:41,276 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/uploads
+2024-10-01 23:40:41,276 - tests.test_main - INFO - Creating app with test configuration
+2024-10-01 23:40:41,277 - tests.test_main - DEBUG - App config: DEBUG = False
+2024-10-01 23:40:41,277 - tests.test_main - DEBUG - App config: TESTING = True
+2024-10-01 23:40:41,277 - tests.test_main - DEBUG - App config: PROPAGATE_EXCEPTIONS = None
+2024-10-01 23:40:41,277 - tests.test_main - DEBUG - App config: SECRET_KEY = None
+2024-10-01 23:40:41,277 - tests.test_main - DEBUG - App config: PERMANENT_SESSION_LIFETIME = 31 days, 0:00:00
+2024-10-01 23:40:41,278 - tests.test_main - DEBUG - App config: USE_X_SENDFILE = False
+2024-10-01 23:40:41,278 - tests.test_main - DEBUG - App config: SERVER_NAME = None
+2024-10-01 23:40:41,278 - tests.test_main - DEBUG - App config: APPLICATION_ROOT = /
+2024-10-01 23:40:41,278 - tests.test_main - DEBUG - App config: SESSION_COOKIE_NAME = session
+2024-10-01 23:40:41,278 - tests.test_main - DEBUG - App config: SESSION_COOKIE_DOMAIN = None
+2024-10-01 23:40:41,278 - tests.test_main - DEBUG - App config: SESSION_COOKIE_PATH = None
+2024-10-01 23:40:41,278 - tests.test_main - DEBUG - App config: SESSION_COOKIE_HTTPONLY = True
+2024-10-01 23:40:41,278 - tests.test_main - DEBUG - App config: SESSION_COOKIE_SECURE = False
+2024-10-01 23:40:41,278 - tests.test_main - DEBUG - App config: SESSION_COOKIE_SAMESITE = None
+2024-10-01 23:40:41,278 - tests.test_main - DEBUG - App config: SESSION_REFRESH_EACH_REQUEST = True
+2024-10-01 23:40:41,278 - tests.test_main - DEBUG - App config: MAX_CONTENT_LENGTH = None
+2024-10-01 23:40:41,278 - tests.test_main - DEBUG - App config: SEND_FILE_MAX_AGE_DEFAULT = None
+2024-10-01 23:40:41,278 - tests.test_main - DEBUG - App config: TRAP_BAD_REQUEST_ERRORS = None
+2024-10-01 23:40:41,278 - tests.test_main - DEBUG - App config: TRAP_HTTP_EXCEPTIONS = False
+2024-10-01 23:40:41,278 - tests.test_main - DEBUG - App config: EXPLAIN_TEMPLATE_LOADING = False
+2024-10-01 23:40:41,278 - tests.test_main - DEBUG - App config: PREFERRED_URL_SCHEME = http
+2024-10-01 23:40:41,278 - tests.test_main - DEBUG - App config: TEMPLATES_AUTO_RELOAD = None
+2024-10-01 23:40:41,278 - tests.test_main - DEBUG - App config: MAX_COOKIE_SIZE = 4093
+2024-10-01 23:40:41,278 - tests.test_main - DEBUG - App config: CHROMA_DB_PATH = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/chroma_db
+2024-10-01 23:40:41,278 - tests.test_main - DEBUG - App config: RAW_DOCUMENTS_PATH = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/raw-documents
+2024-10-01 23:40:41,278 - tests.test_main - DEBUG - App config: UPLOAD_FOLDER = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/uploads
+2024-10-01 23:40:41,278 - tests.test_main - INFO - Testing file upload with no file
+2024-10-01 23:40:41,279 - tests.test_main - INFO - Tearing down test case
+2024-10-01 23:40:41,280 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/chroma_db
+2024-10-01 23:40:41,280 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/raw-documents
+2024-10-01 23:40:41,280 - tests.test_main - INFO - Created directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/uploads
+2024-10-01 23:40:41,280 - tests.test_main - INFO - Creating app with test configuration
+2024-10-01 23:40:41,282 - tests.test_main - DEBUG - App config: DEBUG = False
+2024-10-01 23:40:41,282 - tests.test_main - DEBUG - App config: TESTING = True
+2024-10-01 23:40:41,282 - tests.test_main - DEBUG - App config: PROPAGATE_EXCEPTIONS = None
+2024-10-01 23:40:41,282 - tests.test_main - DEBUG - App config: SECRET_KEY = None
+2024-10-01 23:40:41,283 - tests.test_main - DEBUG - App config: PERMANENT_SESSION_LIFETIME = 31 days, 0:00:00
+2024-10-01 23:40:41,283 - tests.test_main - DEBUG - App config: USE_X_SENDFILE = False
+2024-10-01 23:40:41,283 - tests.test_main - DEBUG - App config: SERVER_NAME = None
+2024-10-01 23:40:41,283 - tests.test_main - DEBUG - App config: APPLICATION_ROOT = /
+2024-10-01 23:40:41,283 - tests.test_main - DEBUG - App config: SESSION_COOKIE_NAME = session
+2024-10-01 23:40:41,283 - tests.test_main - DEBUG - App config: SESSION_COOKIE_DOMAIN = None
+2024-10-01 23:40:41,283 - tests.test_main - DEBUG - App config: SESSION_COOKIE_PATH = None
+2024-10-01 23:40:41,283 - tests.test_main - DEBUG - App config: SESSION_COOKIE_HTTPONLY = True
+2024-10-01 23:40:41,283 - tests.test_main - DEBUG - App config: SESSION_COOKIE_SECURE = False
+2024-10-01 23:40:41,283 - tests.test_main - DEBUG - App config: SESSION_COOKIE_SAMESITE = None
+2024-10-01 23:40:41,283 - tests.test_main - DEBUG - App config: SESSION_REFRESH_EACH_REQUEST = True
+2024-10-01 23:40:41,283 - tests.test_main - DEBUG - App config: MAX_CONTENT_LENGTH = None
+2024-10-01 23:40:41,283 - tests.test_main - DEBUG - App config: SEND_FILE_MAX_AGE_DEFAULT = None
+2024-10-01 23:40:41,283 - tests.test_main - DEBUG - App config: TRAP_BAD_REQUEST_ERRORS = None
+2024-10-01 23:40:41,283 - tests.test_main - DEBUG - App config: TRAP_HTTP_EXCEPTIONS = False
+2024-10-01 23:40:41,283 - tests.test_main - DEBUG - App config: EXPLAIN_TEMPLATE_LOADING = False
+2024-10-01 23:40:41,283 - tests.test_main - DEBUG - App config: PREFERRED_URL_SCHEME = http
+2024-10-01 23:40:41,283 - tests.test_main - DEBUG - App config: TEMPLATES_AUTO_RELOAD = None
+2024-10-01 23:40:41,283 - tests.test_main - DEBUG - App config: MAX_COOKIE_SIZE = 4093
+2024-10-01 23:40:41,283 - tests.test_main - DEBUG - App config: CHROMA_DB_PATH = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/chroma_db
+2024-10-01 23:40:41,283 - tests.test_main - DEBUG - App config: RAW_DOCUMENTS_PATH = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/raw-documents
+2024-10-01 23:40:41,283 - tests.test_main - DEBUG - App config: UPLOAD_FOLDER = /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/uploads
+2024-10-01 23:40:41,284 - tests.test_main - INFO - Testing successful file upload
+2024-10-01 23:40:41,288 - tests.test_main - INFO - Displaying search function results
+2024-10-01 23:40:41,289 - tests.test_main - INFO - Search response: None
+2024-10-01 23:40:41,289 - tests.test_main - INFO - Tearing down test case
+2024-10-01 23:40:41,289 - tests.test_main - INFO - Removed: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl/uploads/test_essay.txt
+2024-10-01 23:40:41,289 - tests.test_main - INFO - Removing temporary directory: /var/folders/h3/_wwn5qxn4lv3x31f10s531cc0000gn/T/tmp_sxpi8pl

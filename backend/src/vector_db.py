@@ -1,27 +1,36 @@
 import os
 import chromadb
-import requests
-from flask import request, jsonify
+import ollama
+from flask import request, jsonify, current_app
 from chromadb.utils import embedding_functions
 
-CHROMA_DB_PATH = os.getenv('CHROMA_DB_PATH', '/app/chroma_db')
-OLLAMA_URL = os.getenv('OLLAMA_URL', 'http://ollama:11434')
-OLLAMA_MODEL = os.getenv('OLLAMA_MODEL', 'llama3.2:3b')
+# Global variables to store the embedding function and Chroma client
+embedding_function = None
+chroma_client = None
 
-# Initialize embedding function and Chroma client at module level
-embedding_function = embedding_functions.DefaultEmbeddingFunction()
-chroma_client = chromadb.PersistentClient(path=CHROMA_DB_PATH)
+def get_chroma_client():
+    global chroma_client
+    if chroma_client is None:
+        # Use the app config to get the CHROMA_DB_PATH, fallback to /app/chroma_db if not set
+        chroma_db_path = current_app.config.get('CHROMA_DB_PATH', '/app/chroma_db')
+        chroma_client = chromadb.PersistentClient(path=chroma_db_path)
+    return chroma_client
 
+def get_embedding_function():
+    global embedding_function
+    if embedding_function is None:
+        embedding_function = embedding_functions.DefaultEmbeddingFunction()
+    return embedding_function
 
 def get_collection():
-    collection = chroma_client.get_or_create_collection(
+    client = get_chroma_client()
+    embedding_func = get_embedding_function()
+    collection = client.get_or_create_collection(
         name="documents",
-        embedding_function=embedding_function,
+        embedding_function=embedding_func,
         metadata={"hnsw:space": "cosine", "hnsw:construction_ef": 100, "hnsw:search_ef": 10}
     )
-
     return collection
-
 
 def search_documents():
     """
@@ -56,9 +65,11 @@ def generate(search_results, prompt):
         if successful: pass a json filled with ollama results with the http code 200
     """
     
-
-    response = requests.post(f"{OLLAMA_URL}/api/generate", json={
-        "model": OLLAMA_MODEL,
-        "prompt": prompt, # stringify search_results json?
-
-    })
+    response = ollama.chat(model='llama3.2:3b', messages=[
+    {
+        'role': 'user',
+        'content': 'Why is the sky blue?',
+    },
+    ])
+    print(response['message']['content'])
+    return jsonify(response['message']), 200

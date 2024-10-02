@@ -1,43 +1,29 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import chromadb
-from chromadb.utils import embedding_functions
 import os
 import nltk
 import threading
-import requests
 
 # Project python files.
 import document_chunker as chunker
+import vector_db as vector_db
 
 app = Flask(__name__)
 CORS(app)
 
-CHROMA_DB_PATH = os.getenv('CHROMA_DB_PATH', '/app/chroma_db')
 UPLOAD_FOLDER = os.getenv('UPLOAD_FOLDER', '/app/uploads')
-OLLAMA_URL = 'http://ollama:11434'
-OLLAMA_MODEL = 'llama3.2:3b'
+OLLAMA_URL = os.getenv('OLLAMA_URL', 'http://ollama:11434')
+OLLAMA_MODEL = os.getenv('OLLAMA_MODEL', 'llama3.2:3b')
 
 # Global variables to track initialization status
 nltk_ready = False
 chroma_ready = False
 initialization_error = None
 
-# Initialize embedding function and Chroma client at module level
-embedding_function = embedding_functions.DefaultEmbeddingFunction()
-chroma_client = chromadb.PersistentClient(path=CHROMA_DB_PATH)
-
-def get_collection():
-    collection = chroma_client.get_or_create_collection(
-        name="documents",
-        embedding_function=embedding_function,
-        metadata={"hnsw:space": "cosine", "hnsw:construction_ef": 100, "hnsw:search_ef": 10}
-    )
-
-    return collection
+def is_ready():
+    return (nltk_ready and chroma_ready)
 
 def initialize_backend():
-    global nltk_ready, chroma_ready, initialization_error
     try:
         # Initialize NLTK
         nltk.download('punkt', quiet=True)
@@ -45,7 +31,7 @@ def initialize_backend():
         nltk_ready = True
 
         # Initialize Chroma collection
-        get_collection()
+        vector_db.get_collection()
         chroma_ready = True
     except Exception as e:
         initialization_error = str(e)
@@ -80,7 +66,7 @@ def upload_file():
         if theres no file to upload: ({'error': 'No file part'}, 400)
         if filename is empty: ({'error': 'No selected file'}, 400)
     """
-    if not (nltk_ready and chroma_ready):
+    if not (is_ready()):
         return jsonify({'error': 'Backend is not fully initialized yet'}), 503
     if 'file' not in request.files:
         return jsonify({'error': 'No file part'}), 400
@@ -90,14 +76,14 @@ def upload_file():
     if file:
         filename = os.path.join(UPLOAD_FOLDER, file.filename)
         file.save(filename)
-        collection = get_collection()
+        collection = vector_db.get_collection()
         chunker.embed_documents([filename], collection)  # Call embed_documents with a list containing the filename
         return jsonify({'message': 'File uploaded and embedded successfully'}), 200
 
 @app.route('/search', methods=['POST'])
-def search_documents():
+def search_wrapper():
     """
-    Search through submitted files to find the best matches for the given query. WE MIGHT GET RID OF THIS ENDPOINT LATER.
+    Search through submitted files to find the best matches for the given query. This is a wrapper to vector_db.search_documents()
 
     This function handles all POST requests to the '/search' endpoint.
 
@@ -105,18 +91,11 @@ def search_documents():
         None
     Returns:
         tuple - a json of the data and the http code
-        if successful: returns the results of the prompt it was given with a status code of 200
-
+        if backend not ready: returns ({'error': 'Backend is not fully initialized yet'}), 503)
     """
-    if not (nltk_ready and chroma_ready):
+    if not (is_ready()):
         return jsonify({'error': 'Backend is not fully initialized yet'}), 503
-    collection = get_collection()
-    query = request.json.get('query')
-    results = collection.query(
-        query_texts=[query],
-        n_results=5
-    )
-    return jsonify(results)
+    return vector_db.search_documents()
 
 @app.route('/documents', methods=['GET'])
 def list_documents():
@@ -135,7 +114,7 @@ def list_documents():
     Raises:
         None
     """
-    if not (nltk_ready and chroma_ready):
+    if not (is_ready()):
         return jsonify({'error': 'Backend is not fully initialized yet'}), 503
     files = os.listdir(UPLOAD_FOLDER)
     return jsonify(files)
@@ -161,18 +140,26 @@ def delete_document(filename):
     Raises:
         None
     """
-    if not (nltk_ready and chroma_ready):
+    if not (is_ready()):
         return jsonify({'error': 'Backend is not fully initialized yet'}), 503
     file_path = os.path.join(UPLOAD_FOLDER, filename)
     if os.path.exists(file_path):
         os.remove(file_path)
         # Remove document chunks from Chroma
-        collection = get_collection()
+        collection = vector_db.get_collection()
         collection.delete(where={"source": file_path})
         return jsonify({'message': 'Document deleted successfully'}), 200
     else:
         return jsonify({'error': 'Document not found'}), 404
 
+@app.route('/generate', methods=['POST'])
+def generate_wrapper():
+    # add docs here!
+    if not (is_ready()):
+        return jsonify({'error': 'Backend is not fully initialized yet'}), 503
+    vector_db.generate()
+
+    
 if __name__ == '__main__':
     port = int(os.environ.get('FLASK_RUN_PORT', 9090))
     app.run(host='0.0.0.0', port=port, debug=False)

@@ -81,7 +81,7 @@ def get_collection():
 
 def ollama_health_check():
     """
-    Check if Ollama is running by sending a GET request to the /api/tags endpoint.
+    Check if Ollama is running by sending a GET request to the root endpoint.
 
     Args:
         None
@@ -89,29 +89,15 @@ def ollama_health_check():
     Returns:
         bool: True if Ollama is running and accessible, False otherwise.
 
-    Retries once with a timeout of 3 seconds.
     """
-    max_retries = 1
-    timeout = 3
+    try:
+        response = requests.get(f"{ollama_base_url}", timeout=3)
 
-    for attempt in range(max_retries + 1):
-        try:
-            response = requests.get(f"{ollama_base_url}/", timeout=timeout)
-            if response.status_code == 200:
-                return True
-            else:
-                logger.info(f"Unexpected status code: {response.status_code}")
-        except ConnectionError as ce:
-            logger.info(f"Connection error on attempt {attempt + 1}: {ce}")
-        except RequestException as re:
-            logger.info(f"Request exception on attempt {attempt + 1}: {re}")
-
-        if attempt < max_retries:
-            logger.info(f"Retrying in 1 second...")
-            time.sleep(1)
-
-    logger.info("Max retries exceeded. Ollama health check failed.")
-    return False
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        return False
+    if response.status_code == 200:
+        return True
 
 # API ENDPOINT FUNCTIONS
 

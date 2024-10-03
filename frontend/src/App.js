@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:9090';
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:9090/api';
 
 export default function App() {
   const [file, setFile] = useState(null);

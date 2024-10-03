@@ -1,5 +1,7 @@
 # Study Buddy - Your AI Tutor
 
+![Screenshot of the application running.](pictures/Demo.png)
+
 This project is in pre-release, we are looking for help on getting this into a first release ready state!
 
 Our plans for this project is to make a fully offline and easily customizable RAG system to aid in research/studying. You control your data. Make use of your hardware.

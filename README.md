@@ -6,10 +6,13 @@ Our plans for this project is to make a fully offline and easily customizable RA
 ## Requirements
 ### Hardware
 
-* This was developed on a M1 Macbook Pro with 16gb RAM. YMMV with different hardware.
+* This was developed on a M1 Macbook Pro with 16gb RAM. YMMV with different hardware, we tried to keep cross-platform support in mind. We're going to expose the model choices in the frontend very soon, so you can run a model suitable for your hardware.
 
 ### Software
 
+* Ollama (running somewhere you can access)
+* Docker
+* Pyenv and Poetry
 
 ## Usage
 

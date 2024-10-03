@@ -25,7 +25,19 @@ This was developed on a M1 Macbook Pro with 16gb RAM. Your mileage shouldn't var
 4. Navigate to localhost:9091 in your browser and begin!
 
 ## Development
-### Running
+
+We use Git Flow for development. Switch to the development branch create a feature branch off of it to start developing.
+
+```
+git switch develop
+git flow feature start feature-name
+# After doing your changes, commit
+git flow feature finish feature-name
+```
+
+Please check if we have any feature branches in the repository already, and refrain from naming your feature that.
+
+### Running While Developing
 #### Backend
 0. Have python 3.11.10 installed through pyenv
 1. Navigate to /backend
@@ -44,7 +56,8 @@ This was developed on a M1 Macbook Pro with 16gb RAM. Your mileage shouldn't var
 ### Unit Testing
 #### Backend
 1. Navigate to /backend
-2. Run ``poetry run pytest``
+2. Make sure you have run ``poetry install`` before, run it if not.
+3. Run ``poetry run pytest``
 
 #### Frontend
 **WIP - We are looking into selenium for testing the frontend (we also need to make a good frontend)**

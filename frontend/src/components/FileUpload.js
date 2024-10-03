@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 
-const BACKEND_URL =
-  process.env.REACT_APP_BACKEND_URL || "http://localhost:9090/api";
+const BACKEND_URL_API = (process.env.REACT_APP_BACKEND_URL ? process.env.REACT_APP_BACKEND_URL + "/api" : "http://localhost:9090/api");
 
 const FileUpload = ({ isBackendReady, fetchDocuments, setError }) => {
   const [file, setFile] = useState(null);
@@ -21,7 +20,7 @@ const FileUpload = ({ isBackendReady, fetchDocuments, setError }) => {
     formData.append("file", file);
 
     try {
-      const response = await axios.post(`${BACKEND_URL}/upload`, formData, {
+      const response = await axios.post(`${BACKEND_URL_API}/upload`, formData, {
         onUploadProgress: (progressEvent) => {
           const percentCompleted = Math.round(
             (progressEvent.loaded * 100) / progressEvent.total

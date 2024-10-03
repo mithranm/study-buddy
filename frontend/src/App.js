@@ -7,8 +7,7 @@ import SearchAndChat from "./components/SearchAndChat";
 import StatusMessage from "./components/StatusMessage";
 import DocumentList from "./components/DocumentList";
 
-const BACKEND_URL =
-  process.env.REACT_APP_BACKEND_URL || "http://localhost:9090/api";
+const BACKEND_URL_API = (process.env.REACT_APP_BACKEND_URL ? process.env.REACT_APP_BACKEND_URL + "/api" : "http://localhost:9090/api");
 
 export default function App() {
   const [documents, setDocuments] = useState([]);
@@ -22,7 +21,7 @@ export default function App() {
   useEffect(() => {
     const checkBackendStatus = async () => {
       try {
-        const response = await axios.get(`${BACKEND_URL}/status`);
+        const response = await axios.get(`${BACKEND_URL_API}/status`);
         setBackendStatus(response.data);
         if (response.data.nltk_ready && response.data.chroma_ready) {
           fetchDocuments();
@@ -42,7 +41,7 @@ export default function App() {
 
   const fetchDocuments = async () => {
     try {
-      const response = await axios.get(`${BACKEND_URL}/documents`);
+      const response = await axios.get(`${BACKEND_URL_API}/documents`);
       setDocuments(response.data);
     } catch (error) {
       console.error("Error fetching documents:", error);
@@ -52,7 +51,7 @@ export default function App() {
 
   const handleDeleteDocument = async (filename) => {
     try {
-      await axios.delete(`${BACKEND_URL}/documents/${filename}`);
+      await axios.delete(`${BACKEND_URL_API}/documents/${filename}`);
       fetchDocuments();
     } catch (error) {
       console.error("Error deleting document:", error);

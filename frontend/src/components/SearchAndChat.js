@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 
-const BACKEND_URL =
-  process.env.REACT_APP_BACKEND_URL || "http://localhost:9090/api";
+const BACKEND_URL_API = (process.env.REACT_APP_BACKEND_URL ? process.env.REACT_APP_BACKEND_URL + "/api" : "http://localhost:9090/api");
 
 const SearchAndChat = ({ isBackendReady, setError }) => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -16,7 +15,7 @@ const SearchAndChat = ({ isBackendReady, setError }) => {
     setIsSearching(true);
     setError(null);
     try {
-      const response = await axios.post(`${BACKEND_URL}/search`, {
+      const response = await axios.post(`${BACKEND_URL_API}/search`, {
         query: searchQuery,
       });
       setSearchResults(response.data);
@@ -37,8 +36,8 @@ const SearchAndChat = ({ isBackendReady, setError }) => {
     setError(null);
     setChatResponse("");
     try {
-      console.log("Sending chat request to:", `${BACKEND_URL}/chat`);
-      const response = await axios.post(`${BACKEND_URL}/chat`, {
+      console.log("Sending chat request to:", `${BACKEND_URL_API}/chat`);
+      const response = await axios.post(`${BACKEND_URL_API}/chat`, {
         prompt: searchQuery,
       });
       console.log("Chat response received:", response.data);

@@ -8,11 +8,10 @@ services:
     volumes:
       # Bind mount only the necessary code directories
       - ./backend/src:/app/src
-      - ./backend/tests:/app/tests
-      - ./backend/uploads:/app/uploads
       # Use named volumes for data directories to keep them inside the container
       - chroma_db:/app/chroma_db
       - textracted:/app/textracted
+      - uploads:/app/uploads
     env_file:
       - ./backend/.env
     environment:
@@ -46,3 +45,4 @@ services:
 volumes:
   chroma_db:
   textracted:
+  uploads:

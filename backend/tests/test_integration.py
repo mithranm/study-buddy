@@ -136,6 +136,7 @@ def test_entire_system(client, app, pytestconfig, essay_content):
         logger.info(f"Upload response: {upload_response.get_data(as_text=True)}")
 
         # TESTING PDF HERE
+        #Basically we needed pytest to pass what the root dir is, and then we can access test_upload
         test_pdf_path = os.path.join(pytestconfig.rootdir, 'test_upload', 'test.pdf')
         
         with open(test_pdf_path, "rb") as pdf:

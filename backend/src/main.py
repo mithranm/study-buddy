@@ -1,11 +1,9 @@
 import os
 import nltk
-import threading
-import ollama
 import logging
 import traceback
 import sys
-from flask import Flask, request, jsonify, Blueprint
+from flask import Flask, request, jsonify, Blueprint, current_app
 from flask_cors import CORS
 
 # Project python files.
@@ -18,18 +16,7 @@ bp = Blueprint('study-buddy', __name__)
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
-# HELPER METHODS HERE
-def is_ready():
-    """
-    This function checks to see if the services of the system are ready.
-
-    Args:
-        None
-
-    Returns:
-        bool - checks if nltk AND chroma are ready.
-    """
-    return app.nltk_ready and app.chroma_ready
+backend_initialized = False
 
 # API ENDPOINT METHODS HERE
 @bp.route('/status', methods=['GET'])
@@ -44,9 +31,9 @@ def get_status():
         json - containing nltk and chroma status variables.
     """
     return jsonify({
-        'nltk_ready': app.nltk_ready,
-        'chroma_ready': app.chroma_ready,
-        'error': app.initialization_error
+        'nltk_ready': current_app.nltk_ready,
+        'chroma_ready': current_app.chroma_ready,
+        'error': current_app.initialization_error
     })
 
 @bp.route('/upload', methods=['POST'])
@@ -65,19 +52,17 @@ def upload_file():
         if theres no file to upload: ({'error': 'No file part'}, 400)
         if filename is empty: ({'error': 'No selected file'}, 400)
     """
-    if not is_ready():
-        return jsonify({'error': 'Backend is not fully initialized yet'}), 503
     if 'file' not in request.files:
         return jsonify({'error': 'No file part'}), 400
     file = request.files['file']
     if file.filename == '':
         return jsonify({'error': 'No selected file'}), 400
     if file:
-        filename = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
+        filename = os.path.join(current_app.config['UPLOAD_FOLDER'], file.filename)
         file.save(filename)
         collection = vector_db.get_collection()
         # Pass the TEXTRACTED_PATH to embed_documents
-        chunker.embed_documents([filename], collection, app.config['TEXTRACTED_PATH'])
+        chunker.embed_documents([filename], collection, current_app.config['TEXTRACTED_PATH'])
         return jsonify({'message': 'File uploaded and embedded successfully'}), 200
 
 @bp.route('/search', methods=['POST'])
@@ -91,10 +76,8 @@ def search_wrapper():
         None
     Returns:
         tuple - a json of the data and the http code
-        if backend not ready: returns ({'error': 'Backend is not fully initialized yet'}), 503)
+        if backend not ready: returns ({'error': 'Backend is fully initialized yet'}), 503)
     """
-    if not is_ready():
-        return jsonify({'error': 'Backend is not fully initialized yet'}), 503
     query = request.json.get('query')
     if not query:
         return jsonify({'error': 'No query provided'}), 400
@@ -112,14 +95,12 @@ def list_documents():
     Returns:
         tuple: a json file that contains data and http code
         if successful: sends a json of the files submitted with the http code 200.
-        if backend not ready: ({error: Backend is not fully initialized yet}, 503).
-    
+        if backend not ready: ({error: Backend is fully initialized yet}, 503).
+
     Raises:
         None
     """
-    if not is_ready():
-        return jsonify({'error': 'Backend is not fully initialized yet'}), 503
-    files = os.listdir(app.config['UPLOAD_FOLDER'])
+    files = os.listdir(current_app.config['UPLOAD_FOLDER'])
     return jsonify(files)
 
 @bp.route('/documents/<filename>', methods=['DELETE'])
@@ -143,9 +124,7 @@ def delete_document(filename):
     Raises:
         None
     """
-    if not is_ready():
-        return jsonify({'error': 'Backend is not fully initialized yet'}), 503
-    file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
     if os.path.exists(file_path):
         os.remove(file_path)
         # Remove document chunks from Chroma
@@ -168,14 +147,10 @@ def chat_wrapper():
     Raises:
         None
     """
-    print("chat called")
-    if not is_ready():
-        return jsonify({'error': 'Backend is not fully initialized yet'}), 503
-    
     prompt = request.json.get('prompt')
     if not prompt:
         return jsonify({'error': 'No prompt given'}), 400
-    
+
     try:
         print("running search documents")
         search_results, http_code = vector_db.search_documents(prompt)
@@ -227,7 +202,7 @@ def create_app(test_config=None):
         logger.info("Created necessary directories")
     except Exception as e:
         logger.error(f"Error creating directories: {str(e)}")
-        
+
     # Global variables to track initialization status
     app.nltk_ready = False
     app.chroma_ready = False
@@ -251,8 +226,8 @@ def create_app(test_config=None):
                 logger.error(f"Initialization error: {str(e)}")
 
     initialize_backend()
-
     app.register_blueprint(bp, url_prefix="/api/")
+    backend_initialized = True
 
     return app
 

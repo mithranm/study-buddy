@@ -129,13 +129,12 @@ class FlaskAppTestCase(unittest.TestCase):
         # No need to remove temp_dir here as it's handled in tearDownClass
         logger.info(f"Test case teardown complete.")
 
-    @patch('src.main.ollama')
     @patch('src.main.vector_db')
     def test_status_endpoint(self, mock_vector_db, mock_ollama):
         logger.info("Testing status endpoint")
         # Mock the vector_db.get_collection to prevent actual DB operations
         mock_vector_db.get_collection.return_value = MagicMock()
-        response = self.client.get('/status')
+        response = self.client.get('/api/status')
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
         self.assertIn('nltk_ready', data)
@@ -150,7 +149,7 @@ class FlaskAppTestCase(unittest.TestCase):
         mock_vector_db.get_collection.return_value = MagicMock()
         test_file = 'test_essay.txt'
         
-        response = self.client.post('/upload', 
+        response = self.client.post('/api/upload', 
             content_type='multipart/form-data',
             data={'file': (io.BytesIO(self.essay_content.encode('utf-8')), test_file)})
 
@@ -164,7 +163,7 @@ class FlaskAppTestCase(unittest.TestCase):
 
     def test_upload_file_no_file(self):
         logger.info("Testing file upload with no file")
-        response = self.client.post('/upload', 
+        response = self.client.post('/api/upload', 
                                     content_type='multipart/form-data',
                                     data={})
         
@@ -174,7 +173,7 @@ class FlaskAppTestCase(unittest.TestCase):
 
     def test_upload_file_empty_filename(self):
         logger.info("Testing file upload with empty filename")
-        response = self.client.post('/upload', 
+        response = self.client.post('/api/upload', 
                                     content_type='multipart/form-data',
                                     data={'file': (io.BytesIO(b''), '')})
         
@@ -187,7 +186,7 @@ class FlaskAppTestCase(unittest.TestCase):
         logger.info("Testing successful document search")
         mock_vector_db.search_documents.return_value = {'documents': [['test result']]}, 200
         
-        response = self.client.post('/search', json={'query': 'test query'})
+        response = self.client.post('/api/search', json={'query': 'test query'})
         
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
@@ -195,7 +194,7 @@ class FlaskAppTestCase(unittest.TestCase):
 
     def test_search_documents_no_query(self):
         logger.info("Testing document search with no query")
-        response = self.client.post('/search', json={})
+        response = self.client.post('/api/search', json={})
         
         self.assertEqual(response.status_code, 400)
         data = json.loads(response.data)
@@ -208,7 +207,7 @@ class FlaskAppTestCase(unittest.TestCase):
             with open(os.path.join(self.temp_uploads, file), 'w') as f:
                 f.write('Test content')
 
-        response = self.client.get('/documents')
+        response = self.client.get('/api/documents')
         
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
@@ -224,7 +223,7 @@ class FlaskAppTestCase(unittest.TestCase):
         with open(os.path.join(self.temp_uploads, test_file), 'w') as f:
             f.write('Test content for deletion')
         
-        response = self.client.delete(f'/documents/{test_file}')
+        response = self.client.delete(f'/api/documents/{test_file}')
         
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
@@ -234,7 +233,7 @@ class FlaskAppTestCase(unittest.TestCase):
 
     def test_delete_nonexistent_document(self):
         logger.info("Testing deletion of non-existent document")
-        response = self.client.delete('/documents/nonexistent.txt')
+        response = self.client.delete('/api/documents/nonexistent.txt')
         
         self.assertEqual(response.status_code, 404)
         data = json.loads(response.data)
@@ -247,7 +246,7 @@ class FlaskAppTestCase(unittest.TestCase):
         mock_search.return_value = {'documents': [['test result 1', 'test result 2']]}, 200
         mock_chat.return_value = jsonify({'message': 'Ollama response'}), 200
 
-        response = self.client.post('/chat', json={'prompt': 'What do the sources say?'})
+        response = self.client.post('/api/chat', json={'prompt': 'What do the sources say?'})
         
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.data)
@@ -257,7 +256,7 @@ class FlaskAppTestCase(unittest.TestCase):
 
     def test_chat_no_prompt(self):
         logger.info("Testing generation with no prompt")
-        response = self.client.post('/chat', json={})
+        response = self.client.post('/api/chat', json={})
         
         self.assertEqual(response.status_code, 400)
         data = json.loads(response.data)

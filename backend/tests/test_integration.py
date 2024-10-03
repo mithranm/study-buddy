@@ -125,7 +125,7 @@ def test_entire_system(client, app, pytestconfig, essay_content):
         # Step 1: Upload Document
         test_file = 'integration_test_essay.txt'
         
-        upload_response = client.post('/upload', 
+        upload_response = client.post('/api/upload', 
             content_type='multipart/form-data',
             data={'file': (io.BytesIO(essay_content.encode('utf-8')), test_file)}
         )
@@ -142,7 +142,7 @@ def test_entire_system(client, app, pytestconfig, essay_content):
         with open(test_pdf_path, "rb") as pdf:
             pdf_content = pdf.read()
 
-        upload_response = client.post('/upload', 
+        upload_response = client.post('/api/upload', 
             content_type='multipart/form-data',
             data={'file': (io.BytesIO(pdf_content), "test.pdf")}
         )
@@ -159,14 +159,14 @@ def test_entire_system(client, app, pytestconfig, essay_content):
         logger.info(f"Number of vectors in collection after upload: {count}")
         assert count > 0, "ChromaDB should have at least one vector after embedding."
         
-        search_response = client.post('/search', json={'query': 'sustainable development'})
+        search_response = client.post('/api/search', json={'query': 'sustainable development'})
         logger.info(search_response.get_json())
         assert search_response.status_code == 200
         assert 'documents' in search_response.get_json()
         
         # Step 2: Initiate Chat
         prompt = 'What do the sources say about sustainable development and climate change?'
-        chat_response = client.post('/chat', json={'prompt': prompt})
+        chat_response = client.post('/api/chat', json={'prompt': prompt})
         logger.info(chat_response.get_json())
         assert chat_response.status_code == 200
         response_data = chat_response.get_json()

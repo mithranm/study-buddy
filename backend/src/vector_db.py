@@ -7,6 +7,8 @@ import json
 import time
 import re
 import logging
+import requests
+from requests.exceptions import RequestException, ConnectionError
 
 logger = logging.getLogger(__name__)
 
@@ -16,8 +18,6 @@ OLLAMA_HOST = os.getenv('OLLAMA_HOST', 'localhost:11434')
 embedding_function = None
 chroma_client = None
 ollama_base_url = OLLAMA_HOST
-
-OLLAMA_HOST = os.getenv('OLLAMA_HOST', 'localhost:11434')
 
 # Prepend 'http://' to ensure the URL is properly formatted
 ollama_base_url = f'http://{OLLAMA_HOST}'
@@ -40,6 +40,7 @@ if os.path.exists('/.dockerenv'):
     else:
         logger.info(f"Did not find a valid localhost:port pattern in OLLAMA_HOST: '{OLLAMA_HOST}'")
 
+# HELPER METHODS
 
 def get_chroma_client():
     global chroma_client
@@ -77,6 +78,42 @@ def get_collection():
         metadata={"hnsw:space": "cosine", "hnsw:construction_ef": 100, "hnsw:search_ef": 10}
     )
     return collection
+
+def ollama_health_check():
+    """
+    Check if Ollama is running by sending a GET request to the /api/tags endpoint.
+
+    Args:
+        None
+
+    Returns:
+        bool: True if Ollama is running and accessible, False otherwise.
+
+    Retries once with a timeout of 3 seconds.
+    """
+    max_retries = 1
+    timeout = 3
+
+    for attempt in range(max_retries + 1):
+        try:
+            response = requests.get(f"{ollama_base_url}/", timeout=timeout)
+            if response.status_code == 200:
+                return True
+            else:
+                logger.info(f"Unexpected status code: {response.status_code}")
+        except ConnectionError as ce:
+            logger.info(f"Connection error on attempt {attempt + 1}: {ce}")
+        except RequestException as re:
+            logger.info(f"Request exception on attempt {attempt + 1}: {re}")
+
+        if attempt < max_retries:
+            logger.info(f"Retrying in 1 second...")
+            time.sleep(1)
+
+    logger.info("Max retries exceeded. Ollama health check failed.")
+    return False
+
+# API ENDPOINT FUNCTIONS
 
 def search_documents(query):
     """

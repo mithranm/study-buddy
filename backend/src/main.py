@@ -147,6 +147,11 @@ def chat_wrapper():
     Raises:
         None
     """
+
+    if (not vector_db.ollama_health_check()):
+        logger.info("Ollama is not running")
+        return jsonify({'error': 'Ollama is not running, please make sure ollama is running on your local machine'}, 503)
+    
     prompt = request.json.get('prompt')
     if not prompt:
         return jsonify({'error': 'No prompt given'}), 400

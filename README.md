@@ -2,17 +2,18 @@
 
 This project is in pre-release, we are looking for help on getting this into a first release ready state!
 
-Our plans for this project is to make a fully offline and easily customizable RAG system to aid in research/studying.
+Our plans for this project is to make a fully offline and easily customizable RAG system to aid in research/studying. You control your data. Make use of your hardware.
 ## Requirements
 ### Hardware
 
-* This was developed on a M1 Macbook Pro with 16gb RAM. YMMV with different hardware, we tried to keep cross-platform support in mind. We're going to expose the model choices in the frontend very soon, so you can run a model suitable for your hardware.
+This was developed on a M1 Macbook Pro with 16gb RAM. Your mileage shouldn't vary much with different hardware as we kept cross-platform support in mind and running ollama is your responsibility. You just need cpu + memory powerful enough to run MiniLM_L6_V2.
 
 ### Software
 
 * Ollama (running somewhere you can access)
 * Docker
 * Pyenv and Poetry
+* NodeJS
 
 ## Usage
 
@@ -21,10 +22,32 @@ Our plans for this project is to make a fully offline and easily customizable RA
 3. Run ``docker-compose up --build `` in the project root.
 4. Navigate to localhost:9091 in your browser and begin!
 
-## Testing
-### Backend
+## Development
+### Running
+#### Backend
+0. Have python 3.11.10 installed through pyenv
+1. Navigate to /backend
+2. Run ``poetry install`` 
+3. Run ``poetry shell``
+4. Run ``python -m src.main``
+5. Congrats, the flask server is running on port 9090.
+
+#### Frontend
+0. Have NodeJS v20 LTS installed
+1. Navigate to /frontend
+2. Run ``npm install``
+3. Run ``npm start``
+4. Congrats, the react app is running on port 9091.
+
+### Unit Testing
+#### Backend
 1. Navigate to /backend
 2. Run ``poetry run pytest``
 
-### Frontend
+#### Frontend
 **WIP - We are looking into selenium for testing the frontend (we also need to make a good frontend)**
+
+# Future Updates
+* We plan to fully support CUDA once we get our hands on some NVIDIA hardware. This should allow stronger embedding models to be ran.
+* We're going to expose the Ollama model choices in the frontend very soon, so you can run a model suitable for your hardware.
+* We want to support OpenAI generic apis to avoid reliance on Ollama. Should allow usage of frameworks like vLLM and the OpenAI api itself.

@@ -1,5 +1,9 @@
 # Study Buddy - Your AI Tutor
 
+This project is in pre-release, we are looking for help on getting this into a first release ready state!
+
+Our plans for this project is to make a fully offline and easily customizable RAG system to aid in research/studying.
+
 ## Usage
 
 1. Clone this repo with ``git clone https://github.com/mithranm/study-buddy``
@@ -8,6 +12,9 @@
 4. Navigate to localhost:9091 in your browser and begin!
 
 ## Testing
+### Backend
+1. Navigate to /backend
+2. Run ``poetry run pytest``
 
-1. Navigate to backend
-2. run ``poetry run pytest``
+### Frontend
+**WIP - We are looking into selenium for testing the frontend (we also need to make a good frontend)**

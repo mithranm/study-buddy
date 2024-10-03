@@ -130,7 +130,7 @@ class FlaskAppTestCase(unittest.TestCase):
         logger.info(f"Test case teardown complete.")
 
     @patch('src.main.vector_db')
-    def test_status_endpoint(self, mock_vector_db, mock_ollama):
+    def test_status_endpoint(self, mock_vector_db):
         logger.info("Testing status endpoint")
         # Mock the vector_db.get_collection to prevent actual DB operations
         mock_vector_db.get_collection.return_value = MagicMock()

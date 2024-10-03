@@ -3,6 +3,13 @@
 This project is in pre-release, we are looking for help on getting this into a first release ready state!
 
 Our plans for this project is to make a fully offline and easily customizable RAG system to aid in research/studying.
+## Requirements
+### Hardware
+
+* This was developed on a M1 Macbook Pro with 16gb RAM. YMMV with different hardware.
+
+### Software
+
 
 ## Usage
 

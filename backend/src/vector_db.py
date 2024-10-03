@@ -8,7 +8,6 @@ import time
 import re
 import logging
 
-logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 OLLAMA_HOST = os.getenv('OLLAMA_HOST', 'localhost:11434')
@@ -18,6 +17,11 @@ embedding_function = None
 chroma_client = None
 ollama_base_url = OLLAMA_HOST
 
+OLLAMA_HOST = os.getenv('OLLAMA_HOST', 'localhost:11434')
+
+# Prepend 'http://' to ensure the URL is properly formatted
+ollama_base_url = f'http://{OLLAMA_HOST}'
+
 if os.path.exists('/.dockerenv'):
     # Set the base URL for Ollama package
     match = re.search(r'localhost:(\d+)', OLLAMA_HOST)
@@ -26,15 +30,16 @@ if os.path.exists('/.dockerenv'):
         # Extract the port number
         port = match.group(1)
         
-        # Create the new host string
-        ollama_base_url = f'host.docker.internal:{port}'
+        # Create the new host string with 'http://'
+        ollama_base_url = f'http://host.docker.internal:{port}'
         
         # Set the new OLLAMA_HOST value
         os.environ['OLLAMA_HOST'] = ollama_base_url
         
-        logger.info(f"Updated OLLAMA_HOST from '{OLLAMA_HOST}' to '{ollama_base_url}'")
+        logger.info(f"Updated OLLAMA_HOST from 'http://{OLLAMA_HOST}' to '{ollama_base_url}'")
     else:
         logger.info(f"Did not find a valid localhost:port pattern in OLLAMA_HOST: '{OLLAMA_HOST}'")
+
 
 def get_chroma_client():
     global chroma_client

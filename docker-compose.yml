@@ -6,18 +6,43 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - ./backend:/app
+      # Bind mount only the necessary code directories
+      - ./backend/src:/app/src
+      - ./backend/tests:/app/tests
+      - ./backend/uploads:/app/uploads
+      # Use named volumes for data directories to keep them inside the container
+      - chroma_db:/app/chroma_db
+      - textracted:/app/textracted
     env_file:
       - ./backend/.env
+    environment:
+      - FLASK_ENV
+      - FLASK_APP
+      - FLASK_RUN_PORT
+      - CHROMA_DB_PATH
+      - TEXTRACTED_PATH
+      - UPLOAD_FOLDER
+      - OLLAMA_HOST
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9090/status"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   frontend:
     build: ./frontend
     ports:
       - "9091:9091"
     volumes:
-      - ./frontend:/app
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
       - /app/node_modules
     depends_on:
       - backend
     env_file:
       - ./frontend/.env
+
+# Define named volumes
+volumes:
+  chroma_db:
+  textracted:

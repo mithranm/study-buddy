@@ -35,7 +35,7 @@ def create_app(test_config=None):
     # Set default configurations
     app.config.setdefault('CHROMA_DB_PATH', os.path.join(base_path, 'chroma_db'))
     app.config.setdefault('UPLOAD_FOLDER', os.path.join(base_path, 'uploads'))
-    app.config.setdefault('RAW_DOCUMENTS_PATH', os.path.join(base_path, 'raw-documents'))
+    app.config.setdefault('TEXTRACTED_PATH', os.path.join(base_path, 'textracted'))
 
     # Log all app configurations
     for key, value in app.config.items():
@@ -45,11 +45,11 @@ def create_app(test_config=None):
     try:
         os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
         os.makedirs(app.config['CHROMA_DB_PATH'], exist_ok=True)
-        os.makedirs(app.config['RAW_DOCUMENTS_PATH'], exist_ok=True)
+        os.makedirs(app.config['TEXTRACTED_PATH'], exist_ok=True)
         logger.info("Created necessary directories")
     except Exception as e:
         logger.error(f"Error creating directories: {str(e)}")
-
+        
     # Global variables to track initialization status
     app.nltk_ready = False
     app.chroma_ready = False
@@ -71,8 +71,7 @@ def create_app(test_config=None):
         with app.app_context():
             try:
                 # Initialize NLTK
-                #nltk.download('punkt', quiet=True)
-                nltk.download('punkt_tab', quiet=True)
+                nltk.download('punkt_tab')
                 app.nltk_ready = True
 
                 # Initialize Chroma collection
@@ -133,8 +132,10 @@ def create_app(test_config=None):
             filename = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
             file.save(filename)
             collection = vector_db.get_collection()
-            chunker.embed_documents([filename], collection)
+            # Pass the TEXTRACTED_PATH to embed_documents
+            chunker.embed_documents([filename], collection, app.config['TEXTRACTED_PATH'])
             return jsonify({'message': 'File uploaded and embedded successfully'}), 200
+
 
     @app.route('/search', methods=['POST'])
     def search_wrapper():

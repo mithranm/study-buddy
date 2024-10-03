@@ -3,23 +3,26 @@ import os
 from pathlib import Path
 import pypdf
 import markdown
+import logging
 
-output_dir = "./documents"
+logger = logging.getLogger(__name__)
 
-# Basic skeleton of the method. We need to modify this. xlsx, html, docx file.
-def file_to_markdown(file_path):
+def file_to_markdown(file_path, output_dir):
     try:
         file_name, file_extension = os.path.splitext(file_path)
         if file_extension.lower() == ".pdf":
-            return pdf_to_markdown(file_path)
+            return pdf_to_markdown(file_path, output_dir)
         else:
-            return f"Unsupported file type: {file_extension}"
+            logger.error(f"Unsupported file type: {file_extension}")
+            raise ValueError(f"Unsupported file type: {file_extension}")
     except FileNotFoundError:
-        return f"File not found: {file_path}"
+        logger.error(f"File not found: {file_path}")
+        raise FileNotFoundError(f"File not found: {file_path}")
     except Exception as e:
-        return f"An error occurred: {str(e)}"
+        logger.error(f"An error occurred: {str(e)}")
+        raise Exception
 
-def pdf_to_markdown(pdf_path):
+def pdf_to_markdown(pdf_path, output_dir):
     # Create output directory if it doesn't exist
     Path(output_dir).mkdir(parents=True, exist_ok=True)
 
@@ -28,7 +31,7 @@ def pdf_to_markdown(pdf_path):
 
     # Open the PDF file
     with open(pdf_path, 'rb') as file:
-        pdf_reader = pypdf.PdfReader(file) # Reads the binary information of the pdf.
+        pdf_reader = pypdf.PdfReader(file)
         
         # Extract text from all pages
         text = ""
@@ -44,9 +47,13 @@ def pdf_to_markdown(pdf_path):
         md_file.write(md)
 
     print(f"Converted {pdf_path} to {output_path}")
+    return output_path
 
 if __name__ == "__main__":
-
+    if len(sys.argv) < 3:
+        print("Usage: python document_textractor.py <pdf_path> <output_dir>")
+        sys.exit(1)
+    
     pdf_path = sys.argv[1]
-
-    pdf_to_markdown(pdf_path)
+    output_dir = sys.argv[2]
+    pdf_to_markdown(pdf_path, output_dir)

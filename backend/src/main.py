@@ -59,10 +59,19 @@ def create_app(test_config=None):
         return app.nltk_ready and app.chroma_ready
 
     def initialize_backend():
+        """
+        Initializes everything the system needs.
+
+        Args:
+            None
+        
+        Returns:
+            None
+        """
         with app.app_context():
             try:
                 # Initialize NLTK
-                nltk.download('punkt', quiet=True)
+                #nltk.download('punkt', quiet=True)
                 nltk.download('punkt_tab', quiet=True)
                 app.nltk_ready = True
 
@@ -70,7 +79,7 @@ def create_app(test_config=None):
                 vector_db.get_collection()
                 app.chroma_ready = True
             except LookupError as le:
-                app.initialization_error = f"NLTK LookupError: {str(le)}"
+                app.initialization_error = f"NLTK LookupError: {str(le)}" # The exception from my machine is here. Maybe something wrong with how we're initializing the backend?
                 logger.error(f"Initialization error: {str(le)}")
             except Exception as e:
                 app.initialization_error = f"General Initialization Error: {str(e)}"
@@ -82,6 +91,15 @@ def create_app(test_config=None):
 
     @app.route('/status', methods=['GET'])
     def get_status():
+        """
+        Getter method for status of backend to let any application using this interface know when its ready.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
         return jsonify({
             'nltk_ready': app.nltk_ready,
             'chroma_ready': app.chroma_ready,

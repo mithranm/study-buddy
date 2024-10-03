@@ -55,6 +55,15 @@ def get_embedding_function():
     return embedding_function
 
 def get_collection():
+    """
+    Getter method to get the collection from the database this API is using.
+
+    Args:
+        None
+
+    Returns:
+        the collection of the database.
+    """
     client = get_chroma_client()
     embedding_func = get_embedding_function()
     collection = client.get_or_create_collection(
@@ -122,7 +131,7 @@ def chat(search_results, prompt):
         
         # Prepare the request payload
         payload = {
-            "model": "llama3.2",
+            "model": "llama3.2:3b", # why was this llama3.2? thought we were using llama3.2:3b
             "messages": [
                 {
                     "role": "system",
@@ -134,19 +143,17 @@ def chat(search_results, prompt):
                 }
             ],
             "stream": False,
-            "options": {
-                "seed": 101,
-                "temperature": 0
-            }
+            # DELETED OPTIONS WITH TEMPATURE
         }
 
         logger.info(f"Payload sent to Ollama: {json.dumps(payload, indent=2)}")
         logger.info("Sending request to Ollama")
+        logger.info(f"Ollama base url {ollama_base_url}")
         start_time = time.time()
 
         # Send POST request to Ollama with a longer timeout
         response = requests.post(
-            f'http://{ollama_base_url}/api/chat',
+            f'{ollama_base_url}/api/chat',
             json=payload,
             headers={"Content-Type": "application/json"},
             timeout=30
@@ -169,9 +176,9 @@ def chat(search_results, prompt):
             logger.info("No 'message' field found in Ollama response.")
             return jsonify({'error': 'No message from Ollama.'}), 500
 
-        logger.info(f"Extracted message: {chatted_message}")
+        logger.info(f"Extracted message: {chatted_message['content']}")
 
-        return jsonify({'message': chatted_message}), 200
+        return jsonify({'message': chatted_message['content']}), 200 # do we want to do this instead? check the frontend to see the format. All i did was indexed it to only get the content.
 
     except requests.exceptions.Timeout:
         logger.info("Request to Ollama timed out")

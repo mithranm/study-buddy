@@ -147,6 +147,21 @@ class IntegrationTestCase(unittest.TestCase):
         )
         self.assertEqual(upload_response.status_code, 200)
         self.assertIn('File uploaded and embedded successfully', upload_response.get_data(as_text=True))
+
+        # TESTING PDF HERE ------------------------------------- NEWLY ADDED
+
+        pdf = open("/test_upload/test.pdf", "rb")
+        pdf_content = pdf.read()
+
+        upload_response = self.client.post('/upload', 
+            content_type='multipart/form-data',
+            data={'file': (io.BytesIO(pdf_content.encode('utf-8')), "test.pdf")}
+        )
+
+        self.assertEqual(upload_response.status_code, 200)
+        self.assertIn('File uploaded and embedded successfully', upload_response.get_data(as_test=True))
+
+        # END OF TESTING PDF ------------------------------------
         
         # Optionally, verify that vectors are stored
         collection = get_collection()

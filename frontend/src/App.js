@@ -105,7 +105,7 @@ export default function App() {
       if (typeof response.data === 'object' && response.data.response) {
         setChatResponse(response.data.response);
       } else {
-        setChatResponse(JSON.stringify(response.data));
+        setChatResponse(JSON.stringify(response.data['message']));
       }
     } catch (error) {
       console.error('Error in chat:', error);

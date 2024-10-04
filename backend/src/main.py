@@ -166,18 +166,21 @@ def chat_wrapper():
         return jsonify({'error': 'Ollama is not running, please make sure ollama is running on your local machine'}, 503)
     
     prompt = request.json.get('prompt')
+
+    model = request.json.get('model')
+
     if not prompt:
         return jsonify({'error': 'No prompt given'}), 400
 
     try:
         print("running search documents")
         search_results, http_code = vector_db.search_documents(prompt)
+
         if http_code != 200:
-            print("search failed")
             return jsonify({'error': 'Search failed'}), http_code
-        print("running chat")
+        
         # Call chat with the search results and prompt
-        return ollama.chat(search_results, prompt)
+        return ollama.chat(search_results, prompt, model)
     except Exception as e:
         print("Exception chat")
         traceback.print_exc(file=sys.stderr)

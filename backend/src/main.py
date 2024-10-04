@@ -9,6 +9,7 @@ from flask_cors import CORS
 # Project python files.
 from . import document_chunker as chunker
 from . import vector_db
+from . import ollama_calls as ollama
 
 # BLUEPRINT OF API
 bp = Blueprint('study-buddy', __name__)
@@ -133,6 +134,18 @@ def delete_document(filename):
         return jsonify({'message': 'Document deleted successfully'}), 200
     else:
         return jsonify({'error': 'Document not found'}), 404
+    
+@bp.route('/get_models', methods=['GET'])
+def get_models_wrapper():
+    """
+    Add pydocs here :p
+    """
+    if (not ollama.ollama_health_check()):
+        logger.info("Ollama is not running")
+        return jsonify({'error': 'Ollama is not running, please make sure ollama is running on your local machine'}, 503)
+    
+    return ollama.get_models()
+
 
 @bp.route('/chat', methods=['POST'])
 def chat_wrapper():
@@ -148,7 +161,7 @@ def chat_wrapper():
         None
     """
 
-    if (not vector_db.ollama_health_check()):
+    if (not ollama.ollama_health_check()):
         logger.info("Ollama is not running")
         return jsonify({'error': 'Ollama is not running, please make sure ollama is running on your local machine'}, 503)
     
@@ -164,7 +177,7 @@ def chat_wrapper():
             return jsonify({'error': 'Search failed'}), http_code
         print("running chat")
         # Call chat with the search results and prompt
-        return vector_db.chat(search_results, prompt)
+        return ollama.chat(search_results, prompt)
     except Exception as e:
         print("Exception chat")
         traceback.print_exc(file=sys.stderr)

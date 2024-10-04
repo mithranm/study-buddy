@@ -64,5 +64,4 @@ Please check if we have any feature branches in the repository already, and refr
 
 # Future Updates
 * We plan to fully support CUDA once we get our hands on some NVIDIA hardware. This should allow stronger embedding models to be ran.
-* We're going to expose the Ollama model choices in the frontend very soon, so you can run a model suitable for your hardware.
 * We want to support OpenAI generic apis to avoid reliance on Ollama. Should allow usage of frameworks like vLLM and the OpenAI api itself.

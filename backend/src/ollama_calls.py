@@ -80,7 +80,7 @@ def get_models():
         return jsonify({'error': f'Unexpected error: {str(e)}'}), 500
     
 
-def chat(search_results, prompt):
+def chat(search_results, prompt, model):
     """
     Calls Ollama endpoint api/chat with text chunk + prompt given by user.
 
@@ -115,7 +115,7 @@ def chat(search_results, prompt):
         
         # Prepare the request payload
         payload = {
-            "model": "llama3.2:3b", # why was this llama3.2? thought we were using llama3.2:3b
+            "model": model, # why was this llama3.2? thought we were using llama3.2:3b
             "messages": [
                 {
                     "role": "system",

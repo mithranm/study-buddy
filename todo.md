@@ -8,6 +8,8 @@
 
 ### Backend
 
+* [ ] Add modal to serve llama3.2:vision to not disregard images in pdf files.
+
 #### main.py
 
 * [ ] Work on preventing dupes from entering the system (Filename can not be the same even with different extension).

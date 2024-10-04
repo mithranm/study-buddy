@@ -101,6 +101,8 @@ def list_documents():
     Raises:
         None
     """
+    collection = vector_db.get_collection() # TODO: get rid of this later.
+    logger.info(f"State check of database: {collection.peek(100)['ids']}") # TODO: Here too
     files = os.listdir(current_app.config['UPLOAD_FOLDER'])
     return jsonify(files)
 
@@ -125,12 +127,22 @@ def delete_document(filename):
     Raises:
         None
     """
-    file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+    file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename) 
     if os.path.exists(file_path):
-        os.remove(file_path)
         # Remove document chunks from Chroma
         collection = vector_db.get_collection()
         collection.delete(where={"source": file_path})
+
+        # Remove from backend/upload/
+        os.remove(file_path)
+        
+        split_filename = os.path.splitext(filename)
+        if (split_filename[1] == ".pdf"):
+            textracted_path = os.path.join(current_app.config['TEXTRACTED_PATH'], f"{split_filename[0]}.md")
+
+            os.remove(textracted_path)
+
+        logger.info(f"New collection file should not be present: {collection.peek(100)['ids']}") # after deletion you should not see the file in the database you just deleted.
         return jsonify({'message': 'Document deleted successfully'}), 200
     else:
         return jsonify({'error': 'Document not found'}), 404

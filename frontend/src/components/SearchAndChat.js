@@ -3,7 +3,7 @@ import axios from "axios";
 
 const BACKEND_URL_API = (process.env.REACT_APP_BACKEND_URL ? process.env.REACT_APP_BACKEND_URL + "/api" : "http://localhost:9090/api");
 
-const SearchAndChat = ({ isBackendReady, setError }) => {
+const SearchAndChat = ({ isBackendReady, setError, selectedModel }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [chatResponse, setChatResponse] = useState("");
@@ -32,6 +32,10 @@ const SearchAndChat = ({ isBackendReady, setError }) => {
 
   const handleChat = async (e) => {
     e.preventDefault();
+    if (!selectedModel) {
+      setError("Please select a model before chatting.");
+      return;
+    }
     setIsChatting(true);
     setError(null);
     setChatResponse("");
@@ -39,6 +43,7 @@ const SearchAndChat = ({ isBackendReady, setError }) => {
       console.log("Sending chat request to:", `${BACKEND_URL_API}/chat`);
       const response = await axios.post(`${BACKEND_URL_API}/chat`, {
         prompt: searchQuery,
+        model: selectedModel
       });
       console.log("Chat response received:", response.data);
       if (typeof response.data === "object" && response.data.response) {
@@ -89,7 +94,7 @@ const SearchAndChat = ({ isBackendReady, setError }) => {
           <button
             onClick={handleChat}
             disabled={
-              !searchQuery || isSearching || isChatting || !isBackendReady
+              !searchQuery || isSearching || isChatting || !isBackendReady || !selectedModel
             }
             className="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50"
           >

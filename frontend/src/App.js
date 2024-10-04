@@ -6,6 +6,7 @@ import FileUpload from "./components/FileUpload";
 import SearchAndChat from "./components/SearchAndChat";
 import StatusMessage from "./components/StatusMessage";
 import DocumentList from "./components/DocumentList";
+import GetModels from "./components/GetModels";
 
 const BACKEND_URL_API = (process.env.REACT_APP_BACKEND_URL ? process.env.REACT_APP_BACKEND_URL + "/api" : "http://localhost:9090/api");
 
@@ -17,6 +18,7 @@ export default function App() {
     error: null,
   });
   const [error, setError] = useState(null);
+  const [selectedModel, setSelectedModel] = useState('');
 
   useEffect(() => {
     const checkBackendStatus = async () => {
@@ -57,9 +59,13 @@ export default function App() {
       console.error("Error deleting document:", error);
       setError(
         error.response?.data?.error ||
-          "Error deleting document. Please try again."
+        "Error deleting document. Please try again."
       );
     }
+  };
+
+  const handleModelSelect = (model) => {
+    setSelectedModel(model);
   };
 
   const isBackendReady = backendStatus.nltk_ready && backendStatus.chroma_ready;
@@ -78,14 +84,23 @@ export default function App() {
             error={error}
           />
 
+          <GetModels
+            isBackendReady={isBackendReady}
+            onModelSelect={handleModelSelect}
+          />
+
           <FileUpload
             isBackendReady={isBackendReady}
             fetchDocuments={fetchDocuments}
             setError={setError}
           />
 
-          <SearchAndChat isBackendReady={isBackendReady} setError={setError} />
-
+          <SearchAndChat 
+            isBackendReady={isBackendReady} 
+            setError={setError}
+            selectedModel={selectedModel}
+          />
+          
           <DocumentList
             isBackendReady={isBackendReady}
             documents={documents}

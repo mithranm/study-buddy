@@ -166,7 +166,7 @@ def test_entire_system(client, app, pytestconfig, essay_content):
         
         # Step 2: Initiate Chat
         prompt = 'What do the sources say about sustainable development and climate change?'
-        chat_response = client.post('/api/chat', json={'prompt': prompt})
+        chat_response = client.post('/api/chat', json={'prompt': prompt, 'model': "llama3.2:3b"})
         logger.info(chat_response.get_json())
         assert chat_response.status_code == 200
         response_data = chat_response.get_json()

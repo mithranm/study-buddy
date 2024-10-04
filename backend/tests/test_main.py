@@ -240,7 +240,7 @@ class FlaskAppTestCase(unittest.TestCase):
         self.assertEqual(data['error'], 'Document not found')
 
     @patch('src.main.vector_db.search_documents')
-    @patch('src.main.vector_db.chat')
+    @patch('src.ollama_calls.chat')
     def test_chat_success(self, mock_chat, mock_search):
         logger.info("Testing successful chat")
         mock_search.return_value = {'documents': [['test result 1', 'test result 2']]}, 200

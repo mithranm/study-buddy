@@ -9,7 +9,9 @@ import json
 logger = logging.getLogger(__name__)
 
 OLLAMA_HOST = os.getenv('OLLAMA_HOST', 'localhost:11434')
-ollama_base_url = OLLAMA_HOST
+ollama_base_url = f'http://{OLLAMA_HOST}'
+
+
 if os.path.exists('/.dockerenv'):
     # Set the base URL for Ollama package
     match = re.search(r'localhost:(\d+)', OLLAMA_HOST)
@@ -64,12 +66,12 @@ def get_models():
 
     try:
         response = requests.get(f"{ollama_base_url}/api/tags")
-        
+
         result = response.json()
         # Parsing through json to get model names only.
 
         for model in result.get('models'):
-            models.append(model.name)
+            models.append(model['name'])
 
         return jsonify({'models': models}), 200
 

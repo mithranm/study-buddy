@@ -21,6 +21,7 @@ pip-delete-this-directory.txt
 /backend/**/*.py[cod]
 /backend/**/chroma_db/
 /backend/**/uploads/
+/backend/**/textracted/
 
 # Poetry
 /backend/poetry.lock

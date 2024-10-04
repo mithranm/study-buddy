@@ -19,7 +19,7 @@
 
 ## Testing
 
-* [ ] Make deletes work, right now they delete the file from uploads but they don't seem to remove the embeddings from chromadb.
+* [X] Make deletes work, right now they delete the file from uploads but they don't seem to remove the embeddings from chromadb.
 * [X] Unit testing search function to see what it the json is. look at /backend/tests/test_main.py line 144
 * [ ] Communication from backend to frontend let the frontend know when the backend is working (nltk, chromaDB)
 

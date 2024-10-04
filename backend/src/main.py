@@ -9,6 +9,7 @@ from flask_cors import CORS
 # Project python files.
 from . import document_chunker as chunker
 from . import vector_db
+from . import ollama_calls as ollama
 
 # BLUEPRINT OF API
 bp = Blueprint('study-buddy', __name__)
@@ -133,6 +134,18 @@ def delete_document(filename):
         return jsonify({'message': 'Document deleted successfully'}), 200
     else:
         return jsonify({'error': 'Document not found'}), 404
+    
+@bp.route('/get_models', methods=['GET'])
+def get_models_wrapper():
+    """
+    Add pydocs here :p
+    """
+    if (not ollama.ollama_health_check()):
+        logger.info("Ollama is not running")
+        return jsonify({'error': 'Ollama is not running, please make sure ollama is running on your local machine'}, 503)
+    
+    return ollama.get_models()
+
 
 @bp.route('/chat', methods=['POST'])
 def chat_wrapper():
@@ -147,6 +160,11 @@ def chat_wrapper():
     Raises:
         None
     """
+
+    if (not ollama.ollama_health_check()):
+        logger.info("Ollama is not running")
+        return jsonify({'error': 'Ollama is not running, please make sure ollama is running on your local machine'}, 503)
+    
     prompt = request.json.get('prompt')
     if not prompt:
         return jsonify({'error': 'No prompt given'}), 400
@@ -159,7 +177,7 @@ def chat_wrapper():
             return jsonify({'error': 'Search failed'}), http_code
         print("running chat")
         # Call chat with the search results and prompt
-        return vector_db.chat(search_results, prompt)
+        return ollama.chat(search_results, prompt)
     except Exception as e:
         print("Exception chat")
         traceback.print_exc(file=sys.stderr)
@@ -179,11 +197,8 @@ def create_app(test_config=None):
         # Load the test config if passed in
         app.config.from_mapping(test_config)
 
-    # Set default paths based on whether we're in Docker or not
-    if os.path.exists('/.dockerenv'):
-        base_path = '/app'
-    else:
-        base_path = os.path.dirname(os.path.abspath(__file__))
+    # Set base_path to the project root directory
+    base_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
     # Set default configurations
     app.config.setdefault('CHROMA_DB_PATH', os.path.join(base_path, 'chroma_db'))
@@ -219,7 +234,7 @@ def create_app(test_config=None):
                 vector_db.get_collection()
                 app.chroma_ready = True
             except LookupError as le:
-                app.initialization_error = f"NLTK LookupError: {str(le)}" # The exception from my machine is here. Maybe something wrong with how we're initializing the backend?
+                app.initialization_error = f"NLTK LookupError: {str(le)}"
                 logger.error(f"Initialization error: {str(le)}")
             except Exception as e:
                 app.initialization_error = f"General Initialization Error: {str(e)}"

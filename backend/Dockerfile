@@ -13,11 +13,8 @@ COPY pyproject.toml poetry.lock ./
 RUN poetry config virtualenvs.create false \
     && poetry install --no-interaction --no-ansi
 
-# Copy the entire application
-COPY . .
-
-# Set PYTHONPATH to include the app directory
-ENV PYTHONPATH=/app
+# Copy the source code and necessary configuration files
+COPY src/ src/
 
 # Expose the port the app runs on
 EXPOSE 9090

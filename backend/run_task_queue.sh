@@ -6,7 +6,7 @@ GUNICORN_PID=$!
 echo "Started Gunicorn with PID $GUNICORN_PID"
 
 # Start Celery Worker in the background
-poetry run celery -A src.make_celery.celery_app worker --loglevel=INFO &
+poetry run celery -A src.make_celery.celery_app worker --pool=solo --loglevel=INFO &
 CELERY_PID=$!
 echo "Started Celery with PID $CELERY_PID"
 

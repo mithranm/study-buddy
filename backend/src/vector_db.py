@@ -61,9 +61,12 @@ def search_documents(query):
         return jsonify({'error': 'No query given.'}), 400
     logger.debug(f"Searching documents with query: {query}")
     collection = get_collection()
-    results = collection.query(
-        query_texts=[query],
-        n_results=5
-    )
+    try:
+        results = collection.query(
+            query_texts=[query],
+            n_results=5
+        )
+    except Exception as e:
+        logger.error(f"ERROR: {str(e)}")
     
     return results, 200

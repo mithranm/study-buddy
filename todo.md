@@ -5,10 +5,12 @@
 ### Frontend
 
 * [X] Add a dropdown menu containing all available ollama models the API endpoint will be /get_models.
+* [ ] Add the functionality of uploading multiple files at once.
 
 ### Backend
 
 * [ ] Add modal to serve llama3.2:vision to not disregard images in pdf files.
+* [ ] Upload multiple files at once (either do threading or iterate through)
 
 #### main.py
 

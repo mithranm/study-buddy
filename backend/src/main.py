@@ -3,19 +3,24 @@ import nltk
 import logging
 import traceback
 import sys
+import time
 from flask import Flask, request, jsonify, Blueprint, current_app
 from flask_cors import CORS
+from celery import Celery, Task
+import redis
 
 # Project python files.
 from . import document_chunker as chunker
 from . import vector_db
 from . import ollama_calls as ollama
+from .tasks import process_file
 
 # BLUEPRINT OF API
 bp = Blueprint('study-buddy', __name__)
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
+
 
 # API ENDPOINT METHODS HERE
 @bp.route('/status', methods=['GET'])
@@ -57,16 +62,20 @@ def upload_file():
     if file.filename == '':
         return jsonify({'error': 'No selected file'}), 400
     if file:
-        filename = os.path.join(current_app.config['UPLOAD_FOLDER'], file.filename)
+        file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], file.filename)
+
         collection = vector_db.get_collection()
         # Checks to see if the file already exists in the upload directory to prevent from the file being chunked again in chroma db.
-        if(os.path.exists(filename) and len(collection.get(where={"source": filename})['ids'])): # Also checks the data base just to make sure no funny business is going on
+
+        if(os.path.exists(file_path) and len(collection.get(where={"source": file_path})['ids'])): # Also checks the data base just to make sure no funny business is going on
             return jsonify({"error": "Tried uploading a file that already exists."}), 400
         
-        file.save(filename)
-        # Pass the TEXTRACTED_PATH to embed_documents
-        chunker.embed_documents([filename], collection, current_app.config['TEXTRACTED_PATH'])
-        return jsonify({'message': 'File uploaded and embedded successfully'}), 200
+        file.save(file_path)
+
+        # Sending a task to complete adding to db in the background.
+        process_file.delay(file.filename, file_path, current_app.config["TEXTRACTED_PATH"])
+
+        return jsonify({'message': 'File recieved and is being processed', 'filename': file.filename}), 202
 
 @bp.route('/search', methods=['POST'])
 def search_wrapper():
@@ -103,8 +112,6 @@ def list_documents():
     Raises:
         None
     """
-    collection = vector_db.get_collection() # TODO: get rid of this later.
-    logger.info(f"State check of database: {collection.peek(100)['ids']}") # TODO: Here too
     files = os.listdir(current_app.config['UPLOAD_FOLDER'])
     return jsonify(files)
 
@@ -199,6 +206,21 @@ def chat_wrapper():
         print("Exception chat")
         traceback.print_exc(file=sys.stderr)
         return jsonify({'error': f'Exception in chat process: {str(e)}'}), 500
+    
+def celery_init_app(app: Flask) -> Celery:
+    """
+    Initialize celery app.
+    """
+    class FlaskTask(Task):
+        def __call__(self, *args: object, **kwargs: object) -> object:
+            with app.app_context():
+                return self.run(*args, **kwargs)
+
+    celery_app = Celery(app.name, task_cls=FlaskTask)
+    celery_app.config_from_object(app.config["CELERY"])
+    celery_app.set_default()
+    app.extensions["celery"] = celery_app
+    return celery_app
 
 def create_app(test_config=None):
     """
@@ -206,6 +228,25 @@ def create_app(test_config=None):
     """
     app = Flask(__name__)
     CORS(app)
+
+    # Initialize Redis client
+    app.redis_client = redis.StrictRedis(
+        host='localhost',   # Change as necessary
+        port=6379,          # Default Redis port
+        db=0,               # Database number
+        decode_responses=True  # Optional: decode responses to strings
+    )
+
+
+    app.config.from_mapping(
+        CELERY=dict(
+            broker_url="redis://localhost:6379",
+            result_backend="redis://localhost:6379",
+            task_ignore_result=True,
+        ),
+    )
+    app.config.from_prefixed_env()
+    celery_init_app(app)
 
     if test_config is None:
         # Load the instance config, if it exists, when not testing

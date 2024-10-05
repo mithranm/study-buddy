@@ -3,6 +3,7 @@ from flask import request, jsonify, current_app
 from chromadb.utils import embedding_functions
 import logging
 
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 # Global variables to store the Embedding Function and Chroma Client so they don't get made more than once
@@ -40,13 +41,17 @@ def get_collection():
     Returns:
         the collection of the database.
     """
+    logger.info("passed")
     client = get_chroma_client()
+    logger.info(f"get_chroma_client passed")
     embedding_func = get_embedding_function()
+    logger.info(f"get_embedding_function passed")
     collection = client.get_or_create_collection(
         name="documents",
         embedding_function=embedding_func,
         metadata={"hnsw:space": "cosine", "hnsw:construction_ef": 100, "hnsw:search_ef": 10}
     )
+    logger.info("get_or_create_collection passed")
     return collection
 
 # API ENDPOINT FUNCTION

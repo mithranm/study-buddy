@@ -153,9 +153,9 @@ class FlaskAppTestCase(unittest.TestCase):
             content_type='multipart/form-data',
             data={'file': (io.BytesIO(self.essay_content.encode('utf-8')), test_file)})
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 202)
         data = json.loads(response.data)
-        self.assertEqual(data['message'], 'File uploaded and embedded successfully')
+        self.assertEqual(data['message'], 'File recieved and is being processed')
 
         expected_file_path = os.path.join(self.temp_uploads, test_file)
         self.assertTrue(os.path.exists(expected_file_path))

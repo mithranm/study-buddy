@@ -45,7 +45,7 @@ def upload_file():
     Args:
         None
     Returns:
-        tuple - a json of the message and the http code
+        tuple: a json of the message and the http code
         if successful: ({'message': 'File uploaded and embedded sucessfully'}, 200)
         if backend not ready: ({'error': 'Backend is not fully initialized yet'}, 503)
         if theres no file to upload: ({'error': 'No file part'}, 400)

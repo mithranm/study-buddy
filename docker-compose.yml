@@ -16,6 +16,9 @@ services:
       - RAW_DOCUMENTS_PATH=/app/raw-documents
       - UPLOAD_FOLDER=/app/uploads
       - OLLAMA_HOST=localhost:11434
+      - GCP_PROJECT_ID
+      - GCP_LOCATION
+      - GCP_SECRET_PATH
     working_dir: /app
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9090/api/status"]

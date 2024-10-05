@@ -58,12 +58,12 @@ def upload_file():
         return jsonify({'error': 'No selected file'}), 400
     if file:
         filename = os.path.join(current_app.config['UPLOAD_FOLDER'], file.filename)
+        collection = vector_db.get_collection()
         # Checks to see if the file already exists in the upload directory to prevent from the file being chunked again in chroma db.
-        if(os.path.exists(filename)):
+        if(os.path.exists(filename) and len(collection.get(where={"source": filename})['ids'])): # Also checks the data base just to make sure no funny business is going on
             return jsonify({"error": "Tried uploading a file that already exists."}), 400
         
         file.save(filename)
-        collection = vector_db.get_collection()
         # Pass the TEXTRACTED_PATH to embed_documents
         chunker.embed_documents([filename], collection, current_app.config['TEXTRACTED_PATH'])
         return jsonify({'message': 'File uploaded and embedded successfully'}), 200

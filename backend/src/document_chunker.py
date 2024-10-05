@@ -30,6 +30,7 @@ LOG_DIR = "logs"
 LOG_FILE = "document_chunker.log"
 MAX_LOG_SIZE = 10 * 1024 * 1024  # 10 MB
 BACKUP_COUNT = 5
+BASE_PATH = "."
 
 def setup_logging(log_to_file=True):
     logger = logging.getLogger(__name__)
@@ -238,7 +239,7 @@ def process_pdf_with_captions(file_path: str, textracted_path: str) -> str:
         return ""
 
     full_text = ""
-    image_dir = ensure_image_dir(textracted_path)
+    image_dir = ensure_image_dir(BASE_PATH)
 
     for page_num, page in enumerate(doc, start=1):
         logger.debug(f"Processing page {page_num}")
@@ -479,11 +480,8 @@ def main():
     global logger
     logger = setup_logging(log_to_file=True)
 
-    # Define base path
-    base_path = "."
-
     # Perform cleanup before running
-    cleanup_existing_files(base_path, LOG_FILE, IMAGE_DIR_NAME)
+    cleanup_existing_files(BASE_PATH, LOG_FILE, IMAGE_DIR_NAME)
 
     # Initialize ChromaDB client
     client = chromadb.PersistentClient(path="./chroma_db")

@@ -12,8 +12,8 @@
 
 #### main.py
 
-* [ ] Work on preventing dupes from entering the system (Filename can not be the same even with different extension).
-  * [ ] For now just look for the same filename if that filename exists in the chromaDB then reject upload and let the user know.
+* [X] Work on preventing dupes from entering the system (Filename can not be the same even with different extension).
+  * [X] For now just look for the same filename if that filename exists in the chromaDB then reject upload and let the user know.
 * [X] Add a new API endpoint with the url /get_models that will return the available models.
   * [X] This feature MUST call ollama_health_check before performing any requests to ollama server.
 

@@ -6,18 +6,39 @@ import google.auth.transport.requests
 from google.auth.exceptions import DefaultCredentialsError
 from google.oauth2 import service_account
 from google.auth import default
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Constants
-PROJECT_ID = "selfcareassistant" #This needs to be defined in .env as GCP_PROJECT_ID
-LOCATION = "us-central1" #Change to GCP_LOCATION
-ENDPOINT = "us-central1-aiplatform.googleapis.com" #Construct this from location
-MODEL_ID = "meta/llama-3.2-90b-vision-instruct-maas" #This is ok
+PROJECT_ID = os.getenv("GCP_PROJECT_ID")
+if not PROJECT_ID:
+    raise ValueError("GCP_PROJECT_ID environment variable is not set")
+LOCATION = os.getenv("GCP_LOCATION")
+if not LOCATION:
+    raise ValueError("GCP_LOCATION environment variable is not set")
+ENDPOINT = f"{LOCATION}-aiplatform.googleapis.com"
+MODEL_ID = "meta/llama-3.2-90b-vision-instruct-maas"
+
+# Construct the path to the secrets directory
+SECRETS_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'secrets'))
 
 def get_access_token():
     """Get and refresh the access token."""
     try:
-        # Set the path to your service account JSON file
-        os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'selfcareassistant-99a02733eae9.json'
+        # Get the filename of the service account JSON file from environment variable
+        secret_filename = os.getenv("GCP_SECRET_PATH")
+        if not secret_filename:
+            raise ValueError("GCP_SECRET_PATH environment variable is not set")
+        
+        # Construct the full path to the secret file
+        secret_path = os.path.join(SECRETS_DIR, secret_filename)
+        
+        if not os.path.exists(secret_path):
+            raise FileNotFoundError(f"GCP secret file not found at {secret_path}")
+        
+        os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = secret_path
         
         creds, _ = default(scopes=['https://www.googleapis.com/auth/cloud-platform'])
         
@@ -25,7 +46,7 @@ def get_access_token():
         creds.refresh(auth_req)
         
         return creds.token
-    except DefaultCredentialsError as e:
+    except (DefaultCredentialsError, ValueError, FileNotFoundError) as e:
         print(f"Error with credentials: {e}")
         return None
 
@@ -84,14 +105,13 @@ def process_image(image_path: str, prompt: str) -> str:
 
 def caption_image(image_path: str, custom_prompt: str = None) -> str:
     """
-    Captions an image using Google Cloud AI Platform.
-    
+    Captions an image using LLama 3.2 Vision MaaS from GCP
+
     Args:
-    image_path (str): Path to the image file.
-    custom_prompt (str, optional): Custom prompt for the model. If None, a default prompt is used.
-    
+        image_path: an absolute path to an image, probably only jpg and png
+        prompt: prompt to use for captioning
     Returns:
-    str: The generated caption for the image.
+        str - the caption you requested
     """
     if not os.path.exists(image_path):
         return "Image file not found."
@@ -106,6 +126,6 @@ def caption_image(image_path: str, custom_prompt: str = None) -> str:
 
 # Example usage
 if __name__ == "__main__":
-    image_path = "mystery.jpeg"
+    image_path = "/Users/mithranmohanraj/Documents/study-buddy/backend/test_images/mystery.jpeg"
     caption = caption_image(image_path)
     print(f"Image Caption: {caption}")

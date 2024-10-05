@@ -22,8 +22,7 @@ pip-delete-this-directory.txt
 /backend/**/chroma_db/
 /backend/**/uploads/
 /backend/**/textracted/
-/backend/secrets/
-/backend/src/selfcareassistant-99a02733eae9.json
+/backend/secrets/selfcareassistant-99a02733eae9.json
 
 # Poetry
 /backend/poetry.lock

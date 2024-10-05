@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # Start Gunicorn in the background
-gunicorn --bind 0.0.0.0:9090 src.wsgi:app &
+poetry run gunicorn --bind 0.0.0.0:9090 src.wsgi:app &
 GUNICORN_PID=$!
 echo "Started Gunicorn with PID $GUNICORN_PID"
 
 # Start Celery Worker in the background
-celery -A src.make_celery.celery_app worker --loglevel=INFO &
+poetry run celery -A src.make_celery.celery_app worker --loglevel=INFO &
 CELERY_PID=$!
 echo "Started Celery with PID $CELERY_PID"
 

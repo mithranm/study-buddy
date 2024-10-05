@@ -20,6 +20,7 @@ gunicorn = "^23.0.0"
 google-auth = "^2.35.0"
 google-auth-oauthlib = "^1.2.1"
 requests = "^2.32.3"
+google-cloud-storage = "^2.18.2"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.0.0"

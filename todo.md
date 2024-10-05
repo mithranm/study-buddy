@@ -15,7 +15,7 @@
 
 ## Documentation
 
-* [ ] More pydocs also find a way to config pydocs to correctly document main.py with nested methods.
+* [X] More pydocs also find a way to config pydocs to correctly document main.py with nested methods.
 
 ## Overall Design
 

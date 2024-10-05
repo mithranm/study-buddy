@@ -2,22 +2,10 @@
 
 ## App
 
-### Frontend
+### main.py
 
-* [X] Add a dropdown menu containing all available ollama models the API endpoint will be /get_models.
-* [ ] Add the functionality of uploading multiple files at once.
-
-### Backend
-
-* [ ] Add modal to serve llama3.2:vision to not disregard images in pdf files.
-* [ ] Upload multiple files at once (either do threading or iterate through)
-
-#### main.py
-
-* [X] Work on preventing dupes from entering the system (Filename can not be the same even with different extension).
-  * [X] For now just look for the same filename if that filename exists in the chromaDB then reject upload and let the user know.
-* [X] Add a new API endpoint with the url /get_models that will return the available models.
-  * [X] This feature MUST call ollama_health_check before performing any requests to ollama server.
+* [ ] Work on preventing dupes from entering the system (Filename can not be the same even with different extension).
+  * [ ] For now just look for the same filename if that filename exists in the chromaDB then reject upload and let the user know.
 
 ## Testing
 
@@ -27,8 +15,9 @@
 
 ## Documentation
 
-* [ ] More pydocs
+* [ ] More pydocs also find a way to config pydocs to correctly document main.py with nested methods.
 
 ## Overall Design
 
-* [ ] be able to select documents like in notebooklm. Because if user puts in some irrelavent file that they don't want ollama to use, they can deselect it
+* [ ] Be able to select documents like in notebooklm. Because if user puts in some irrelavent file that they don't want ollama to use, they can deselect it
+* [ ] Sourcing where it found the information so look into better designing how we send payload to ollama with sources. Something like adding filename in the payload.

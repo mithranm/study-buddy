@@ -17,8 +17,6 @@ bp = Blueprint('study-buddy', __name__)
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
-backend_initialized = False
-
 # API ENDPOINT METHODS HERE
 @bp.route('/status', methods=['GET'])
 def get_status():
@@ -238,26 +236,23 @@ def create_app(test_config=None):
     app.chroma_ready = False
     app.initialization_error = None
 
-    def initialize_backend():
-        with app.app_context():
-            try:
-                # Initialize NLTK
-                nltk.download('punkt_tab')
-                app.nltk_ready = True
+    with app.app_context():
+        try:
+            # Initialize NLTK
+            nltk.download('punkt_tab')
+            app.nltk_ready = True
 
-                # Initialize Chroma collection
-                vector_db.get_collection()
-                app.chroma_ready = True
-            except LookupError as le:
-                app.initialization_error = f"NLTK LookupError: {str(le)}"
-                logger.error(f"Initialization error: {str(le)}")
-            except Exception as e:
-                app.initialization_error = f"General Initialization Error: {str(e)}"
-                logger.error(f"Initialization error: {str(e)}")
+            # Initialize Chroma collection
+            vector_db.get_collection()
+            app.chroma_ready = True
+        except LookupError as le:
+            app.initialization_error = f"NLTK LookupError: {str(le)}"
+            logger.error(f"Initialization error: {str(le)}")
+        except Exception as e:
+            app.initialization_error = f"General Initialization Error: {str(e)}"
+            logger.error(f"Initialization error: {str(e)}")
 
-    initialize_backend()
     app.register_blueprint(bp, url_prefix="/api/")
-    backend_initialized = True
 
     return app
 

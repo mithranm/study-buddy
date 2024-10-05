@@ -19,5 +19,5 @@ COPY src/ src/
 # Expose the port the app runs on
 EXPOSE 9090
 
-# Run the application as a module
-CMD ["python", "-m", "src.main"]
+# Run the application using Gunicorn
+CMD ["gunicorn", "--bind", "0.0.0.0:9090", "src.wsgi:app"]

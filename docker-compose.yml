@@ -1,29 +1,24 @@
-version: '3.8'
-
 services:
   backend:
     build: ./backend
     ports:
       - "9090:9090"
     volumes:
-      # Bind mount only the necessary code directories
       - ./backend/src:/app/src
-      # Use named volumes for data directories to keep them inside the container
       - chroma_db:/app/chroma_db
       - textracted:/app/textracted
       - uploads:/app/uploads
-    env_file:
-      - ./backend/.env
     environment:
-      - FLASK_ENV
-      - FLASK_APP
-      - FLASK_RUN_PORT
-      - CHROMA_DB_PATH
-      - TEXTRACTED_PATH
-      - UPLOAD_FOLDER
-      - OLLAMA_HOST
+      - FLASK_ENV=${FLASK_ENV:-production}  # Default to production if not set
+      - FLASK_APP=src.main
+      - FLASK_RUN_PORT=9090
+      - CHROMA_DB_PATH=/app/chroma_db
+      - RAW_DOCUMENTS_PATH=/app/raw-documents
+      - UPLOAD_FOLDER=/app/uploads
+      - OLLAMA_HOST=localhost:11434
+    working_dir: /app
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9090/status"]
+      test: ["CMD", "curl", "-f", "http://localhost:9090/api/status"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -36,12 +31,12 @@ services:
       - ./frontend/src:/app/src
       - ./frontend/public:/app/public
       - /app/node_modules
+    environment:
+      - REACT_APP_BACKEND_URL=http://localhost:9090
+      - PORT=9091
     depends_on:
       - backend
-    env_file:
-      - ./frontend/.env
 
-# Define named volumes
 volumes:
   chroma_db:
   textracted:

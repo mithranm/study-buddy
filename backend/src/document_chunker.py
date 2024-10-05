@@ -3,32 +3,21 @@ import re
 import io
 import uuid
 import logging
+import glob
+
 from pathlib import Path
 from typing import List
+from nltk.tokenize import sent_tokenize
+from logging.handlers import RotatingFileHandler
+from PIL import Image
+from chromadb.config import Settings
 
 import fitz  # PyMuPDF
-from PIL import Image
 import pytesseract
-from nltk.tokenize import sent_tokenize
 import chromadb
 
 from . import google_calls
 from . import document_textractor
-
-# Initialize logging
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)  # Set to DEBUG for detailed logs
-
-# Create console handler with a higher log level
-ch = logging.StreamHandler()
-ch.setLevel(logging.DEBUG)  # Adjust as needed
-
-# Create formatter and add it to the handlers
-formatter = logging.Formatter('[%(levelname)s] %(message)s')
-ch.setFormatter(formatter)
-
-# Add the handlers to the logger
-logger.addHandler(ch)
 
 # Constants
 MAX_IMAGE_SIZE = (1000, 1000)  # Maximum width and height for images
@@ -37,6 +26,98 @@ CAPTION_START = "[[IMAGE_CAPTION_START]]"
 CAPTION_END = "[[IMAGE_CAPTION_END]]"
 ALLOWED_FILE_EXTENSIONS = {'.txt', '.md', '.pdf'}  # Allowed file types
 MAX_FILE_SIZE = 50 * 1024 * 1024  # 50 MB max file size
+LOG_DIR = "logs"
+LOG_FILE = "document_chunker.log"
+MAX_LOG_SIZE = 10 * 1024 * 1024  # 10 MB
+BACKUP_COUNT = 5
+
+def setup_logging(log_to_file=True):
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.DEBUG)
+
+    # Create formatter
+    formatter = logging.Formatter('[%(asctime)s] [%(levelname)s] %(message)s')
+
+    if log_to_file:
+        # Ensure log directory exists
+        os.makedirs(LOG_DIR, exist_ok=True)
+        log_path = os.path.join(LOG_DIR, LOG_FILE)
+
+        # Create rotating file handler
+        file_handler = RotatingFileHandler(
+            log_path, maxBytes=MAX_LOG_SIZE, backupCount=BACKUP_COUNT
+        )
+        file_handler.setFormatter(formatter)
+        logger.addHandler(file_handler)
+
+    # Always add a console handler for immediate feedback
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(formatter)
+    logger.addHandler(console_handler)
+
+    return logger
+
+def cleanup_existing_files(base_path: str, log_file: str, image_dir: str):
+    """
+    Clean up existing files created by this project before running.
+
+    Args:
+        base_path (str): The base directory path.
+        log_file (str): The name of the log file.
+        image_dir (str): The directory for extracted images.
+    """
+    logger.info("Starting cleanup of existing project files.")
+
+    # Remove specific log file
+    log_path = os.path.join(base_path, LOG_DIR, log_file)
+    if os.path.exists(log_path):
+        os.remove(log_path)
+        logger.info(f"Removed existing log file: {log_path}")
+
+    # Remove files in the image directory, but keep the directory
+    image_path = os.path.join(base_path, image_dir)
+    if os.path.exists(image_path):
+        for file in os.listdir(image_path):
+            file_path = os.path.join(image_path, file)
+            if os.path.isfile(file_path):
+                os.remove(file_path)
+                logger.info(f"Removed existing image file: {file_path}")
+
+    # Remove ChromaDB files if they exist, but keep the directory
+    chroma_db_path = os.path.join(base_path, "chroma_db")
+    if os.path.exists(chroma_db_path):
+        for item in os.listdir(chroma_db_path):
+            item_path = os.path.join(chroma_db_path, item)
+            if os.path.isfile(item_path):
+                os.remove(item_path)
+            elif os.path.isdir(item_path):
+                for sub_item in os.listdir(item_path):
+                    sub_item_path = os.path.join(item_path, sub_item)
+                    if os.path.isfile(sub_item_path):
+                        os.remove(sub_item_path)
+                os.rmdir(item_path)
+        logger.info(f"Removed existing ChromaDB files in: {chroma_db_path}")
+
+    # Remove any existing content log files
+    content_log_pattern = os.path.join(base_path, LOG_DIR, "*_content.log")
+    for file_path in glob.glob(content_log_pattern):
+        os.remove(file_path)
+        logger.info(f"Removed existing content log file: {file_path}")
+
+    logger.info("Cleanup of project files completed.")
+
+def log_full_content(content, file_path):
+    # Ensure content log directory exists
+    os.makedirs(LOG_DIR, exist_ok=True)
+    
+    # Create a filename based on the original file's name
+    base_name = os.path.basename(file_path)
+    log_filename = f"{os.path.splitext(base_name)[0]}_content.log"
+    log_path = os.path.join(LOG_DIR, log_filename)
+    
+    # Write content to file
+    with open(log_path, 'w', encoding='utf-8') as f:
+        f.write(content)
 
 def ensure_image_dir(base_path: str) -> str:
     """
@@ -180,7 +261,7 @@ def process_pdf_with_captions(file_path: str, textracted_path: str) -> str:
                     logger.warning(f"No image data found in image block on page {page_num}")
                     continue
 
-                logger.debug(f"Image block on page {page_num}: {img}")
+                logger.debug(f"Image block on page {page_num}")
                 logger.debug(f"Type of image block: {type(img)}")
 
                 if isinstance(img, dict):
@@ -270,8 +351,6 @@ def process_pdf_with_captions(file_path: str, textracted_path: str) -> str:
                     logger.error(f"Scaling failed for image xref {xref} on page {page_num}: {e}")
                     full_text += f"{CAPTION_START}Image scaling failed{CAPTION_END}\n"
                     continue
-
-                # Save image securely
                 image_filename = f"{uuid.uuid4()}.jpeg"
                 image_path = os.path.join(image_dir, image_filename)
                 try:
@@ -350,7 +429,7 @@ def embed_documents(file_paths: List[str], collection: chromadb.Collection, text
         else:
             try:
                 # Implement your own file_to_markdown conversion if needed
-                converted_path = textractor.file_to_markdown(file_path, textracted_path)
+                converted_path = document_textractor.file_to_markdown(file_path, textracted_path)
                 with open(converted_path, 'r', encoding='utf-8') as file:
                     content = file.read()
                 logger.debug(f"Converted file to markdown and read content: {converted_path}")
@@ -361,8 +440,8 @@ def embed_documents(file_paths: List[str], collection: chromadb.Collection, text
         if not content.strip():
             logger.warning(f"No content extracted from {file_path}. Skipping chunking.")
             continue
-
-        logger.info(f"Content before chunking for {file_path}:\n{content[:1000]}")  # Log first 1000 characters
+        log_full_content(content, file_path)
+        logger.info(f"Content before chunking for {file_path}:\n{content[:100]}")
         chunks = chunk_document(content)
 
         if not chunks:
@@ -395,22 +474,32 @@ def embed_documents(file_paths: List[str], collection: chromadb.Collection, text
     except Exception as e:
         logger.error(f"Failed to add chunks to ChromaDB collection: {e}")
 
-# Example of how to initialize and use the embed_documents function
-if __name__ == "__main__":
-    from chromadb.config import Settings
+def main():
+    # Setup logging first
+    global logger
+    logger = setup_logging(log_to_file=True)
+
+    # Define base path
+    base_path = "."
+
+    # Perform cleanup before running
+    cleanup_existing_files(base_path, LOG_FILE, IMAGE_DIR_NAME)
 
     # Initialize ChromaDB client
-    client = chromadb.Client(Settings(
-        chroma_db_impl="duckdb+parquet",
-        persist_directory="./chroma_db"
-    ))
+    client = chromadb.PersistentClient(path="./chroma_db")
 
     # Create or get a collection
     collection = client.get_or_create_collection(name="documents")
 
     # Define paths
-    textracted_path = "/path/to/textracted/output"  # Update this path accordingly
-    file_paths = ["/path/to/your/document.pdf"]  # Update with your document paths
+    textracted_path = "./textracted"
+    file_paths = ["./test_upload/document.pdf"]
 
     # Embed documents
     embed_documents(file_paths, collection, textracted_path)
+
+if __name__ == "__main__":
+    main()
+else:
+    # For when the module is imported
+    logger = setup_logging(log_to_file=False)

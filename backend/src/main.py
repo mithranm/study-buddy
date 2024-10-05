@@ -40,6 +40,35 @@ def get_status():
         'error': current_app.initialization_error
     })
 
+@bp.route('/upload/stream-status/<filename>')
+def upload_stream_status(filename):
+    """
+    Sends status updates of file upload to the app that calls this endpoint using Server-Sent Event (SSE)
+
+    Args:
+        filename: String
+    
+    Returns:
+        A Response containing the status of the file. 
+    """
+
+    def event_stream():
+        while (True):
+            if filename in event_to_send:
+                status = event_to_send[filename]
+            else:
+                status = "unknown"
+
+            yield f"data: {status}\n\n" # SSE protocol that every Server Sent Event should be terminated with two newlines.
+            if (status == "completed"):
+                break
+
+            time.sleep(1)
+
+            
+    return Response(event_stream(), content_type='text/event-stream') # content_type will let the client or browser that this is an SSE stream.
+
+
 @bp.route('/upload', methods=['POST'])
 def upload_file():
     """
@@ -64,7 +93,10 @@ def upload_file():
     if file:
         file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], file.filename)
 
+        file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], file.filename)
+
         collection = vector_db.get_collection()
+        event_to_send[file.filename] = "checking for dupes..."
         # Checks to see if the file already exists in the upload directory to prevent from the file being chunked again in chroma db.
 
         if(os.path.exists(file_path) and len(collection.get(where={"source": file_path})['ids'])): # Also checks the data base just to make sure no funny business is going on

@@ -58,6 +58,10 @@ def upload_file():
         return jsonify({'error': 'No selected file'}), 400
     if file:
         filename = os.path.join(current_app.config['UPLOAD_FOLDER'], file.filename)
+        # Checks to see if the file already exists in the upload directory to prevent from the file being chunked again in chroma db.
+        if(os.path.exists(filename)):
+            return jsonify({"error": "Tried uploading a file that already exists."}), 400
+        
         file.save(filename)
         collection = vector_db.get_collection()
         # Pass the TEXTRACTED_PATH to embed_documents

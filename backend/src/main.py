@@ -3,7 +3,9 @@ import nltk
 import logging
 import traceback
 import sys
-from flask import Flask, request, jsonify, Blueprint, current_app
+import threading
+import time
+from flask import Flask, request, jsonify, Blueprint, current_app, Response
 from flask_cors import CORS
 
 # Project python files.
@@ -16,6 +18,11 @@ bp = Blueprint('study-buddy', __name__)
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
+
+# GLOBAL VARIABLE FOR SERVER SENT EVENTS
+event_to_send = {}
+# GLOBAL LOCK FOR COLLECTION TO ENSURE NO RACE CONDITIONS
+collection_lock = threading.Lock()
 
 # API ENDPOINT METHODS HERE
 @bp.route('/status', methods=['GET'])
@@ -34,6 +41,35 @@ def get_status():
         'chroma_ready': current_app.chroma_ready,
         'error': current_app.initialization_error
     })
+
+@bp.route('/upload/stream-status/<filename>')
+def upload_stream_status(filename):
+    """
+    Sends status updates of file upload to the app that calls this endpoint using Server-Sent Event (SSE)
+
+    Args:
+        filename: String
+    
+    Returns:
+        A Response containing the status of the file. 
+    """
+
+    def event_stream():
+        while (True):
+            if filename in event_to_send:
+                status = event_to_send[filename]
+            else:
+                status = "unknown"
+
+            yield f"data: {status}\n\n" # SSE protocol that every Server Sent Event should be terminated with two newlines.
+            if (status == "completed"):
+                break
+
+            time.sleep(1)
+
+            
+    return Response(event_stream(), content_type='text/event-stream') # content_type will let the client or browser that this is an SSE stream.
+
 
 @bp.route('/upload', methods=['POST'])
 def upload_file():
@@ -57,16 +93,44 @@ def upload_file():
     if file.filename == '':
         return jsonify({'error': 'No selected file'}), 400
     if file:
-        filename = os.path.join(current_app.config['UPLOAD_FOLDER'], file.filename)
+        file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], file.filename)
+
         collection = vector_db.get_collection()
+        event_to_send[file.filename] = "checking for dupes..."
         # Checks to see if the file already exists in the upload directory to prevent from the file being chunked again in chroma db.
-        if(os.path.exists(filename) and len(collection.get(where={"source": filename})['ids'])): # Also checks the data base just to make sure no funny business is going on
+
+        if(os.path.exists(file_path) and len(collection.get(where={"source": file_path})['ids'])): # Also checks the data base just to make sure no funny business is going on
+            event_to_send[file.filename] = "file already exist."
             return jsonify({"error": "Tried uploading a file that already exists."}), 400
         
-        file.save(filename)
-        # Pass the TEXTRACTED_PATH to embed_documents
-        chunker.embed_documents([filename], collection, current_app.config['TEXTRACTED_PATH'])
-        return jsonify({'message': 'File uploaded and embedded successfully'}), 200
+        event_to_send[file.filename] = "saving..."
+        file.save(file_path)
+
+        # METHOD FOR THREADS TO PROCESS FILES
+        # Look into background workers tools like (Celery or RQ) TODO: READ DOCUMENTATION ON CELERY
+        def process_file(filename ,file_path, collection, textracted_path):
+            """
+            Where threads start to process files and embed them into the data base.
+
+            Args:
+                filename: String
+                collection: Database
+                textracted_path: String if the file is pdf it will need this parameter.
+
+            Returns:
+                None
+            """
+            event_to_send[filename] = "embedding file..."
+            # CRITICAL AREA.
+            with collection_lock:
+                # Pass the TEXTRACTED_PATH to embed_documents
+                chunker.embed_documents([file_path], collection, textracted_path)
+            event_to_send[filename] = "completed"
+
+        # Sending thread to complete adding to db in the background.
+        threading.Thread(target=process_file, args=(file.filename, file_path, collection, current_app.config["TEXTRACTED_PATH"])).start()
+
+        return jsonify({'message': 'File recieved and is being processed', 'filename': file.filename}), 202
 
 @bp.route('/search', methods=['POST'])
 def search_wrapper():
@@ -103,8 +167,6 @@ def list_documents():
     Raises:
         None
     """
-    collection = vector_db.get_collection() # TODO: get rid of this later.
-    logger.info(f"State check of database: {collection.peek(100)['ids']}") # TODO: Here too
     files = os.listdir(current_app.config['UPLOAD_FOLDER'])
     return jsonify(files)
 

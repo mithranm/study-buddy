@@ -28,7 +28,7 @@ services:
 
   celery_worker:
     build: ./backend
-    command: celery -A src.main:celery worker --loglevel=info
+    command: celery -A src.make_celery.celery_app worker --loglevel=info
     volumes:
       - ./backend/src:/app/src
       - chroma_db:/app/chroma_db
@@ -50,6 +50,16 @@ services:
 
   redis:
     image: "redis:alpine"
+
+  chromadb:
+    image: chromadb/chroma:latest
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./chroma_db:/data
+    environment:
+      - CHROMA_DB_PATH=/data
+    restart: always
 
   frontend:
     build: ./frontend

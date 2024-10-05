@@ -64,8 +64,6 @@ def upload_file():
     if file:
         file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], file.filename)
 
-        file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], file.filename)
-
         collection = vector_db.get_collection()
         # Checks to see if the file already exists in the upload directory to prevent from the file being chunked again in chroma db.
 
@@ -241,12 +239,15 @@ def create_app(test_config=None):
 
 
     app.config.from_mapping(
+        CHROMA_SERVER_HOST="chromadb",  # Service name if using Docker Compose
+        CHROMA_SERVER_PORT=9092,        # Port exposed by ChromaDB server
         CELERY=dict(
             broker_url="redis://localhost:6379",
             result_backend="redis://localhost:6379",
             task_ignore_result=True,
         ),
     )
+
     app.config.from_prefixed_env()
     celery_init_app(app)
 

@@ -16,6 +16,8 @@ RUN poetry config virtualenvs.create false \
 # Copy the source code and necessary configuration files
 COPY src/ src/
 
+COPY secrets/ secrets/
+
 # Expose the port the app runs on
 EXPOSE 9090
 

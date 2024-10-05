@@ -1,8 +1,10 @@
 import chromadb
 from flask import request, jsonify, current_app
+from chromadb.config import Settings
 from chromadb.utils import embedding_functions
 import logging
 
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 # Global variables to store the Embedding Function and Chroma Client so they don't get made more than once
@@ -15,38 +17,30 @@ chroma_client = None
 def get_chroma_client():
     global chroma_client
     if chroma_client is None:
-        chroma_db_path = current_app.config.get('CHROMA_DB_PATH', '/app/chroma_db')
         try:
-            chroma_client = chromadb.PersistentClient(path=chroma_db_path)
-            logger.info(f"ChromaDB client initialized with path: {chroma_db_path}")
+            chroma_client = chromadb.Client(
+                Settings(
+                    chroma_server_host=current_app.config.get('CHROMA_SERVER_HOST', 'localhost'),
+                    chroma_server_http_port=current_app.config.get('CHROMA_SERVER_PORT', 9092)
+                )
+            )
+            logger.info("ChromaDB client connected to the server.")
         except Exception as e:
-            logger.error(f"Error initializing ChromaDB client: {str(e)}")
+            logger.error(f"Error connecting to ChromaDB server: {str(e)}")
             raise
     return chroma_client
 
-def get_embedding_function():
-    global embedding_function
-    if embedding_function is None:
-        embedding_function = embedding_functions.DefaultEmbeddingFunction()
-    return embedding_function
-
 def get_collection():
-    """
-    Getter method to get the collection from the database this API is using.
-
-    Args:
-        None
-
-    Returns:
-        the collection of the database.
-    """
+    logger.info("CALLED GET_COLLECTION")
     client = get_chroma_client()
-    embedding_func = get_embedding_function()
+
+    logger.info("GET_CHROMA_CLIENT PASSED")
     collection = client.get_or_create_collection(
         name="documents",
-        embedding_function=embedding_func,
         metadata={"hnsw:space": "cosine", "hnsw:construction_ef": 100, "hnsw:search_ef": 10}
     )
+
+    logger.info("GET_COLLECTION PASSED")
     return collection
 
 # API ENDPOINT FUNCTION

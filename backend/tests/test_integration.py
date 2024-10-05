@@ -129,8 +129,8 @@ def test_entire_system(client, app, pytestconfig, essay_content):
             content_type='multipart/form-data',
             data={'file': (io.BytesIO(essay_content.encode('utf-8')), test_file)}
         )
-        assert upload_response.status_code == 200
-        assert 'File uploaded and embedded successfully' in upload_response.get_data(as_text=True)
+        assert upload_response.status_code == 202
+        assert 'File recieved and is being processed' in upload_response.get_data(as_text=True)
 
         # Log the upload response
         logger.info(f"Upload response: {upload_response.get_data(as_text=True)}")
@@ -147,8 +147,8 @@ def test_entire_system(client, app, pytestconfig, essay_content):
             data={'file': (io.BytesIO(pdf_content), "test.pdf")}
         )
 
-        assert upload_response.status_code == 200
-        assert 'File uploaded and embedded successfully' in upload_response.get_data(as_text=True)
+        assert upload_response.status_code == 202
+        assert 'File recieved and is being processed' in upload_response.get_data(as_text=True)
 
         # Log the PDF upload response
         logger.info(f"PDF upload response: {upload_response.get_data(as_text=True)}")

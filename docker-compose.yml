@@ -25,6 +25,41 @@ services:
     env_file:
       - ./backend/.env
 
+  celery_worker:
+    build: ./backend
+    command: celery -A src.make_celery.celery_app worker --loglevel=info
+    volumes:
+      - ./backend/src:/app/src
+      - chroma_db:/app/chroma_db
+      - textracted:/app/textracted
+      - uploads:/app/uploads
+    environment:
+      - FLASK_ENV=${FLASK_ENV:-production}
+      - CHROMA_DB_PATH=/app/chroma_db
+      - RAW_DOCUMENTS_PATH=/app/raw-documents
+      - UPLOAD_FOLDER=/app/uploads
+      - OLLAMA_HOST=localhost:11434
+      - GCP_PROJECT_ID
+      - GCP_LOCATION
+      - GCP_SECRET_PATH
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      - redis
+
+  redis:
+    image: "redis:alpine"
+
+  chromadb:
+    image: chromadb/chroma:latest
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./chroma_db:/data
+    environment:
+      - CHROMA_DB_PATH=/data
+    restart: always
+
   frontend:
     build: ./frontend
     ports:

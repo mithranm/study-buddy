@@ -1,11 +1,11 @@
-# TODO
+# TODO - Please Be Mindful Of The Differences Between Main and Develop's Version
 
 ## App
 
 ### main.py
 
-* [X] Work on preventing dupes from entering the system (Filename can not be the same even with different extension).
-  * [X] For now just look for the same filename if that filename exists in the chromaDB then reject upload and let the user know.
+* [ ] Work on preventing dupes from entering the system (Filename can not be the same even with different extension).
+  * [ ] For now just look for the same filename if that filename exists in the chromaDB then reject upload and let the user know.
 
 ## Testing
 
@@ -15,7 +15,7 @@
 
 ## Documentation
 
-* [X] More pydocs also find a way to config pydocs to correctly document main.py with nested methods.
+* [ ] More pydocs also find a way to config pydocs to correctly document main.py with nested methods.
 
 ## Overall Design
 

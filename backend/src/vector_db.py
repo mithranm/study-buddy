@@ -1,53 +1,64 @@
 import chromadb
 from flask import request, jsonify, current_app
-from chromadb.utils import embedding_functions
+from chromadb.utils.embedding_functions.onnx_mini_lm_l6_v2 import ONNXMiniLM_L6_V2
+from chromadb.config import Settings
+from chromadb.config import DEFAULT_TENANT, DEFAULT_DATABASE, Settings
 import logging
+import time
 
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 # Global variables to store the Embedding Function and Chroma Client so they don't get made more than once
-embedding_function = None
 chroma_client = None
-
+embedding_function = None
 
 # HELPER METHODS
 
-def get_chroma_client():
+def get_chroma_client(max_retries=5, retry_delay=5):
     global chroma_client
-    if chroma_client is None:
-        chroma_db_path = current_app.config.get('CHROMA_DB_PATH', '/app/chroma_db')
+    retries = 0
+    while retries < max_retries:
         try:
-            chroma_client = chromadb.PersistentClient(path=chroma_db_path)
-            logger.info(f"ChromaDB client initialized with path: {chroma_db_path}")
+            if chroma_client is None:
+                chroma_host = current_app.config["CHROMA_HOST"]
+                chroma_port = current_app.config["CHROMA_PORT"]
+                logger.info(f"CHROMA_HOST IS {chroma_host}, CHROMA_PORT IS {chroma_port}")
+                chroma_client = chromadb.HttpClient(
+                    host=chroma_host,
+                    port=chroma_port,
+                    #TODO: Setup Authentication, it's not needed in a local setup though so we didn't really do it
+                    settings=Settings(
+                        chroma_client_auth_provider="chromadb.auth.token_authn.TokenAuthClientProvider",
+                        chroma_client_auth_credentials="your_secret_token_here",
+                        allow_reset=True
+                    )
+                )
+            else:
+                return chroma_client
         except Exception as e:
-            logger.error(f"Error initializing ChromaDB client: {str(e)}")
-            raise
-    return chroma_client
-
-def get_embedding_function():
-    global embedding_function
-    if embedding_function is None:
-        embedding_function = embedding_functions.DefaultEmbeddingFunction()
-    return embedding_function
+            logger.warning(f"Failed to connect to Chroma (attempt {retries + 1}/{max_retries}): {str(e)}")
+            retries += 1
+            if retries < max_retries:
+                logger.info(f"Retrying in {retry_delay} seconds...")
+                time.sleep(retry_delay)
+    raise Exception("Failed to connect Chroma after multiple attempts")
+    
 
 def get_collection():
-    """
-    Getter method to get the collection from the database this API is using.
-
-    Args:
-        None
-
-    Returns:
-        the collection of the database.
-    """
+    global embedding_function
+    logger.info("CALLED GET_COLLECTION")
     client = get_chroma_client()
-    embedding_func = get_embedding_function()
-    collection = client.get_or_create_collection(
-        name="documents",
-        embedding_function=embedding_func,
-        metadata={"hnsw:space": "cosine", "hnsw:construction_ef": 100, "hnsw:search_ef": 10}
-    )
-    return collection
+    collection = None
+    embedding_function = embedding_function or ONNXMiniLM_L6_V2(preferred_providers=["CPUExecutionProvider"])
+    try:
+        logger.info("asdf LINE 39")
+        collection = client.get_collection(name="documents", embedding_function=embedding_function)
+        return collection
+    except Exception as e:
+        logger.info("asdf LINE 42")
+        logger.info(f"Collection 'documents' not found, creating it. Error: {str(e)}")
+        collection = client.create_collection(name="documents", embedding_function=embedding_function)
 
 # API ENDPOINT FUNCTION
 
@@ -67,9 +78,12 @@ def search_documents(query):
         return jsonify({'error': 'No query given.'}), 400
     logger.debug(f"Searching documents with query: {query}")
     collection = get_collection()
-    results = collection.query(
-        query_texts=[query],
-        n_results=5
-    )
+    try:
+        results = collection.query(
+            query_texts=[query],
+            n_results=5
+        )
+        return results, 200
+    except Exception as e:
+        logger.error(f"ERROR: {str(e)}")
     
-    return results, 200

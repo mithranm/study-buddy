@@ -53,6 +53,7 @@ export default function App() {
 
   const handleDeleteDocument = async (filename) => {
     try {
+      console.log(filename)
       await axios.delete(`${BACKEND_URL_API}/documents/${filename}`);
       fetchDocuments();
     } catch (error) {

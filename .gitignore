@@ -16,12 +16,17 @@ pip-delete-this-directory.txt
 *.egg-info/
 .eggs/
 
-# Explicitly ignore backend Python cache
+# Explicitly ignore backend paths
 /backend/**/__pycache__/
 /backend/**/*.py[cod]
 /backend/**/chroma_db/
 /backend/**/uploads/
 /backend/**/textracted/
+/backend/**/extracted_images
+/backend/secrets/*
+!/backend/secrets/secrets-go-here.json
+/backend/**/chroma_data/
+/backend/**/logs
 
 # Poetry
 /backend/poetry.lock

@@ -153,9 +153,9 @@ class FlaskAppTestCase(unittest.TestCase):
             content_type='multipart/form-data',
             data={'file': (io.BytesIO(self.essay_content.encode('utf-8')), test_file)})
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 202)
         data = json.loads(response.data)
-        self.assertEqual(data['message'], 'File uploaded and embedded successfully')
+        self.assertEqual(data['message'], 'File recieved and is being processed')
 
         expected_file_path = os.path.join(self.temp_uploads, test_file)
         self.assertTrue(os.path.exists(expected_file_path))
@@ -240,7 +240,7 @@ class FlaskAppTestCase(unittest.TestCase):
         self.assertEqual(data['error'], 'Document not found')
 
     @patch('src.main.vector_db.search_documents')
-    @patch('src.main.vector_db.chat')
+    @patch('src.ollama_calls.chat')
     def test_chat_success(self, mock_chat, mock_search):
         logger.info("Testing successful chat")
         mock_search.return_value = {'documents': [['test result 1', 'test result 2']]}, 200

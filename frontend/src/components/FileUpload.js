@@ -1,43 +1,57 @@
 import React, { useState } from "react";
 import axios from "axios";
 
-const BACKEND_URL_API = (process.env.REACT_APP_BACKEND_URL ? process.env.REACT_APP_BACKEND_URL + "/api" : "http://localhost:9090/api");
+const BACKEND_URL_API = process.env.REACT_APP_BACKEND_URL
+  ? process.env.REACT_APP_BACKEND_URL + "/api"
+  : "http://localhost:9090/api";
 
 const FileUpload = ({ isBackendReady, fetchDocuments, setError }) => {
   const [file, setFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadStatus, setUploadStatus] = useState("");
 
   const handleFileUpload = async (e) => {
     e.preventDefault();
     if (!file) return;
 
     setIsUploading(true);
-    setUploadProgress(0);
+    setUploadStatus("Starting upload...");
     setError(null);
 
     const formData = new FormData();
     formData.append("file", file);
 
     try {
-      const response = await axios.post(`${BACKEND_URL_API}/upload`, formData, {
-        onUploadProgress: (progressEvent) => {
-          const percentCompleted = Math.round(
-            (progressEvent.loaded * 100) / progressEvent.total
-          );
-          setUploadProgress(percentCompleted);
-        },
-      });
-      alert(response.data.message);
-      fetchDocuments();
+      const response = await axios.post(`${BACKEND_URL_API}/upload`, formData);
+      const { filename } = response.data
+      console.log(filename)
+      
+      const eventSource = new EventSource(
+        `${BACKEND_URL_API}/upload/stream-status/${filename}`
+      );
+
+      eventSource.onmessage = (event) => {
+        setUploadStatus(event.data);
+        if (event.data === "completed") {
+          eventSource.close();
+          setIsUploading(false);
+          alert("File uploaded and embedded successfully");
+          fetchDocuments();
+        }
+      };
+
+      eventSource.onerror = (event) => {
+        eventSource.close();
+        setIsUploading(false);
+        setError("Error occurred while tracking upload progress");
+      };
+
     } catch (error) {
       console.error("Error uploading file:", error);
       setError(
         error.response?.data?.error || "Error uploading file. Please try again."
       );
     } finally {
-      setIsUploading(false);
-      setUploadProgress(0);
       setFile(null);
     }
   };
@@ -61,9 +75,12 @@ const FileUpload = ({ isBackendReady, fetchDocuments, setError }) => {
           disabled={!file || isUploading || !isBackendReady}
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50"
         >
-          {isUploading ? `Uploading... ${uploadProgress}%` : "Upload"}
+          {isUploading ? "Uploading..." : "Upload"}
         </button>
       </div>
+      {isUploading && (
+        <div className="mt-2 text-sm text-gray-600">Status: {uploadStatus}</div>
+      )}
     </form>
   );
 };

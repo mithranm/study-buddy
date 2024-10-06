@@ -33,9 +33,5 @@ ENV PYTHONPATH=/app/src
 # Expose the port the app runs on
 EXPOSE 9090
 
-# Create a non-root user and switch to it
-RUN useradd -m myuser
-USER myuser
-
 # Run the application using Gunicorn
 CMD ["gunicorn", "--bind", "0.0.0.0:9090", "src.wsgi:app"]

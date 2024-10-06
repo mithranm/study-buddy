@@ -30,8 +30,6 @@ const FileUpload = ({ isBackendReady, fetchDocuments, setError }) => {
         `${BACKEND_URL_API}/upload/stream-status/${filename}`
       );
 
-      console.log("hello")
-
       eventSource.onmessage = (event) => {
         setUploadStatus(event.data);
         if (event.data === "completed") {

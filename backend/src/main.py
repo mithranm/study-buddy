@@ -3,15 +3,17 @@ import nltk
 import logging
 import traceback
 import sys
-import threading
 import time
-from flask import Flask, request, jsonify, Blueprint, current_app, Response
+from flask import Flask, request, jsonify, Blueprint, current_app
 from flask_cors import CORS
+from celery import Celery, Task
+import redis
 
 # Project python files.
 from . import document_chunker as chunker
 from . import vector_db
 from . import ollama_calls as ollama
+from .tasks import process_file
 
 # BLUEPRINT OF API
 bp = Blueprint('study-buddy', __name__)
@@ -22,10 +24,6 @@ logger = logging.getLogger(__name__)
 logging.getLogger("urllib3").setLevel(logging.WARNING)
 logging.getLogger("gunicorn").setLevel(logging.WARNING)
 
-# GLOBAL VARIABLE FOR SERVER SENT EVENTS
-event_to_send = {}
-# GLOBAL LOCK FOR COLLECTION TO ENSURE NO RACE CONDITIONS
-collection_lock = threading.Lock()
 
 # API ENDPOINT METHODS HERE
 @bp.route('/status', methods=['GET'])
@@ -44,35 +42,6 @@ def get_status():
         'chroma_ready': current_app.chroma_ready,
         'error': current_app.initialization_error
     })
-
-@bp.route('/upload/stream-status/<filename>')
-def upload_stream_status(filename):
-    """
-    Sends status updates of file upload to the app that calls this endpoint using Server-Sent Event (SSE)
-
-    Args:
-        filename: String
-    
-    Returns:
-        A Response containing the status of the file. 
-    """
-
-    def event_stream():
-        while (True):
-            if filename in event_to_send:
-                status = event_to_send[filename]
-            else:
-                status = "unknown"
-
-            yield f"data: {status}\n\n" # SSE protocol that every Server Sent Event should be terminated with two newlines.
-            if (status == "completed"):
-                break
-
-            time.sleep(1)
-
-            
-    return Response(event_stream(), content_type='text/event-stream') # content_type will let the client or browser that this is an SSE stream.
-
 
 @bp.route('/upload', methods=['POST'])
 def upload_file():
@@ -99,39 +68,15 @@ def upload_file():
         file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], file.filename)
 
         collection = vector_db.get_collection()
-        event_to_send[file.filename] = "checking for dupes..."
         # Checks to see if the file already exists in the upload directory to prevent from the file being chunked again in chroma db.
 
         if(os.path.exists(file_path) and len(collection.get(where={"source": file_path})['ids'])): # Also checks the data base just to make sure no funny business is going on
-            event_to_send[file.filename] = "file already exist."
             return jsonify({"error": "Tried uploading a file that already exists."}), 400
         
-        event_to_send[file.filename] = "saving..."
         file.save(file_path)
 
-        # METHOD FOR THREADS TO PROCESS FILES
-        # Look into background workers tools like (Celery or RQ) TODO: READ DOCUMENTATION ON CELERY
-        def process_file(filename ,file_path, collection, textracted_path):
-            """
-            Where threads start to process files and embed them into the data base.
-
-            Args:
-                filename: String
-                collection: Database
-                textracted_path: String if the file is pdf it will need this parameter.
-
-            Returns:
-                None
-            """
-            event_to_send[filename] = "embedding file..."
-            # CRITICAL AREA.
-            with collection_lock:
-                # Pass the TEXTRACTED_PATH to embed_documents
-                chunker.embed_documents([file_path], collection, textracted_path)
-            event_to_send[filename] = "completed"
-
-        # Sending thread to complete adding to db in the background.
-        threading.Thread(target=process_file, args=(file.filename, file_path, collection, current_app.config["TEXTRACTED_PATH"])).start()
+        # Sending a task to complete adding to db in the background.
+        process_file.delay(file.filename, file_path, current_app.config["TEXTRACTED_PATH"])
 
         return jsonify({'message': 'File recieved and is being processed', 'filename': file.filename}), 202
 
@@ -264,6 +209,34 @@ def chat_wrapper():
         print("Exception chat")
         traceback.print_exc(file=sys.stderr)
         return jsonify({'error': f'Exception in chat process: {str(e)}'}), 500
+    
+def celery_init_app(app: Flask) -> Celery:
+    """
+    Initialize celery app.
+    """
+    class FlaskTask(Task):
+        def __call__(self, *args: object, **kwargs: object) -> object:
+            with app.app_context():
+                return self.run(*args, **kwargs)
+
+    celery_app = Celery(app.name, task_cls=FlaskTask)
+    celery_app.config_from_object(app.config["CELERY"])
+    celery_app.set_default()
+    app.extensions["celery"] = celery_app
+    return celery_app
+
+def initialize_chroma():
+    client = vector_db.get_chroma_client()
+    try:
+        # Attempt to create the default tenant and database
+        client.create_tenant("default_tenant")
+        client.create_database("default_database", "default_tenant")
+    except Exception as e:
+        # If tenant/database already exists, this will throw an exception
+        logger.info(f"Tenant/Database initialization: {str(e)}")
+    
+    # Now get or create your collection
+    collection = vector_db.get_collection()
 
 def create_app(test_config=None):
     """
@@ -271,6 +244,28 @@ def create_app(test_config=None):
     """
     app = Flask(__name__)
     CORS(app)
+
+    # Initialize Redis client
+    app.redis_client = redis.StrictRedis(
+        host=os.getenv("REDIS_HOST", "localhost"),   # Change as necessary
+        port=6379,          # Default Redis port
+        db=0,               # Database number
+        decode_responses=True  # Optional: decode responses to strings
+    )
+
+
+    app.config.from_mapping(
+        CHROMA_HOST=os.getenv("CHROMA_HOST", "localhost"),  # Service name if using Docker Compose
+        CHROMA_PORT=os.getenv("CHROMA_PORT", "9092"),        # Port exposed by ChromaDB server
+        CELERY=dict(
+            broker_url="redis://localhost:6379",
+            result_backend="redis://localhost:6379",
+            task_ignore_result=True,
+        ),
+    )
+
+    app.config.from_prefixed_env()
+    celery_init_app(app)
 
     if test_config is None:
         # Load the instance config, if it exists, when not testing
@@ -312,7 +307,7 @@ def create_app(test_config=None):
             app.nltk_ready = True
 
             # Initialize Chroma collection
-            vector_db.get_collection()
+            initialize_chroma()
             app.chroma_ready = True
         except LookupError as le:
             app.initialization_error = f"NLTK LookupError: {str(le)}"

@@ -1,22 +1,34 @@
-FROM python:3.11.10
+FROM python:3.11.10-slim
 
 # Set the working directory
 WORKDIR /app
 
-# Install poetry
+# Install tesseract and clean up in the same layer
+ENV PYTHONUNBUFFERED=1
+RUN apt-get update \
+    && apt-get -y install tesseract-ocr \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Poetry
 RUN pip install poetry
 
 # Copy only requirements files first to leverage Docker cache
 COPY pyproject.toml poetry.lock ./
 
-# Configure poetry and install dependencies
-RUN poetry config virtualenvs.create false \
-    && poetry install --no-interaction --no-ansi
+# Configure Poetry to create virtual environment inside the project directory
+RUN poetry config virtualenvs.create true \
+    && poetry config virtualenvs.in-project true
 
-# Copy the source code and necessary configuration files
-COPY src/ src/
+# Install dependencies with cache mount
+RUN --mount=type=cache,target=/root/.cache/pypoetry \
+    poetry install --no-interaction --no-ansi
 
-COPY secrets/ secrets/
+# Update PATH to include the virtual environment binaries
+ENV PATH="/app/.venv/bin:$PATH"
+
+# Set PYTHONPATH
+ENV PYTHONPATH=/app/src
 
 # Expose the port the app runs on
 EXPOSE 9090

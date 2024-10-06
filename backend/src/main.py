@@ -14,6 +14,7 @@ from . import document_chunker as chunker
 from . import vector_db
 from . import ollama_calls as ollama
 from .tasks import process_file
+from . import make_celery
 
 # BLUEPRINT OF API
 bp = Blueprint('study-buddy', __name__)
@@ -79,10 +80,39 @@ def upload_file():
         process_file.delay(file.filename, file_path, current_app.config["TEXTRACTED_PATH"])
 
         return jsonify({'message': 'File recieved and is being processed', 'filename': file.filename}), 202
-    
+
 @bp.route('/task_status/<task_id>') # made it task_id to add more scalability.
 def task_status(task_id):
-    
+    task = current_app.celery_app.AsyncResult(task_id)
+    if task.state == 'PENDING':
+        # Task has not started yet
+        response = {
+            'state': task.state,
+            'status': 'Pending...'
+        }
+    elif task.state == 'STARTED':
+        response = {
+            'state': task.state,
+            'status': task.info.get('status', '')
+        }
+    elif task.state == 'SUCCESS':
+        response = {
+            'state': task.state,
+            'status': task.info.get('status', '')
+        }
+    elif task.state == 'FAILURE':
+        # Something went wrong in the background job
+        response = {
+            'state': task.state,
+            'status': str(task.info.get('status', ''))
+        }
+    else:
+        # For any other states
+        response = {
+            'state': task.state,
+            'status': task.info.get('status', '')
+        }
+    return jsonify(response)
 
 
 @bp.route('/search', methods=['POST'])
@@ -214,21 +244,6 @@ def chat_wrapper():
         print("Exception chat")
         traceback.print_exc(file=sys.stderr)
         return jsonify({'error': f'Exception in chat process: {str(e)}'}), 500
-    
-def celery_init_app(app: Flask) -> Celery:
-    """
-    Initialize celery app.
-    """
-    class FlaskTask(Task):
-        def __call__(self, *args: object, **kwargs: object) -> object:
-            with app.app_context():
-                return self.run(*args, **kwargs)
-
-    celery_app = Celery(app.name, task_cls=FlaskTask)
-    celery_app.config_from_object(app.config["CELERY"])
-    celery_app.set_default()
-    app.extensions["celery"] = celery_app
-    return celery_app
 
 def initialize_chroma():
     client = vector_db.get_chroma_client()
@@ -258,7 +273,6 @@ def create_app(test_config=None):
         decode_responses=True  # Optional: decode responses to strings
     )
 
-
     app.config.from_mapping(
         CHROMA_HOST=os.getenv("CHROMA_HOST", "localhost"),  # Service name if using Docker Compose
         CHROMA_PORT=os.getenv("CHROMA_PORT", "9092"),        # Port exposed by ChromaDB server
@@ -270,7 +284,12 @@ def create_app(test_config=None):
     )
 
     app.config.from_prefixed_env()
-    celery_init_app(app)
+
+    # Initialize Celery
+    celery_app = make_celery(app)
+    # Store celery_app as an attribute of app
+    app.celery_app = celery_app
+
 
     if test_config is None:
         # Load the instance config, if it exists, when not testing

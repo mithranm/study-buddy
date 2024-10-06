@@ -40,7 +40,7 @@ services:
 
   celery_worker:
     build: ./backend
-    command: celery -A src.make_celery.celery_app worker --pool=solo --loglevel=INFO
+    command: celery -A src worker --pool=solo --loglevel=INFO
     volumes:
       - ./backend/src:/app/src
       - chroma_db:/app/chroma_db

@@ -3,7 +3,6 @@ import logging
 from . import vector_db
 from . import document_chunker as chunker
 
-logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 @shared_task(bind=True)
@@ -13,14 +12,10 @@ def process_file(self, file_path, textracted_path):
 
     Args:
         self: The task instance.
-        file_path: String containing the path of the file.
-        textracted_path: String containing the path to the textracted directory.
-
-    Returns:
-        None
+        file_path: Path to the uploaded file.
+        textracted_path: Path to the textracted directory.
     """
     try:
-        # Log the start of the processing
         logger.info(f"Starting to process file: {file_path}")
 
         # Update task state
@@ -29,7 +24,6 @@ def process_file(self, file_path, textracted_path):
         collection = vector_db.get_collection()
         chunker.embed_documents([file_path], collection, textracted_path)
 
-        # Log successful processing
         logger.info(f"Successfully processed file: {file_path}")
 
         return {'status': 'Task completed'}

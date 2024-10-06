@@ -2,7 +2,6 @@ import chromadb
 from flask import request, jsonify, current_app
 from chromadb.utils.embedding_functions.onnx_mini_lm_l6_v2 import ONNXMiniLM_L6_V2
 from chromadb.config import Settings
-from chromadb.config import DEFAULT_TENANT, DEFAULT_DATABASE, Settings
 import logging
 import time
 
@@ -27,47 +26,49 @@ def get_chroma_client(max_retries=5, retry_delay=5):
                 chroma_client = chromadb.HttpClient(
                     host=chroma_host,
                     port=chroma_port,
-                    #TODO: Setup Authentication, it's not needed in a local setup though so we didn't really do it
                     settings=Settings(
-                        chroma_client_auth_provider="chromadb.auth.token_authn.TokenAuthClientProvider",
-                        chroma_client_auth_credentials="your_secret_token_here",
                         allow_reset=True
                     )
                 )
-            else:
-                return chroma_client
+            return chroma_client
         except Exception as e:
             logger.warning(f"Failed to connect to Chroma (attempt {retries + 1}/{max_retries}): {str(e)}")
             retries += 1
             if retries < max_retries:
                 logger.info(f"Retrying in {retry_delay} seconds...")
                 time.sleep(retry_delay)
-    raise Exception("Failed to connect Chroma after multiple attempts")
-    
+    raise Exception("Failed to connect to Chroma after multiple attempts")
 
 def get_collection():
     global embedding_function
     logger.info("CALLED GET_COLLECTION")
     client = get_chroma_client()
-    collection = None
     embedding_function = embedding_function or ONNXMiniLM_L6_V2(preferred_providers=["CPUExecutionProvider"])
-    logger.info("trying to get collection \'documents\'")
+    logger.info("trying to get collection 'documents'")
     collection = client.get_or_create_collection(name="documents", embedding_function=embedding_function)
     return collection
+
+def initialize_chroma():
+    client = get_chroma_client()
+    try:
+        # Attempt to create the default tenant and database
+        # This might not be necessary depending on your ChromaDB version
+        # If these methods don't exist, you can remove them
+        # client.create_tenant("default_tenant")
+        # client.create_database("default_database", "default_tenant")
+        pass  # Placeholder if not needed
+    except Exception as e:
+        # If tenant/database already exists, this will throw an exception
+        logger.info(f"Tenant/Database initialization: {str(e)}")
+    
+    # Now get or create your collection
+    collection = get_collection()
 
 # API ENDPOINT FUNCTION
 
 def search_documents(query):
     """
     Search through submitted files to find the best matches for the given query.
-
-    This function handles all POST requests to the '/search' endpoint.
-
-    Args:
-        None
-    Returns:
-        tuple - a dictionary of the data and the http code
-        if successful: returns the results of the prompt it was given with a status code of 200
     """
     if not query:
         return jsonify({'error': 'No query given.'}), 400
@@ -81,4 +82,4 @@ def search_documents(query):
         return results, 200
     except Exception as e:
         logger.error(f"ERROR: {str(e)}")
-    
+        return jsonify({'error': str(e)}), 500

@@ -4,30 +4,43 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - ./backend/src:/app/src
       - chroma_db:/app/chroma_db
       - textracted:/app/textracted
       - uploads:/app/uploads
+      - ./backend/src:/app/src
+      - ./backend/secrets:/app/secrets
     environment:
-      - FLASK_ENV=${FLASK_ENV:-production}  # Default to production if not set
+      - FLASK_ENV=${FLASK_ENV:-production}
       - FLASK_APP=src.main
       - FLASK_RUN_PORT=9090
       - CHROMA_DB_PATH=/app/chroma_db
       - RAW_DOCUMENTS_PATH=/app/raw-documents
       - UPLOAD_FOLDER=/app/uploads
-      - OLLAMA_HOST=localhost:11434
+      - OLLAMA_HOST=host.docker.internal:11434
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - CHROMA_HOST=chromadb
+      - CHROMA_PORT=8000
+      - REDIS_HOST=redis
+    env_file:
+      - ./backend/.env
     working_dir: /app
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9090/api/status"]
       interval: 30s
       timeout: 10s
       retries: 5
-    env_file:
-      - ./backend/.env
+    depends_on:
+      redis:
+        condition: service_healthy
+      chromadb:
+        condition: service_healthy
+    networks:
+      - net
 
   celery_worker:
     build: ./backend
-    command: celery -A src.make_celery.celery_app worker --loglevel=info
+    command: celery -A src.make_celery.celery_app worker --pool=solo --loglevel=INFO
     volumes:
       - ./backend/src:/app/src
       - chroma_db:/app/chroma_db
@@ -38,27 +51,48 @@ services:
       - CHROMA_DB_PATH=/app/chroma_db
       - RAW_DOCUMENTS_PATH=/app/raw-documents
       - UPLOAD_FOLDER=/app/uploads
-      - OLLAMA_HOST=localhost:11434
-      - GCP_PROJECT_ID
-      - GCP_LOCATION
-      - GCP_SECRET_PATH
+      - OLLAMA_HOST=host.docker.internal:11434
       - CELERY_BROKER_URL=redis://redis:6379/0
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - CHROMA_HOST=chromadb
+      - CHROMA_PORT=8000
+    env_file:
+      - ./backend/.env
     depends_on:
-      - redis
+      redis:
+        condition: service_healthy
+      chromadb:
+        condition: service_healthy
+    networks:
+      - net
 
   redis:
     image: "redis:alpine"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 30s
+      retries: 50
+    networks:
+      - net
 
   chromadb:
-    image: chromadb/chroma:latest
+    image: chromadb/chroma:0.5.11
+    volumes:
+      - ./chromadb:/chroma/chroma
+    environment:
+      - IS_PERSISTENT=TRUE
+      - PERSIST_DIRECTORY=/chroma/chroma
+      - ANONYMIZED_TELEMETRY=${ANONYMIZED_TELEMETRY:-TRUE}
     ports:
       - "8000:8000"
-    volumes:
-      - ./chroma_db:/data
-    environment:
-      - CHROMA_DB_PATH=/data
-    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/heartbeat"]
+      interval: 5s
+      timeout: 30s
+      retries: 50
+    networks:
+      - net
 
   frontend:
     build: ./frontend
@@ -73,6 +107,11 @@ services:
       - PORT=9091
     depends_on:
       - backend
+    networks:
+      - net
+
+networks:
+  net:
 
 volumes:
   chroma_db:

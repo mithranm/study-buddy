@@ -247,7 +247,7 @@ def create_app(test_config=None):
 
     # Initialize Redis client
     app.redis_client = redis.StrictRedis(
-        host='localhost',   # Change as necessary
+        host=os.getenv("REDIS_HOST", "localhost"),   # Change as necessary
         port=6379,          # Default Redis port
         db=0,               # Database number
         decode_responses=True  # Optional: decode responses to strings
@@ -255,8 +255,8 @@ def create_app(test_config=None):
 
 
     app.config.from_mapping(
-        CHROMA_SERVER_HOST="chromadb",  # Service name if using Docker Compose
-        CHROMA_SERVER_PORT=8000,        # Port exposed by ChromaDB server
+        CHROMA_HOST=os.getenv("CHROMA_HOST", "localhost"),  # Service name if using Docker Compose
+        CHROMA_PORT=os.getenv("CHROMA_PORT", "9092"),        # Port exposed by ChromaDB server
         CELERY=dict(
             broker_url="redis://localhost:6379",
             result_backend="redis://localhost:6379",

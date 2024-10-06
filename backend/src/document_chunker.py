@@ -312,21 +312,21 @@ def process_pdf_with_captions(file_path: str, textracted_path: str) -> str:
         num_images = sum(1 for el in elements if el["type"] == "image")
         logger.debug(f"Page {page_num}: Found {num_text} text blocks and {num_images} image blocks")
 
-        # # If no text blocks, perform OCR on the entire page
-        # if num_text == 0:
-        #     logger.debug(f"No text blocks found on page {page_num}. Performing OCR on entire page.")
-        #     try:
-        #         pix = page.get_pixmap()
-        #         img_data = pix.pil_tobytes("png")
-        #         image = Image.open(io.BytesIO(img_data))
-        #         ocr_text = pytesseract.image_to_string(image).strip()
-        #         if ocr_text:
-        #             full_text += ocr_text + "\n"
-        #             logger.info(f"Added OCR text from entire page {page_num}: {ocr_text[:100]}...")
-        #         else:
-        #             logger.warning(f"No text extracted via OCR from entire page {page_num}")
-        #     except Exception as e:
-        #         logger.error(f"Failed to perform OCR on entire page {page_num}: {e}")
+        # If no text blocks, perform OCR on the entire page
+        if num_text == 0:
+            logger.debug(f"No text blocks found on page {page_num}. Performing OCR on entire page.")
+            try:
+                pix = page.get_pixmap()
+                img_data = pix.pil_tobytes("png")
+                image = Image.open(io.BytesIO(img_data))
+                ocr_text = pytesseract.image_to_string(image).strip()
+                if ocr_text:
+                    full_text += ocr_text + "\n"
+                    logger.info(f"Added OCR text from entire page {page_num}: {ocr_text[:100]}...")
+                else:
+                    logger.warning(f"No text extracted via OCR from entire page {page_num}")
+            except Exception as e:
+                logger.error(f"Failed to perform OCR on entire page {page_num}: {e}")
 
         # Sort elements by their vertical position (y0)
         elements.sort(key=lambda el: el["y0"])

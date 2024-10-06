@@ -4,6 +4,7 @@ from chromadb.utils.embedding_functions.onnx_mini_lm_l6_v2 import ONNXMiniLM_L6_
 from chromadb.config import Settings
 from chromadb.config import DEFAULT_TENANT, DEFAULT_DATABASE, Settings
 import logging
+import time
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -14,24 +15,34 @@ embedding_function = None
 
 # HELPER METHODS
 
-def get_chroma_client():
+def get_chroma_client(max_retries=5, retry_delay=5):
     global chroma_client
-    try:
-        if chroma_client is None:
-            chroma_client = chromadb.HttpClient(
-                host="localhost",
-                port=8000,
-                settings=Settings(
-                    chroma_client_auth_provider="chromadb.auth.token_authn.TokenAuthClientProvider",
-                    chroma_client_auth_credentials="your_secret_token_here",
-                    allow_reset=True
+    retries = 0
+    while retries < max_retries:
+        try:
+            if chroma_client is None:
+                chroma_host = current_app.config["CHROMA_HOST"]
+                chroma_port = current_app.config["CHROMA_PORT"]
+                logger.info(f"CHROMA_HOST IS {chroma_host}, CHROMA_PORT IS {chroma_port}")
+                chroma_client = chromadb.HttpClient(
+                    host=chroma_host,
+                    port=chroma_port,
+                    #TODO: Setup Authentication, it's not needed in a local setup though so we didn't really do it
+                    settings=Settings(
+                        chroma_client_auth_provider="chromadb.auth.token_authn.TokenAuthClientProvider",
+                        chroma_client_auth_credentials="your_secret_token_here",
+                        allow_reset=True
+                    )
                 )
-            )
-        else:
-            return chroma_client
-    except Exception as e:
-        logger.error(f"Error get_chroma_client: {e}")
-        raise
+            else:
+                return chroma_client
+        except Exception as e:
+            logger.warning(f"Failed to connect to Chroma (attempt {retries + 1}/{max_retries}): {str(e)}")
+            retries += 1
+            if retries < max_retries:
+                logger.info(f"Retrying in {retry_delay} seconds...")
+                time.sleep(retry_delay)
+    raise Exception("Failed to connect Chroma after multiple attempts")
     
 
 def get_collection():

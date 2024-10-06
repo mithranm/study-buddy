@@ -21,6 +21,9 @@ bp = Blueprint('study-buddy', __name__)
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
+logging.getLogger("urllib3").setLevel(logging.WARNING)
+logging.getLogger("gunicorn").setLevel(logging.WARNING)
+
 
 # API ENDPOINT METHODS HERE
 @bp.route('/status', methods=['GET'])
@@ -222,6 +225,19 @@ def celery_init_app(app: Flask) -> Celery:
     app.extensions["celery"] = celery_app
     return celery_app
 
+def initialize_chroma():
+    client = vector_db.get_chroma_client()
+    try:
+        # Attempt to create the default tenant and database
+        client.create_tenant("default_tenant")
+        client.create_database("default_database", "default_tenant")
+    except Exception as e:
+        # If tenant/database already exists, this will throw an exception
+        logger.info(f"Tenant/Database initialization: {str(e)}")
+    
+    # Now get or create your collection
+    collection = vector_db.get_collection()
+
 def create_app(test_config=None):
     """
     Creates the app.
@@ -240,7 +256,7 @@ def create_app(test_config=None):
 
     app.config.from_mapping(
         CHROMA_SERVER_HOST="chromadb",  # Service name if using Docker Compose
-        CHROMA_SERVER_PORT=9092,        # Port exposed by ChromaDB server
+        CHROMA_SERVER_PORT=8000,        # Port exposed by ChromaDB server
         CELERY=dict(
             broker_url="redis://localhost:6379",
             result_backend="redis://localhost:6379",
@@ -291,7 +307,7 @@ def create_app(test_config=None):
             app.nltk_ready = True
 
             # Initialize Chroma collection
-            vector_db.get_collection()
+            initialize_chroma()
             app.chroma_ready = True
         except LookupError as le:
             app.initialization_error = f"NLTK LookupError: {str(le)}"

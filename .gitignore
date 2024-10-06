@@ -23,7 +23,10 @@ pip-delete-this-directory.txt
 /backend/**/uploads/
 /backend/**/textracted/
 /backend/**/extracted_images
-/backend/secrets/selfcareassistant-99a02733eae9.json
+/backend/secrets/*
+!/backend/secrets/secrets-go-here.json
+/backend/**/chroma_data/
+/backend/**/logs
 
 # Poetry
 /backend/poetry.lock

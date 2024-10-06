@@ -466,7 +466,7 @@ def embed_documents(file_paths: List[str], collection: chromadb.Collection, text
 
     logger.info(f"Adding {len(all_chunks)} chunks to ChromaDB collection.")
     try:
-        collection.add(
+        collection.upsert(
             documents=all_chunks,
             ids=all_ids,
             metadatas=all_metadatas

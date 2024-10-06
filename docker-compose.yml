@@ -21,7 +21,7 @@ services:
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
       - CHROMA_HOST=chromadb
       - CHROMA_PORT=8000
-      - REDIS_HOST=redis
+      - REDIS_URL=redis://redis_db
     env_file:
       - ./backend/.env
     working_dir: /app
@@ -40,7 +40,7 @@ services:
 
   celery_worker:
     build: ./backend
-    command: celery -A src.make_celery.celery_app worker --pool=solo --loglevel=INFO
+    command: celery -A src worker --pool=solo --loglevel=INFO
     volumes:
       - ./backend/src:/app/src
       - chroma_db:/app/chroma_db

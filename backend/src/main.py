@@ -14,6 +14,8 @@ from . import document_chunker as chunker
 from . import vector_db
 from . import ollama_calls as ollama
 from .tasks import process_file
+from . import make_celery
+from werkzeug.utils import secure_filename
 
 # BLUEPRINT OF API
 bp = Blueprint('study-buddy', __name__)
@@ -29,13 +31,7 @@ logging.getLogger("gunicorn").setLevel(logging.WARNING)
 @bp.route('/status', methods=['GET'])
 def get_status():
     """
-    Getter method for status of backend to let any application using this interface know when its ready.
-
-    Args:
-        None
-
-    Returns:
-        json - containing nltk and chroma status variables.
+    Endpoint to check the status of the backend.
     """
     return jsonify({
         'nltk_ready': current_app.nltk_ready,
@@ -46,39 +42,64 @@ def get_status():
 @bp.route('/upload', methods=['POST'])
 def upload_file():
     """
-    Uploads a file that is chosen by the user.
-
-    This function handles all POST request to the '/upload' endpoint.
-
-    Args:
-        None
-    Returns:
-        tuple: a json of the message and the http code
-        if successful: ({'message': 'File uploaded and embedded sucessfully'}, 200)
-        if backend not ready: ({'error': 'Backend is not fully initialized yet'}, 503)
-        if theres no file to upload: ({'error': 'No file part'}, 400)
-        if filename is empty: ({'error': 'No selected file'}, 400)
+    Uploads a file and processes it asynchronously.
     """
     if 'file' not in request.files:
         return jsonify({'error': 'No file part'}), 400
+
     file = request.files['file']
     if file.filename == '':
         return jsonify({'error': 'No selected file'}), 400
+
     if file:
-        file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], file.filename)
+        filename = secure_filename(file.filename)
+        file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
 
         collection = vector_db.get_collection()
-        # Checks to see if the file already exists in the upload directory to prevent from the file being chunked again in chroma db.
+        if os.path.exists(file_path) and len(collection.get(where={"source": file_path})['ids']):
+            return jsonify({"error": "File already exists."}), 400
 
-        if(os.path.exists(file_path) and len(collection.get(where={"source": file_path})['ids'])): # Also checks the data base just to make sure no funny business is going on
-            return jsonify({"error": "Tried uploading a file that already exists."}), 400
-        
         file.save(file_path)
 
-        # Sending a task to complete adding to db in the background.
-        process_file.delay(file.filename, file_path, current_app.config["TEXTRACTED_PATH"])
+        # Enqueue the task
+        task = process_file.delay(file_path, current_app.config["TEXTRACTED_PATH"])
 
-        return jsonify({'message': 'File recieved and is being processed', 'filename': file.filename}), 202
+        return jsonify({'message': 'File received and is being processed', 'task_id': task.id}), 202
+
+@bp.route('/task_status/<task_id>')
+def task_status(task_id):
+    """
+    Retrieves the status of a Celery task.
+    """
+    task = current_app.celery.AsyncResult(task_id)
+    if task.state == 'PENDING':
+        response = {
+            'state': task.state,
+            'status': 'Pending...'
+        }
+    elif task.state == 'STARTED':
+        response = {
+            'state': task.state,
+            'status': task.info.get('status', '')
+        }
+    elif task.state == 'SUCCESS':
+        response = {
+            'state': task.state,
+            'status': task.info.get('status', '')
+        }
+    elif task.state == 'FAILURE':
+        response = {
+            'state': task.state,
+            'status': str(task.info.get('status', '')),
+            'traceback': str(task.info)
+        }
+    else:
+        response = {
+            'state': task.state,
+            'status': task.info.get('status', '')
+        }
+    return jsonify(response)
+
 
 @bp.route('/search', methods=['POST'])
 def search_wrapper():
@@ -209,21 +230,6 @@ def chat_wrapper():
         print("Exception chat")
         traceback.print_exc(file=sys.stderr)
         return jsonify({'error': f'Exception in chat process: {str(e)}'}), 500
-    
-def celery_init_app(app: Flask) -> Celery:
-    """
-    Initialize celery app.
-    """
-    class FlaskTask(Task):
-        def __call__(self, *args: object, **kwargs: object) -> object:
-            with app.app_context():
-                return self.run(*args, **kwargs)
-
-    celery_app = Celery(app.name, task_cls=FlaskTask)
-    celery_app.config_from_object(app.config["CELERY"])
-    celery_app.set_default()
-    app.extensions["celery"] = celery_app
-    return celery_app
 
 def initialize_chroma():
     client = vector_db.get_chroma_client()
@@ -247,25 +253,29 @@ def create_app(test_config=None):
 
     # Initialize Redis client
     app.redis_client = redis.StrictRedis(
-        host=os.getenv("REDIS_HOST", "localhost"),   # Change as necessary
+        host=os.getenv("REDIS_HOST", "redis://localhost:6379/0"),
         port=6379,          # Default Redis port
         db=0,               # Database number
         decode_responses=True  # Optional: decode responses to strings
     )
 
-
     app.config.from_mapping(
         CHROMA_HOST=os.getenv("CHROMA_HOST", "localhost"),  # Service name if using Docker Compose
         CHROMA_PORT=os.getenv("CHROMA_PORT", "9092"),        # Port exposed by ChromaDB server
         CELERY=dict(
-            broker_url="redis://localhost:6379",
-            result_backend="redis://localhost:6379",
+            broker_url=os.getenv("REDIS_URL", "redis://localhost:6379/0"),
+            result_backend=os.getenv("REDIS_URL", "redis://localhost:6379/0"),
             task_ignore_result=True,
         ),
     )
 
     app.config.from_prefixed_env()
-    celery_init_app(app)
+
+    # Initialize Celery
+    celery_app = make_celery(app)
+    # Store celery_app as an attribute of app
+    app.celery_app = celery_app
+
 
     if test_config is None:
         # Load the instance config, if it exists, when not testing

@@ -14,7 +14,7 @@ This was developed on a M1 Macbook Pro with 16gb RAM. Your mileage shouldn't var
 
 * Ollama (running somewhere you can access)
 * Docker
-* Pyenv and Poetry
+* Poetry
 * NodeJS
 
 ## Usage

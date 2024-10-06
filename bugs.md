@@ -12,4 +12,4 @@
 
 # Testing
 
-* [ ] test_integration.log doesn't contain debug level logs.
+* [X] test_integration.log doesn't contain debug level logs.

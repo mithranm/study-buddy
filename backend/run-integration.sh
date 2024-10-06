@@ -7,9 +7,18 @@ pkill -f 'celery' 2>/dev/null
 
 sleep 1
 
-rm -rf ./chroma_data/* 
-rm -rf ./chroma_db/*
-rm -rf ./textracted/* ./uploads/* ./extracted_images/*
+# Function to handle clean start
+clean_backend() {
+    echo "Cleaning backend files..."
+    rm -rf ./chroma_data/*
+    rm -rf ./chroma_db/*
+    rm -rf ./textracted/* ./uploads/* ./extracted_images/*
+}
+
+# Check for the --clean argument
+if [ "$1" == "--clean" ]; then
+    clean_backend
+fi
 
 CHROMA_PORT=9092
 

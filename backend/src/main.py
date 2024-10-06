@@ -79,6 +79,11 @@ def upload_file():
         process_file.delay(file.filename, file_path, current_app.config["TEXTRACTED_PATH"])
 
         return jsonify({'message': 'File recieved and is being processed', 'filename': file.filename}), 202
+    
+@bp.route('/task_status/<task_id>') # made it task_id to add more scalability.
+def task_status(task_id):
+    
+
 
 @bp.route('/search', methods=['POST'])
 def search_wrapper():
@@ -247,7 +252,7 @@ def create_app(test_config=None):
 
     # Initialize Redis client
     app.redis_client = redis.StrictRedis(
-        host=os.getenv("REDIS_HOST", "localhost"),   # Change as necessary
+        host=os.getenv("REDIS_HOST", "redis://localhost:6379/0"),
         port=6379,          # Default Redis port
         db=0,               # Database number
         decode_responses=True  # Optional: decode responses to strings
@@ -258,8 +263,8 @@ def create_app(test_config=None):
         CHROMA_HOST=os.getenv("CHROMA_HOST", "localhost"),  # Service name if using Docker Compose
         CHROMA_PORT=os.getenv("CHROMA_PORT", "9092"),        # Port exposed by ChromaDB server
         CELERY=dict(
-            broker_url="redis://localhost:6379",
-            result_backend="redis://localhost:6379",
+            broker_url=os.getenv("REDIS_URL", "redis://localhost:6379/0"),
+            result_backend=os.getenv("REDIS_URL", "redis://localhost:6379/0"),
             task_ignore_result=True,
         ),
     )

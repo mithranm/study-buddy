@@ -51,14 +51,9 @@ def get_collection():
     client = get_chroma_client()
     collection = None
     embedding_function = embedding_function or ONNXMiniLM_L6_V2(preferred_providers=["CPUExecutionProvider"])
-    try:
-        logger.info("asdf LINE 39")
-        collection = client.get_collection(name="documents", embedding_function=embedding_function)
-        return collection
-    except Exception as e:
-        logger.info("asdf LINE 42")
-        logger.info(f"Collection 'documents' not found, creating it. Error: {str(e)}")
-        collection = client.create_collection(name="documents", embedding_function=embedding_function)
+    logger.info("trying to get collection \'documents\'")
+    collection = client.get_or_create_collection(name="documents", embedding_function=embedding_function)
+    return collection
 
 # API ENDPOINT FUNCTION
 

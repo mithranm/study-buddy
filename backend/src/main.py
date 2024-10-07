@@ -173,7 +173,8 @@ def delete_document(filename):
         if (split_filename[1] == ".pdf"):
             textracted_path = os.path.join(current_app.config['TEXTRACTED_PATH'], f"{split_filename[0]}.md")
 
-            os.remove(textracted_path)
+            if (os.path.exists(textracted_path)):
+                os.remove(textracted_path)
 
         logger.info(f"New collection file should not be present: {collection.peek(100)['ids']}") # after deletion you should not see the file in the database you just deleted.
         return jsonify({'message': 'Document deleted successfully'}), 200

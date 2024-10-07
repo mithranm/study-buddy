@@ -188,7 +188,7 @@ def get_models_wrapper():
     """
     if (not ollama.ollama_health_check()):
         logger.info("Ollama is not running")
-        return jsonify({'error': 'Ollama is not running, please make sure ollama is running on your local machine'}, 503)
+        return jsonify({'error': 'Ollama is not running, please make sure ollama is running on your local machine'}), 503
     
     return ollama.get_models()
 

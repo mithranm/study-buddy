@@ -1,64 +1,46 @@
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
-import { io } from "socket.io-client";
 
 const BACKEND_URL_API = process.env.REACT_APP_BACKEND_URL
   ? process.env.REACT_APP_BACKEND_URL + "/api"
   : "http://localhost:9090/api";
 
-const SOCKET_URL = process.env.REACT_APP_SOCKET_URL || "http://localhost:9090";
-
-const FileUpload = ({ isBackendReady, fetchDocuments, setError }) => {
+const FileUpload = ({ isBackendReady, fetchDocuments, socket, setError }) => {
   const [file, setFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState("");
   const [processingStatus, setProcessingStatus] = useState("");
-  const [socket, setSocket] = useState(null);
 
-  const handleSocketMessage = useCallback((message) => {
-    switch (message.type) {
-      case "upload_status":
-        setUploadStatus(message.status);
-        if (message.status === "Upload complete") {
-          setIsUploading(false);
-        }
-        break;
-      case "processing_status":
-        setProcessingStatus(message.status);
-        if (message.status === "Processing complete") {
-          fetchDocuments();
-        }
-        break;
-      default:
-        console.log("Received unknown message type:", message.type);
-    }
-  }, [fetchDocuments]);
+  const handleSocketMessage = useCallback(
+    (message) => {
+      switch (message.type) {
+        case "upload_status":
+          setUploadStatus(message.status);
+          if (message.status === "Upload complete") {
+            setIsUploading(false);
+          }
+          break;
+        case "processing_status":
+          setProcessingStatus(message.status);
+          if (message.status === "Processing complete") {
+            fetchDocuments();
+          }
+          break;
+        default:
+          console.log("Received unknown message type:", message.type);
+      }
+    },
+    [fetchDocuments]
+  );
 
   useEffect(() => {
-    const newSocket = io(SOCKET_URL, {
-      transports: ['websocket'],
-      upgrade: false
+    if (socket == null) return;
+
+    socket.on("message", () => {
+      console.log("Recieving message from backend through WebSocket");
+      handleSocketMessage();
     });
-
-    newSocket.on("connect", () => {
-      console.log("Socket.IO connection established");
-    });
-
-    newSocket.on("message", (data) => {
-      handleSocketMessage(data);
-    });
-
-    newSocket.on("connect_error", (error) => {
-      console.error("Socket.IO connection error:", error);
-      setError("Socket.IO connection error");
-    });
-
-    setSocket(newSocket);
-
-    return () => {
-      newSocket.disconnect();
-    };
-  }, [handleSocketMessage, setError]);
+  }, [socket, handleSocketMessage]);
 
   const handleFileUpload = async (e) => {
     e.preventDefault();
@@ -112,10 +94,14 @@ const FileUpload = ({ isBackendReady, fetchDocuments, setError }) => {
         </div>
       </form>
       {uploadStatus && (
-        <div className="mt-2 text-sm text-gray-600">Upload Status: {uploadStatus}</div>
+        <div className="mt-2 text-sm text-gray-600">
+          Upload Status: {uploadStatus}
+        </div>
       )}
       {processingStatus && (
-        <div className="mt-2 text-sm text-gray-600">Processing Status: {processingStatus}</div>
+        <div className="mt-2 text-sm text-gray-600">
+          Processing Status: {processingStatus}
+        </div>
       )}
     </div>
   );

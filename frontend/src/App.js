@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { io } from "socket.io-client";
 
 /* COMPONENTS */
 import FileUpload from "./components/FileUpload";
@@ -8,7 +9,10 @@ import StatusMessage from "./components/StatusMessage";
 import DocumentList from "./components/DocumentList";
 import GetModels from "./components/GetModels";
 
-const BACKEND_URL_API = (process.env.REACT_APP_BACKEND_URL ? process.env.REACT_APP_BACKEND_URL + "/api" : "http://localhost:9090/api");
+const BACKEND_URL_API = process.env.REACT_APP_BACKEND_URL
+  ? process.env.REACT_APP_BACKEND_URL + "/api"
+  : "http://localhost:9090/api";
+const SOCKET_URL = process.env.REACT_APP_SOCKET_URL || "http://localhost:9090";
 
 export default function App() {
   const [documents, setDocuments] = useState([]);
@@ -18,9 +22,28 @@ export default function App() {
     error: null,
   });
   const [error, setError] = useState(null);
-  const [selectedModel, setSelectedModel] = useState('');
+  const [selectedModel, setSelectedModel] = useState("");
+  const [socket, setSocket] = useState(null);
 
   useEffect(() => {
+    const newSocket = io(SOCKET_URL, {
+      transports: ["websocket"],
+      cors: {
+        origin: "http://localhost:9091/",
+      },
+      upgrade: false,
+    });
+
+    newSocket.on("connect", () => {
+      console.log("Socket.IO connection established");
+    });
+
+    newSocket.on("connect_error", (error) => {
+      console.error("Socket.IO connection error:", error);
+      setError("Socket.IO connection error");
+    });
+
+    setSocket(newSocket);
     const checkBackendStatus = async () => {
       try {
         const response = await axios.get(`${BACKEND_URL_API}/status`);
@@ -38,7 +61,10 @@ export default function App() {
     };
 
     const statusInterval = setInterval(checkBackendStatus, 5000);
-    return () => clearInterval(statusInterval);
+    return () => {
+      newSocket.disconnect();
+      clearInterval(statusInterval)
+    };
   }, []);
 
   const fetchDocuments = async () => {
@@ -53,14 +79,14 @@ export default function App() {
 
   const handleDeleteDocument = async (filename) => {
     try {
-      console.log(filename)
+      console.log(filename);
       await axios.delete(`${BACKEND_URL_API}/documents/${filename}`);
       fetchDocuments();
     } catch (error) {
       console.error("Error deleting document:", error);
       setError(
         error.response?.data?.error ||
-        "Error deleting document. Please try again."
+          "Error deleting document. Please try again."
       );
     }
   };
@@ -93,15 +119,16 @@ export default function App() {
           <FileUpload
             isBackendReady={isBackendReady}
             fetchDocuments={fetchDocuments}
+            socket={socket}
             setError={setError}
           />
 
-          <SearchAndChat 
-            isBackendReady={isBackendReady} 
+          <SearchAndChat
+            isBackendReady={isBackendReady}
             setError={setError}
             selectedModel={selectedModel}
           />
-          
+
           <DocumentList
             isBackendReady={isBackendReady}
             documents={documents}

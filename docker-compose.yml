@@ -9,6 +9,7 @@ services:
       - uploads:/app/uploads
       - ./backend/src:/app/src
       - ./backend/secrets:/app/secrets
+      - nltk_data:/home/appuser/nltk_data
     environment:
       - FLASK_ENV=${FLASK_ENV:-production}
       - FLASK_APP=src.main
@@ -21,43 +22,16 @@ services:
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
       - CHROMA_HOST=chromadb
       - CHROMA_PORT=8000
-      - REDIS_URL=redis://redis_db
+      - REDIS_URL=redis://redis
+      - PYTHONPATH=/app/src
+      - NLTK_DATA=/home/appuser/nltk_data
     env_file:
       - ./backend/.env
-    working_dir: /app
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9090/api/status"]
       interval: 30s
       timeout: 10s
       retries: 5
-    depends_on:
-      redis:
-        condition: service_healthy
-      chromadb:
-        condition: service_healthy
-    networks:
-      - net
-
-  celery_worker:
-    build: ./backend
-    command: celery -A src worker --pool=solo --loglevel=INFO
-    volumes:
-      - ./backend/src:/app/src
-      - chroma_db:/app/chroma_db
-      - textracted:/app/textracted
-      - uploads:/app/uploads
-    environment:
-      - FLASK_ENV=${FLASK_ENV:-production}
-      - CHROMA_DB_PATH=/app/chroma_db
-      - RAW_DOCUMENTS_PATH=/app/raw-documents
-      - UPLOAD_FOLDER=/app/uploads
-      - OLLAMA_HOST=host.docker.internal:11434
-      - CELERY_BROKER_URL=redis://redis:6379/0
-      - CELERY_RESULT_BACKEND=redis://redis:6379/0
-      - CHROMA_HOST=chromadb
-      - CHROMA_PORT=8000
-    env_file:
-      - ./backend/.env
     depends_on:
       redis:
         condition: service_healthy
@@ -95,16 +69,13 @@ services:
       - net
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
     ports:
-      - "9091:9091"
-    volumes:
-      - ./frontend/src:/app/src
-      - ./frontend/public:/app/public
-      - /app/node_modules
+      - "9091:80"
     environment:
       - REACT_APP_BACKEND_URL=http://localhost:9090
-      - PORT=9091
     depends_on:
       - backend
     networks:
@@ -118,3 +89,4 @@ volumes:
   textracted:
   uploads:
   chromadb_data:
+  nltk_data:

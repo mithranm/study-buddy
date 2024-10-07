@@ -1,93 +1,673 @@
-main.py
+Project-Hierarchy
 ```
-@bp.route('/upload', methods=['POST'])
-def upload_file():
-    """
-    Uploads a file that is chosen by the user.
+├── backend
+│   ├── chroma_db
+│   ├── secrets
+│   ├── src
+│   │   ├── __init__.py
+│   │   ├── celery_app.py
+│   │   ├── document_chunker.py
+│   │   ├── document_textractor.py
+│   │   ├── extensions.py
+│   │   ├── google_calls.py
+│   │   ├── main.py
+│   │   ├── make_celery.py
+│   │   ├── ollama_calls.py
+│   │   ├── pdf_extractor.py
+│   │   ├── tasks.py
+│   │   ├── vector_db.py
+│   │   └── wsgi.py
+│   ├── test_images
+│   │   └── mystery.jpeg
+│   ├── test_upload
+│   │   ├── document.pdf
+│   │   ├── loremipsum.txt
+│   │   ├── test.pdf
+│   │   └── vision-llm.pdf
+│   ├── tests
+│   │   ├── __init__.py
+│   │   ├── test_integration.py
+│   │   └── test_main.py
+│   ├── textracted
+│   ├── uploads
+│   ├── .python-version
+│   ├── Dockerfile
+│   ├── errorlog.txt
+│   ├── example.env
+│   ├── log.txt
+│   ├── permissions.txt
+│   ├── prompt.txt
+│   ├── prompt2.txt
+│   ├── pydoc-markdown.yml
+│   ├── pyproject.toml
+│   ├── run-dev-server.sh
+│   ├── run-integration.sh
+│   └── supervisord.conf
+├── docs
+│   ├── api.md
+│   └── example-ollama-curl.txt
+├── frontend
+│   ├── public
+│   │   ├── favicon.ico
+│   │   ├── index.html
+│   │   ├── logo192.png
+│   │   ├── logo512.png
+│   │   ├── manifest.json
+│   │   └── robots.txt
+│   ├── src
+│   │   ├── components
+│   │   │   ├── DocumentList.js
+│   │   │   ├── FileUpload.js
+│   │   │   ├── GetModels.js
+│   │   │   ├── SearchAndChat.js
+│   │   │   └── StatusMessage.js
+│   │   ├── App.css
+│   │   ├── App.js
+│   │   ├── App.test.js
+│   │   ├── index.css
+│   │   ├── index.js
+│   │   ├── logo.svg
+│   │   ├── reportWebVitals.js
+│   │   └── setupTests.js
+│   ├── Dockerfile
+│   ├── package-lock.json
+│   └── package.json
+├── .python-version
+├── README.md
+├── bugs.md
+├── docker-compose.yml
+├── logs.txt
+├── notepad.txt
+└── todo.md
+```
+docker-compose.yml
+```
+services:
+  backend:
+    build: ./backend
+    # user: 1000:1000  # Removed this line
+    ports:
+      - "9090:9090"
+    volumes:
+      - chroma_db:/app/chroma_db
+      - textracted:/app/textracted
+      - uploads:/app/uploads
+      - ./backend/src:/app/src
+      - ./backend/secrets:/app/secrets
+      - nltk_data:/usr/local/share/nltk_data
+    environment:
+      - FLASK_ENV=${FLASK_ENV:-production}
+      - FLASK_APP=src.main
+      - FLASK_RUN_PORT=9090
+      - CHROMA_DB_PATH=/app/chroma_db
+      - RAW_DOCUMENTS_PATH=/app/raw-documents
+      - UPLOAD_FOLDER=/app/uploads
+      - OLLAMA_HOST=host.docker.internal:11434
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - CHROMA_HOST=chromadb
+      - CHROMA_PORT=8000
+      - REDIS_URL=redis://redis
+      - PYTHONPATH=/app/src
+    env_file:
+      - ./backend/.env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9090/api/status"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    depends_on:
+      redis:
+        condition: service_healthy
+      chromadb:
+        condition: service_healthy
+    networks:
+      - net
 
-    This function handles all POST request to the '/upload' endpoint.
+  redis:
+    image: "redis:alpine"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 30s
+      retries: 50
+    networks:
+      - net
 
-    Args:
-        None
-    Returns:
-        tuple: a json of the message and the http code
-        if successful: ({'message': 'File uploaded and embedded sucessfully'}, 200)
-        if backend not ready: ({'error': 'Backend is not fully initialized yet'}, 503)
-        if theres no file to upload: ({'error': 'No file part'}, 400)
-        if filename is empty: ({'error': 'No selected file'}, 400)
-    """
-    if 'file' not in request.files:
-        return jsonify({'error': 'No file part'}), 400
-    file = request.files['file']
-    if file.filename == '':
-        return jsonify({'error': 'No selected file'}), 400
-    if file:
-        file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], file.filename)
+  chromadb:
+    image: chromadb/chroma:0.5.11
+    volumes:
+      - chromadb_data:/chroma/chroma
+    environment:
+      - IS_PERSISTENT=TRUE
+      - PERSIST_DIRECTORY=/chroma/chroma
+      - ANONYMIZED_TELEMETRY=${ANONYMIZED_TELEMETRY:-TRUE}
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/heartbeat"]
+      interval: 5s
+      timeout: 30s
+      retries: 50
+    networks:
+      - net
 
-        collection = vector_db.get_collection()
-        # Checks to see if the file already exists in the upload directory to prevent from the file being chunked again in chroma db.
+  frontend:
+    build: ./frontend
+    ports:
+      - "9091:9091"
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+      - /app/node_modules
+    environment:
+      - REACT_APP_BACKEND_URL=http://localhost:9090
+      - PORT=9091
+    depends_on:
+      - backend
+    networks:
+      - net
 
-        if(os.path.exists(file_path) and len(collection.get(where={"source": file_path})['ids'])): # Also checks the data base just to make sure no funny business is going on
-            return jsonify({"error": "Tried uploading a file that already exists."}), 400
-        
-        file.save(file_path)
+networks:
+  net:
 
-        # Sending a task to complete adding to db in the background.
-        process_file.delay(file.filename, file_path, current_app.config["TEXTRACTED_PATH"]) # <--- calling process_file from task.py
+volumes:
+  chroma_db:
+  textracted:
+  uploads:
+  chromadb_data:
+  nltk_data:
+```
+supervisord.conf
+```
+[supervisord]
+nodaemon=true
+logfile=/dev/stdout
+logfile_maxbytes=0
+pidfile=/tmp/supervisord.pid
 
-        return jsonify({'message': 'File recieved and is being processed', 'filename': file.filename}), 202
+[program:gunicorn]
+command=poetry run gunicorn --bind 0.0.0.0:9090 src.wsgi:app
+directory=/app
+user=appuser
+autostart=true
+autorestart=true
+stderr_logfile=/dev/stderr
+stderr_logfile_maxbytes=0
+stdout_logfile=/dev/stdout
+stdout_logfile_maxbytes=0
 
-@bp.route('/task_status/<task_id>') # made it task_id to add more scalability.
-def task_status(task_id):
-    # integrate status reports to frontend here.
+[program:celery]
+command=poetry run celery -A src worker --pool=solo --loglevel=INFO
+directory=/app
+user=appuser
+autostart=true
+autorestart=true
+stderr_logfile=/dev/stderr
+stderr_logfile_maxbytes=0
+stdout_logfile=/dev/stdout
+stdout_logfile_maxbytes=0
+```
+backend/Dockerfile
+```
+FROM python:3.11.10-slim
+
+# Set the working directory
+WORKDIR /app
+
+# Install system dependencies and clean up in the same layer
+ENV PYTHONUNBUFFERED=1
+RUN apt-get update \
+    && apt-get -y install tesseract-ocr supervisor \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Poetry globally
+RUN pip install poetry
+
+# Create a non-root user 'appuser' with UID and GID 1000
+RUN useradd -m -u 1000 appuser
+
+# Set ownership of the working directory to 'appuser'
+RUN chown -R appuser:appuser /app
+
+# Switch to 'appuser' to perform Poetry configuration and installation
+USER appuser
+
+# Ensure Poetry cache directory exists and is writable
+RUN mkdir -p /home/appuser/.cache/pypoetry/cache/repositories/PyPI/_http && \
+    chmod -R 700 /home/appuser/.cache
+
+# Copy only dependency files first to leverage Docker cache
+COPY --chown=appuser:appuser pyproject.toml poetry.lock ./
+
+# Configure Poetry to create virtual environments inside the project directory
+RUN poetry config virtualenvs.create true \
+    && poetry config virtualenvs.in-project true
+
+# Install dependencies with Poetry using a cache mount for efficiency
+RUN --mount=type=cache,target=/home/appuser/.cache/pypoetry/cache poetry install --no-interaction --no-ansi
+
+# Download NLTK data as 'appuser'
+RUN poetry run python -c "import nltk; nltk.download('punkt_tab', download_dir='/usr/local/share/nltk_data')"
+
+# Copy the application source code and secrets with proper ownership
+COPY --chown=appuser:appuser src/ ./src/
+COPY --chown=appuser:appuser secrets/ ./secrets/
+
+# Create the upload directory and set ownership to 'appuser'
+RUN mkdir -p /app/uploads && chown -R appuser:appuser /app/uploads
+
+# Switch back to root to run Supervisord
+USER root
+
+# Copy Supervisord configuration
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+# Set PYTHONPATH environment variable
+ENV PYTHONPATH=/app/src
+
+# Expose the port the app runs on
+EXPOSE 9090
+
+# Use Supervisord as the entrypoint
+CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+
 ```
 
-This is how I am making my celery app.
+Trying to Docker Build
 ```
-app.config.from_mapping(
-        CHROMA_HOST=os.getenv("CHROMA_HOST", "localhost"),  # Service name if using Docker Compose
-        CHROMA_PORT=os.getenv("CHROMA_PORT", "9092"),        # Port exposed by ChromaDB server
-        CELERY=dict(
-            broker_url=os.getenv("REDIS_URL", "redis://localhost:6379/0"),
-            result_backend=os.getenv("REDIS_URL", "redis://localhost:6379/0"),
-            task_ignore_result=True,
-        ),
-    )
+study-buddy-py3.11mithranmohanraj@Mithrans-MBP study-buddy % docker-compose up --build
+[+] Building 10.4s (14/19)                                                                                                                                        docker-container:friendly_bouman
+ => [backend internal] load build definition from Dockerfile                                                                                                                                  0.0s
+ => => transferring dockerfile: 2.13kB                                                                                                                                                        0.0s
+ => [backend internal] load metadata for docker.io/library/python:3.11.10-slim                                                                                                                0.3s
+ => [backend internal] load .dockerignore                                                                                                                                                     0.0s
+ => => transferring context: 2B                                                                                                                                                               0.0s
+ => [backend stage-0  1/15] FROM docker.io/library/python:3.11.10-slim@sha256:5501a4fe605abe24de87c2f3d6cf9fd760354416a0cad0296cf284fddcdca9e2                                                0.0s
+ => => resolve docker.io/library/python:3.11.10-slim@sha256:5501a4fe605abe24de87c2f3d6cf9fd760354416a0cad0296cf284fddcdca9e2                                                                  0.0s
+ => [backend internal] load build context                                                                                                                                                     0.0s
+ => => transferring context: 2.12kB                                                                                                                                                           0.0s
+ => CACHED [backend stage-0  2/15] WORKDIR /app                                                                                                                                               0.0s
+ => CACHED [backend stage-0  3/15] RUN apt-get update     && apt-get -y install tesseract-ocr supervisor     && apt-get clean     && rm -rf /var/lib/apt/lists/*                              0.0s
+ => CACHED [backend stage-0  4/15] RUN pip install poetry                                                                                                                                     0.0s
+ => CACHED [backend stage-0  5/15] RUN useradd -m -u 1000 appuser                                                                                                                             0.0s
+ => CACHED [backend stage-0  6/15] RUN chown -R appuser:appuser /app                                                                                                                          0.0s
+ => CACHED [backend stage-0  7/15] RUN mkdir -p /home/appuser/.cache/pypoetry/cache/repositories/PyPI/_http &&     chmod -R 700 /home/appuser/.cache                                          0.0s
+ => CACHED [backend stage-0  8/15] COPY --chown=appuser:appuser pyproject.toml poetry.lock ./                                                                                                 0.0s
+ => CACHED [backend stage-0  9/15] RUN poetry config virtualenvs.create true     && poetry config virtualenvs.in-project true                                                                 0.0s
+ => ERROR [backend stage-0 10/15] RUN --mount=type=cache,target=/home/appuser/.cache/pypoetry/cache poetry install --no-interaction --no-ansi                                                10.0s
+------                                                                                                                                                                                             
+ > [backend stage-0 10/15] RUN --mount=type=cache,target=/home/appuser/.cache/pypoetry/cache poetry install --no-interaction --no-ansi:                                                            
+0.563 Creating virtualenv study-buddy in /app/.venv                                                                                                                                                
+0.995 Installing dependencies from lock file                                                                                                                                                       
+1.173                                                                                                                                                                                              
+1.173 Package operations: 128 installs, 0 updates, 0 removals                                                                                                                                      
+1.173 
+1.173   - Installing wrapt (1.16.0)
+1.173   - Installing zipp (3.20.2)
+9.492 
+9.492   FileNotFoundError
+9.492 
+9.492   [Errno 2] No such file or directory: '/home/appuser/.cache/pypoetry/cache/repositories/PyPI/_http/2/9/9/5/b'
+9.492 
+9.492   at /usr/local/lib/python3.11/pathlib.py:1116 in mkdir
+9.517       1112│         """
+9.517       1113│         Create a new directory at this given path.
+9.517       1114│         """
+9.517       1115│         try:
+9.517     → 1116│             os.mkdir(self, mode)
+9.517       1117│         except FileNotFoundError:
+9.517       1118│             if not parents or self.parent == self:
+9.517       1119│                 raise
+9.517       1120│             self.parent.mkdir(parents=True, exist_ok=True)
+9.517 
+9.517 The following error occurred when trying to handle this error:
+9.517 
+9.517 
+9.517   FileNotFoundError
+9.517 
+9.517   [Errno 2] No such file or directory: '/home/appuser/.cache/pypoetry/cache/repositories/PyPI/_http/2/9/9/5'
+9.517 
+9.517   at /usr/local/lib/python3.11/pathlib.py:1116 in mkdir
+9.535       1112│         """
+9.535       1113│         Create a new directory at this given path.
+9.535       1114│         """
+9.535       1115│         try:
+9.535     → 1116│             os.mkdir(self, mode)
+9.535       1117│         except FileNotFoundError:
+9.535       1118│             if not parents or self.parent == self:
+9.535       1119│                 raise
+9.535       1120│             self.parent.mkdir(parents=True, exist_ok=True)
+9.535 
+9.535 The following error occurred when trying to handle this error:
+9.535 
+9.535 
+9.535   FileNotFoundError
+9.535 
+9.535   [Errno 2] No such file or directory: '/home/appuser/.cache/pypoetry/cache/repositories/PyPI/_http/2/9/9'
+9.536 
+9.536   at /usr/local/lib/python3.11/pathlib.py:1116 in mkdir
+9.553       1112│         """
+9.553       1113│         Create a new directory at this given path.
+9.553       1114│         """
+9.553       1115│         try:
+9.553     → 1116│             os.mkdir(self, mode)
+9.553       1117│         except FileNotFoundError:
+9.553       1118│             if not parents or self.parent == self:
+9.553       1119│                 raise
+9.553       1120│             self.parent.mkdir(parents=True, exist_ok=True)
+9.553 
+9.553 The following error occurred when trying to handle this error:
+9.553 
+9.553 
+9.553   FileNotFoundError
+9.553 
+9.553   [Errno 2] No such file or directory: '/home/appuser/.cache/pypoetry/cache/repositories/PyPI/_http/2/9'
+9.553 
+9.553   at /usr/local/lib/python3.11/pathlib.py:1116 in mkdir
+9.569       1112│         """
+9.569       1113│         Create a new directory at this given path.
+9.569       1114│         """
+9.569       1115│         try:
+9.569     → 1116│             os.mkdir(self, mode)
+9.569       1117│         except FileNotFoundError:
+9.569       1118│             if not parents or self.parent == self:
+9.569       1119│                 raise
+9.569       1120│             self.parent.mkdir(parents=True, exist_ok=True)
+9.569 
+9.569 The following error occurred when trying to handle this error:
+9.569 
+9.569 
+9.569   FileNotFoundError
+9.569 
+9.569   [Errno 2] No such file or directory: '/home/appuser/.cache/pypoetry/cache/repositories/PyPI/_http/2'
+9.569 
+9.569   at /usr/local/lib/python3.11/pathlib.py:1116 in mkdir
+9.586       1112│         """
+9.586       1113│         Create a new directory at this given path.
+9.586       1114│         """
+9.586       1115│         try:
+9.587     → 1116│             os.mkdir(self, mode)
+9.587       1117│         except FileNotFoundError:
+9.587       1118│             if not parents or self.parent == self:
+9.587       1119│                 raise
+9.587       1120│             self.parent.mkdir(parents=True, exist_ok=True)
+9.587 
+9.587 The following error occurred when trying to handle this error:
+9.587 
+9.587 
+9.587   FileNotFoundError
+9.587 
+9.587   [Errno 2] No such file or directory: '/home/appuser/.cache/pypoetry/cache/repositories/PyPI/_http'
+9.587 
+9.587   at /usr/local/lib/python3.11/pathlib.py:1116 in mkdir
+9.621       1112│         """
+9.621       1113│         Create a new directory at this given path.
+9.621       1114│         """
+9.625       1115│         try:
+9.625     → 1116│             os.mkdir(self, mode)
+9.625       1117│         except FileNotFoundError:
+9.625       1118│             if not parents or self.parent == self:
+9.625       1119│                 raise
+9.625       1120│             self.parent.mkdir(parents=True, exist_ok=True)
+9.625 
+9.625 The following error occurred when trying to handle this error:
+9.625 
+9.625 
+9.625   FileNotFoundError
+9.625 
+9.625   [Errno 2] No such file or directory: '/home/appuser/.cache/pypoetry/cache/repositories/PyPI'
+9.625 
+9.625   at /usr/local/lib/python3.11/pathlib.py:1116 in mkdir
+9.703       1112│         """
+9.703       1113│         Create a new directory at this given path.
+9.703       1114│         """
+9.703       1115│         try:
+9.703     → 1116│             os.mkdir(self, mode)
+9.703       1117│         except FileNotFoundError:
+9.703       1118│             if not parents or self.parent == self:
+9.703       1119│                 raise
+9.703       1120│             self.parent.mkdir(parents=True, exist_ok=True)
+9.703 
+9.703 The following error occurred when trying to handle this error:
+9.703 
+9.703 
+9.703   PermissionError
+9.703 
+9.703   [Errno 13] Permission denied: '/home/appuser/.cache/pypoetry/cache/repositories'
+9.703 
+9.703   at /usr/local/lib/python3.11/pathlib.py:1116 in mkdir
+9.723       1112│         """
+9.723       1113│         Create a new directory at this given path.
+9.723       1114│         """
+9.723       1115│         try:
+9.723     → 1116│             os.mkdir(self, mode)
+9.723       1117│         except FileNotFoundError:
+9.723       1118│             if not parents or self.parent == self:
+9.723       1119│                 raise
+9.723       1120│             self.parent.mkdir(parents=True, exist_ok=True)
+9.723 
+9.723 The following error occurred when trying to handle this error:
+9.723 
+9.723 
+9.723   ProtocolError
+9.723 
+9.723   ("Connection broken: PermissionError(13, 'Permission denied')", PermissionError(13, 'Permission denied'))
+9.723 
+9.723   at /usr/local/lib/python3.11/site-packages/urllib3/response.py:775 in _error_catcher
+9.738        771│                     arg = f"Connection broken: {e!r}"
+9.738        772│                 raise ProtocolError(arg, e) from e
+9.738        773│ 
+9.738        774│             except (HTTPException, OSError) as e:
+9.738     →  775│                 raise ProtocolError(f"Connection broken: {e!r}", e) from e
+9.738        776│ 
+9.738        777│             # If no exception is thrown, we should avoid cleaning up
+9.738        778│             # unnecessarily.
+9.738        779│             clean_exit = True
+9.738 
+9.738 The following error occurred when trying to handle this error:
+9.738 
+9.738 
+9.738   ChunkedEncodingError
+9.738 
+9.738   ("Connection broken: PermissionError(13, 'Permission denied')", PermissionError(13, 'Permission denied'))
+9.738 
+9.738   at /usr/local/lib/python3.11/site-packages/requests/models.py:822 in generate
+9.749        818│             if hasattr(self.raw, "stream"):
+9.749        819│                 try:
+9.749        820│                     yield from self.raw.stream(chunk_size, decode_content=True)
+9.749        821│                 except ProtocolError as e:
+9.749     →  822│                     raise ChunkedEncodingError(e)
+9.749        823│                 except DecodeError as e:
+9.749        824│                     raise ContentDecodingError(e)
+9.749        825│                 except ReadTimeoutError as e:
+9.749        826│                     raise ConnectionError(e)
+9.749 
+9.749 Cannot install zipp.
+9.749 
+9.751 
+9.751   FileNotFoundError
+9.751 
+9.751   [Errno 2] No such file or directory: '/home/appuser/.cache/pypoetry/cache/repositories/PyPI/_http/6/e/e/9/4'
+9.751 
+9.751   at /usr/local/lib/python3.11/pathlib.py:1116 in mkdir
+9.768       1112│         """
+9.768       1113│         Create a new directory at this given path.
+9.768       1114│         """
+9.768       1115│         try:
+9.768     → 1116│             os.mkdir(self, mode)
+9.768       1117│         except FileNotFoundError:
+9.768       1118│             if not parents or self.parent == self:
+9.768       1119│                 raise
+9.768       1120│             self.parent.mkdir(parents=True, exist_ok=True)
+9.768 
+9.768 The following error occurred when trying to handle this error:
+9.768 
+9.768 
+9.768   FileNotFoundError
+9.768 
+9.768   [Errno 2] No such file or directory: '/home/appuser/.cache/pypoetry/cache/repositories/PyPI/_http/6/e/e/9'
+9.768 
+9.768   at /usr/local/lib/python3.11/pathlib.py:1116 in mkdir
+9.784       1112│         """
+9.784       1113│         Create a new directory at this given path.
+9.784       1114│         """
+9.784       1115│         try:
+9.784     → 1116│             os.mkdir(self, mode)
+9.784       1117│         except FileNotFoundError:
+9.784       1118│             if not parents or self.parent == self:
+9.784       1119│                 raise
+9.785       1120│             self.parent.mkdir(parents=True, exist_ok=True)
+9.785 
+9.785 The following error occurred when trying to handle this error:
+9.785 
+9.785 
+9.785   FileNotFoundError
+9.785 
+9.785   [Errno 2] No such file or directory: '/home/appuser/.cache/pypoetry/cache/repositories/PyPI/_http/6/e/e'
+9.785 
+9.785   at /usr/local/lib/python3.11/pathlib.py:1116 in mkdir
+9.801       1112│         """
+9.801       1113│         Create a new directory at this given path.
+9.801       1114│         """
+9.801       1115│         try:
+9.801     → 1116│             os.mkdir(self, mode)
+9.801       1117│         except FileNotFoundError:
+9.801       1118│             if not parents or self.parent == self:
+9.801       1119│                 raise
+9.801       1120│             self.parent.mkdir(parents=True, exist_ok=True)
+9.801 
+9.801 The following error occurred when trying to handle this error:
+9.801 
+9.801 
+9.801   FileNotFoundError
+9.801 
+9.801   [Errno 2] No such file or directory: '/home/appuser/.cache/pypoetry/cache/repositories/PyPI/_http/6/e'
+9.801 
+9.801   at /usr/local/lib/python3.11/pathlib.py:1116 in mkdir
+9.817       1112│         """
+9.817       1113│         Create a new directory at this given path.
+9.817       1114│         """
+9.817       1115│         try:
+9.817     → 1116│             os.mkdir(self, mode)
+9.817       1117│         except FileNotFoundError:
+9.817       1118│             if not parents or self.parent == self:
+9.817       1119│                 raise
+9.817       1120│             self.parent.mkdir(parents=True, exist_ok=True)
+9.817 
+9.817 The following error occurred when trying to handle this error:
+9.817 
+9.817 
+9.817   FileNotFoundError
+9.817 
+9.817   [Errno 2] No such file or directory: '/home/appuser/.cache/pypoetry/cache/repositories/PyPI/_http/6'
+9.817 
+9.818   at /usr/local/lib/python3.11/pathlib.py:1116 in mkdir
+9.834       1112│         """
+9.834       1113│         Create a new directory at this given path.
+9.834       1114│         """
+9.834       1115│         try:
+9.834     → 1116│             os.mkdir(self, mode)
+9.834       1117│         except FileNotFoundError:
+9.834       1118│             if not parents or self.parent == self:
+9.834       1119│                 raise
+9.834       1120│             self.parent.mkdir(parents=True, exist_ok=True)
+9.834 
+9.834 The following error occurred when trying to handle this error:
+9.834 
+9.834 
+9.834   FileNotFoundError
+9.834 
+9.834   [Errno 2] No such file or directory: '/home/appuser/.cache/pypoetry/cache/repositories/PyPI/_http'
+9.834 
+9.834   at /usr/local/lib/python3.11/pathlib.py:1116 in mkdir
+9.850       1112│         """
+9.850       1113│         Create a new directory at this given path.
+9.850       1114│         """
+9.850       1115│         try:
+9.850     → 1116│             os.mkdir(self, mode)
+9.850       1117│         except FileNotFoundError:
+9.850       1118│             if not parents or self.parent == self:
+9.850       1119│                 raise
+9.850       1120│             self.parent.mkdir(parents=True, exist_ok=True)
+9.850 
+9.850 The following error occurred when trying to handle this error:
+9.850 
+9.850 
+9.850   FileNotFoundError
+9.850 
+9.850   [Errno 2] No such file or directory: '/home/appuser/.cache/pypoetry/cache/repositories/PyPI'
+9.850 
+9.850   at /usr/local/lib/python3.11/pathlib.py:1116 in mkdir
+9.867       1112│         """
+9.867       1113│         Create a new directory at this given path.
+9.867       1114│         """
+9.867       1115│         try:
+9.867     → 1116│             os.mkdir(self, mode)
+9.867       1117│         except FileNotFoundError:
+9.867       1118│             if not parents or self.parent == self:
+9.867       1119│                 raise
+9.867       1120│             self.parent.mkdir(parents=True, exist_ok=True)
+9.867 
+9.867 The following error occurred when trying to handle this error:
+9.867 
+9.867 
+9.867   PermissionError
+9.867 
+9.867   [Errno 13] Permission denied: '/home/appuser/.cache/pypoetry/cache/repositories'
+9.867 
+9.867   at /usr/local/lib/python3.11/pathlib.py:1116 in mkdir
+9.885       1112│         """
+9.885       1113│         Create a new directory at this given path.
+9.885       1114│         """
+9.885       1115│         try:
+9.885     → 1116│             os.mkdir(self, mode)
+9.885       1117│         except FileNotFoundError:
+9.885       1118│             if not parents or self.parent == self:
+9.885       1119│                 raise
+9.885       1120│             self.parent.mkdir(parents=True, exist_ok=True)
+9.885 
+9.885 The following error occurred when trying to handle this error:
+9.885 
+9.885 
+9.885   ProtocolError
+9.885 
+9.885   ("Connection broken: PermissionError(13, 'Permission denied')", PermissionError(13, 'Permission denied'))
+9.885 
+9.885   at /usr/local/lib/python3.11/site-packages/urllib3/response.py:775 in _error_catcher
+9.899        771│                     arg = f"Connection broken: {e!r}"
+9.899        772│                 raise ProtocolError(arg, e) from e
+9.899        773│ 
+9.899        774│             except (HTTPException, OSError) as e:
+9.899     →  775│                 raise ProtocolError(f"Connection broken: {e!r}", e) from e
+9.899        776│ 
+9.899        777│             # If no exception is thrown, we should avoid cleaning up
+9.899        778│             # unnecessarily.
+9.900        779│             clean_exit = True
+9.900 
+9.900 The following error occurred when trying to handle this error:
+9.900 
+9.900 
+9.900   ChunkedEncodingError
+9.900 
+9.900   ("Connection broken: PermissionError(13, 'Permission denied')", PermissionError(13, 'Permission denied'))
+9.900 
+9.900   at /usr/local/lib/python3.11/site-packages/requests/models.py:822 in generate
+9.911        818│             if hasattr(self.raw, "stream"):
+9.911        819│                 try:
+9.911        820│                     yield from self.raw.stream(chunk_size, decode_content=True)
+9.911        821│                 except ProtocolError as e:
+9.911     →  822│                     raise ChunkedEncodingError(e)
+9.911        823│                 except DecodeError as e:
+9.911        824│                     raise ContentDecodingError(e)
+9.911        825│                 except ReadTimeoutError as e:
+9.911        826│                     raise ConnectionError(e)
+9.911 
+9.911 Cannot install wrapt.
+9.911 
+------
+failed to solve: process "/bin/sh -c poetry install --no-interaction --no-ansi" did not complete successfully: exit code: 1
 ```
 
-task.py
-```
-@shared_task(bind=True)
-def process_file(self, file_path, textracted_path):
-    """
-    Where threads start to process files and embed them into the data base.
-
-    Args:
-        self: String contains filename.
-        file_path: String contains the path of the file.
-        textracted_path: String contains the path to the textracted directory.
-
-    Returns:
-        None
-    """
-
-    try:
-        # Log the start of the processing
-        logger.info(f"Starting to process file: {self}")
-
-        self.update_state()
-
-        collection = vector_db.get_collection()
-
-        chunker.embed_documents([file_path], collection, textracted_path)
-
-        # Log successful processing
-        logger.info(f"Successfully processed file: {self}")
-
-    except Exception as e:
-        logger.error(f"Error processing file {self}: {str(e)}")
-        # Optionally, you can raise the exception to retry the task if needed
-        # raise e
-```
-
-How can I use redis to send status to the frontend. integrate this into task_status
+Why is my build failing?

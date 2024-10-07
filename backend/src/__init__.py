@@ -71,7 +71,7 @@ def create_app():
         try:
             # Initialize NLTK
             import nltk
-            nltk.download('punkt', quiet=True)
+            nltk.download('punkt_tab', quiet=True)
             app.nltk_ready = True
 
             # Initialize Chroma collection

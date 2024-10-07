@@ -1,13 +1,18 @@
 # src/__init__.py
 
 import os
-from flask import Flask
+from flask import Flask, current_app
 from flask_cors import CORS
 from celery import Celery
+from flask_socketio import SocketIO
+import redis
 import logging
+
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
+
+socketio_app = SocketIO(cors_allowed_origins="*",  async_mode='gevent') # Initialize SocketIO without app
 
 def make_celery(app):
     celery = Celery(
@@ -28,7 +33,15 @@ def make_celery(app):
 
 def create_app():
     app = Flask(__name__)
-    CORS(app)
+    CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
+
+    # Initialize Redis client
+    app.redis_client = redis.StrictRedis(
+        host=os.getenv("REDIS_HOST", "redis://localhost:6379/0"),
+        port=6379,          # Default Redis port
+        db=0,               # Database number
+        decode_responses=True  # Optional: decode responses to strings
+    )
 
     # Load configurations
     app.config.from_mapping(
@@ -38,8 +51,11 @@ def create_app():
         CELERY_RESULT_BACKEND=os.getenv("REDIS_URL", "redis://localhost:6379/0"),
         UPLOAD_FOLDER=os.getenv("UPLOAD_FOLDER", "uploads"),
         TEXTRACTED_PATH=os.getenv("TEXTRACTED_PATH", "textracted"),
-        # Other configurations...
+        SOCKETIO_MESSAGE_QUEUE=os.getenv("SOCKETIO_MESSAGE_QUEUE", "redis://localhost:6379/0"),
     )
+
+    # Initialize SocketIO with the app
+    socketio_app.init_app(app, message_queue=app.config['SOCKETIO_MESSAGE_QUEUE'])
 
     # Initialize Celery
     celery = make_celery(app)
@@ -93,3 +109,5 @@ def create_app():
 
 # Expose the celery app instance at the module level
 celery = make_celery(create_app())
+socketio = socketio_app
+

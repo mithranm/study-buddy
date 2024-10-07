@@ -21,9 +21,10 @@ if [ "$1" == "--clean" ]; then
 fi
 
 CHROMA_PORT=9092
+GUNICORN_PORT=9090
 
 # Start Chroma
-poetry run chroma run --host localhost --port $CHROMA_PORT --path ./chroma_db &
+poetry run chroma run --host localhost --port $CHROMA_PORT --path ./chroma_db >> chroma.log 2>&1 &
 CHROMA_PID=$!
 echo "Started Chroma with PID $CHROMA_PID"
 
@@ -41,12 +42,12 @@ done
 echo "Chroma is ready!"
 
 # Start Gunicorn in the background
-poetry run gunicorn --bind 0.0.0.0:9090 src.wsgi:app &
+poetry run gunicorn --worker-class gevent -w 1 --worker-connections 100 --bind 0.0.0.0:$GUNICORN_PORT src.wsgi:app &
 GUNICORN_PID=$!
 echo "Started Gunicorn with PID $GUNICORN_PID"
 
 # Start Celery Worker in the background
-poetry run celery -A src worker --pool=solo --loglevel=INFO &
+poetry run celery -A src worker --pool=gevent --loglevel=INFO &
 CELERY_PID=$!
 echo "Started Celery with PID $CELERY_PID"
 

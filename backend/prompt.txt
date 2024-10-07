@@ -1,50 +1,368 @@
+Error backend
+WARNING:kombu.connection:No hostname was supplied. Reverting to default 'localhost'
+ERROR:src:Exception on /api/upload [POST]
+Traceback (most recent call last):
+  File "/Users/itohti/Library/Caches/pypoetry/virtualenvs/cloud-practitioner-helper-zU27oPT6-py3.11/lib/python3.11/site-packages/kombu/utils/functional.py", line 32, in __call__
+    return self.__value__
+           ^^^^^^^^^^^^^^
+AttributeError: 'ChannelPromise' object has no attribute '__value__'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/itohti/Library/Caches/pypoetry/virtualenvs/cloud-practitioner-helper-zU27oPT6-py3.11/lib/python3.11/site-packages/kombu/connection.py", line 472, in _reraise_as_library_errors
+    yield
+  File "/Users/itohti/Library/Caches/pypoetry/virtualenvs/cloud-practitioner-helper-zU27oPT6-py3.11/lib/python3.11/site-packages/kombu/connection.py", line 459, in _ensure_connection
+    return retry_over_time(
+           ^^^^^^^^^^^^^^^^
+  File "/Users/itohti/Library/Caches/pypoetry/virtualenvs/cloud-practitioner-helper-zU27oPT6-py3.11/lib/python3.11/site-packages/kombu/utils/functional.py", line 318, in retry_over_time
+    return fun(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/itohti/Library/Caches/pypoetry/virtualenvs/cloud-practitioner-helper-zU27oPT6-py3.11/lib/python3.11/site-packages/kombu/connection.py", line 934, in _connection_factory
+    self._connection = self._establish_connection()
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/itohti/Library/Caches/pypoetry/virtualenvs/cloud-practitioner-helper-zU27oPT6-py3.11/lib/python3.11/site-packages/kombu/connection.py", line 860, in _establish_connection
+    conn = self.transport.establish_connection()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/itohti/Library/Caches/pypoetry/virtualenvs/cloud-practitioner-helper-zU27oPT6-py3.11/lib/python3.11/site-packages/kombu/transport/pyamqp.py", line 203, in establish_connection
+    conn.connect()
+  File "/Users/itohti/Library/Caches/pypoetry/virtualenvs/cloud-practitioner-helper-zU27oPT6-py3.11/lib/python3.11/site-packages/amqp/connection.py", line 324, in connect
+    self.transport.connect()
+  File "/Users/itohti/Library/Caches/pypoetry/virtualenvs/cloud-practitioner-helper-zU27oPT6-py3.11/lib/python3.11/site-packages/amqp/transport.py", line 129, in connect
+    self._connect(self.host, self.port, self.connect_timeout)
+  File "/Users/itohti/Library/Caches/pypoetry/virtualenvs/cloud-practitioner-helper-zU27oPT6-py3.11/lib/python3.11/site-packages/amqp/transport.py", line 184, in _connect
+    self.sock.connect(sa)
+  File "/Users/itohti/Library/Caches/pypoetry/virtualenvs/cloud-practitioner-helper-zU27oPT6-py3.11/lib/python3.11/site-packages/gevent/_socketcommon.py", line 590, in connect
+    self._internal_connect(address)
+  File "/Users/itohti/Library/Caches/pypoetry/virtualenvs/cloud-practitioner-helper-zU27oPT6-py3.11/lib/python3.11/site-packages/gevent/_socketcommon.py", line 634, in _internal_connect
+    raise _SocketError(err, strerror(err))
+ConnectionRefusedError: [Errno 61] Connection refused
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/itohti/Library/Caches/pypoetry/virtualenvs/cloud-practitioner-helper-zU27oPT6-py3.11/lib/python3.11/site-packages/flask/app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/itohti/Library/Caches/pypoetry/virtualenvs/cloud-practitioner-helper-zU27oPT6-py3.11/lib/python3.11/site-packages/flask/app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/itohti/Library/Caches/pypoetry/virtualenvs/cloud-practitioner-helper-zU27oPT6-py3.11/lib/python3.11/site-packages/flask_cors/extension.py", line 194, in wrapped_function
+    return cors_after_request(app.make_response(f(*args, **kwargs)))
+                                                ^^^^^^^^^^^^^^^^^^
+  File "/Users/itohti/Library/Caches/pypoetry/virtualenvs/cloud-practitioner-helper-zU27oPT6-py3.11/lib/python3.11/site-packages/flask/app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/itohti/Library/Caches/pypoetry/virtualenvs/cloud-practitioner-helper-zU27oPT6-py3.11/lib/python3.11/site-packages/flask/app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/itohti/documents/study-buddy/backend/src/main.py", line 65, in upload_file
+    task = process_file.delay(file_path, current_app.config["TEXTRACTED_PATH"])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/itohti/Library/Caches/pypoetry/virtualenvs/cloud-practitioner-helper-zU27oPT6-py3.11/lib/python3.11/site-packages/celery/app/task.py", line 444, in delay
+    return self.apply_async(args, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/itohti/Library/Caches/pypoetry/virtualenvs/cloud-practitioner-helper-zU27oPT6-py3.11/lib/python3.11/site-packages/celery/app/task.py", line 594, in apply_async
+    return app.send_task(
+           ^^^^^^^^^^^^^^
+  File "/Users/itohti/Library/Caches/pypoetry/virtualenvs/cloud-practitioner-helper-zU27oPT6-py3.11/lib/python3.11/site-packages/celery/app/base.py", line 801, in send_task
+    amqp.send_task_message(P, name, message, **options)
+  File "/Users/itohti/Library/Caches/pypoetry/virtualenvs/cloud-practitioner-helper-zU27oPT6-py3.11/lib/python3.11/site-packages/celery/app/amqp.py", line 518, in send_task_message
+    ret = producer.publish(
+          ^^^^^^^^^^^^^^^^^
+  File "/Users/itohti/Library/Caches/pypoetry/virtualenvs/cloud-practitioner-helper-zU27oPT6-py3.11/lib/python3.11/site-packages/kombu/messaging.py", line 186, in publish
+    return _publish(
+           ^^^^^^^^^
+  File "/Users/itohti/Library/Caches/pypoetry/virtualenvs/cloud-practitioner-helper-zU27oPT6-py3.11/lib/python3.11/site-packages/kombu/connection.py", line 556, in _ensured
+    return fun(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/itohti/Library/Caches/pypoetry/virtualenvs/cloud-practitioner-helper-zU27oPT6-py3.11/lib/python3.11/site-packages/kombu/messaging.py", line 195, in _publish
+    channel = self.channel
+              ^^^^^^^^^^^^
+  File "/Users/itohti/Library/Caches/pypoetry/virtualenvs/cloud-practitioner-helper-zU27oPT6-py3.11/lib/python3.11/site-packages/kombu/messaging.py", line 218, in _get_channel
+    channel = self._channel = channel()
+                              ^^^^^^^^^
+  File "/Users/itohti/Library/Caches/pypoetry/virtualenvs/cloud-practitioner-helper-zU27oPT6-py3.11/lib/python3.11/site-packages/kombu/utils/functional.py", line 34, in __call__
+    value = self.__value__ = self.__contract__()
+                             ^^^^^^^^^^^^^^^^^^^
+  File "/Users/itohti/Library/Caches/pypoetry/virtualenvs/cloud-practitioner-helper-zU27oPT6-py3.11/lib/python3.11/site-packages/kombu/messaging.py", line 234, in <lambda>
+    channel = ChannelPromise(lambda: connection.default_channel)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/itohti/Library/Caches/pypoetry/virtualenvs/cloud-practitioner-helper-zU27oPT6-py3.11/lib/python3.11/site-packages/kombu/connection.py", line 953, in default_channel
+    self._ensure_connection(**conn_opts)
+  File "/Users/itohti/Library/Caches/pypoetry/virtualenvs/cloud-practitioner-helper-zU27oPT6-py3.11/lib/python3.11/site-packages/kombu/connection.py", line 458, in _ensure_connection
+    with ctx():
+  File "/Users/itohti/.pyenv/versions/3.11.10/lib/python3.11/contextlib.py", line 158, in __exit__
+    self.gen.throw(typ, value, traceback)
+  File "/Users/itohti/Library/Caches/pypoetry/virtualenvs/cloud-practitioner-helper-zU27oPT6-py3.11/lib/python3.11/site-packages/kombu/connection.py", line 476, in _reraise_as_library_errors
+    raise ConnectionError(str(exc)) from exc
+kombu.exceptions.OperationalError: [Errno 61] Connection refused
+
 main.py
 ```
+import os
+import nltk
+import logging
+import traceback
+import sys
+import time
+from flask import Flask, request, jsonify, Blueprint, current_app
+from flask_cors import CORS
+from celery import Celery, Task
+import redis
+
+# Project python files.
+from . import document_chunker as chunker
+from . import vector_db
+from . import ollama_calls as ollama
+from .tasks import process_file
+from . import make_celery
+from werkzeug.utils import secure_filename
+
+# BLUEPRINT OF API
+bp = Blueprint('study-buddy', __name__)
+
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
+logging.getLogger("urllib3").setLevel(logging.WARNING)
+logging.getLogger("gunicorn").setLevel(logging.WARNING)
+
+
+# API ENDPOINT METHODS HERE
+@bp.route('/status', methods=['GET'])
+def get_status():
+    """
+    Endpoint to check the status of the backend.
+    """
+    return jsonify({
+        'nltk_ready': current_app.nltk_ready,
+        'chroma_ready': current_app.chroma_ready,
+        'error': current_app.initialization_error
+    })
+
 @bp.route('/upload', methods=['POST'])
 def upload_file():
     """
-    Uploads a file that is chosen by the user.
+    Uploads a file and processes it asynchronously.
+    """
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file part'}), 400
 
-    This function handles all POST request to the '/upload' endpoint.
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'No selected file'}), 400
+
+    if file:
+        filename = secure_filename(file.filename)
+        file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+
+        collection = vector_db.get_collection()
+        if os.path.exists(file_path) and len(collection.get(where={"source": file_path})['ids']):
+            return jsonify({"error": "File already exists."}), 400
+
+        file.save(file_path)
+
+        # Enqueue the task
+        task = process_file.delay(file_path, current_app.config["TEXTRACTED_PATH"])
+
+        return jsonify({'message': 'File received and is being processed', 'task_id': task.id}), 202
+
+# If websockets fail fall back to polling at this endpoint.
+@bp.route('/task_status/<task_id>')
+def task_status(task_id):
+    """
+    Retrieves the status of a Celery task.
+    """
+    task = current_app.celery.AsyncResult(task_id)
+    if task.state == 'PENDING':
+        response = {
+            'state': task.state,
+            'status': 'Pending...'
+        }
+    elif task.state == 'STARTED':
+        response = {
+            'state': task.state,
+            'status': task.info.get('status', '')
+        }
+    elif task.state == 'SUCCESS':
+        response = {
+            'state': task.state,
+            'status': task.info.get('status', '')
+        }
+    elif task.state == 'FAILURE':
+        response = {
+            'state': task.state,
+            'status': str(task.info.get('status', '')),
+            'traceback': str(task.info)
+        }
+    else:
+        response = {
+            'state': task.state,
+            'status': task.info.get('status', '')
+        }
+    return jsonify(response)
+
+
+@bp.route('/search', methods=['POST'])
+def search_wrapper():
+    """
+    Search through submitted files to find the best matches for the given query. This is a wrapper to vector_db.search_documents()
+
+    This function handles all POST requests to the '/search' endpoint.
 
     Args:
         None
     Returns:
-        tuple: a json of the message and the http code
-        if successful: ({'message': 'File uploaded and embedded sucessfully'}, 200)
-        if backend not ready: ({'error': 'Backend is not fully initialized yet'}, 503)
-        if theres no file to upload: ({'error': 'No file part'}, 400)
-        if filename is empty: ({'error': 'No selected file'}, 400)
+        tuple - a json of the data and the http code
+        if backend not ready: returns ({'error': 'Backend is fully initialized yet'}), 503)
     """
-    if 'file' not in request.files:
-        return jsonify({'error': 'No file part'}), 400
-    file = request.files['file']
-    if file.filename == '':
-        return jsonify({'error': 'No selected file'}), 400
-    if file:
-        file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], file.filename)
+    query = request.json.get('query')
+    if not query:
+        return jsonify({'error': 'No query provided'}), 400
+    return vector_db.search_documents(query)
 
+@bp.route('/documents', methods=['GET'])
+def list_documents():
+    """
+    Retrieve all documents and return it back to the frontend in json format to be displayed on the screen.
+
+    This function handles all GET requests to '/documents' endpoint.
+
+    Args:
+        None
+    Returns:
+        tuple: a json file that contains data and http code
+        if successful: sends a json of the files submitted with the http code 200.
+        if backend not ready: ({error: Backend is fully initialized yet}, 503).
+
+    Raises:
+        None
+    """
+    files = os.listdir(current_app.config['UPLOAD_FOLDER'])
+    return jsonify(files)
+
+@bp.route('/documents/<filename>', methods=['DELETE'])
+def delete_document(filename):
+    """
+    Delete a document and its associated chunks from the system.
+
+    This function handles HTTP DELETE requests to remove a specific document
+    identified by its filename. It also removes the corresponding document
+    chunks from the Chroma vector store.
+
+    Args:
+        filename (str): The name of the file to be deleted.
+
+    Returns:
+        tuple: A tuple containing a JSON response and an HTTP status code.
+            - If successful: ({'message': 'Document deleted successfully'}, 200)
+            - If backend not ready: ({'error': 'Backend is not fully initialized yet'}, 503)
+            - If file not found: ({'error': 'Document not found'}, 404)
+
+    Raises:
+        None
+    """
+    file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename) 
+    if os.path.exists(file_path):
+        # Remove document chunks from Chroma
         collection = vector_db.get_collection()
-        # Checks to see if the file already exists in the upload directory to prevent from the file being chunked again in chroma db.
+        collection.delete(where={"source": file_path})
 
-        if(os.path.exists(file_path) and len(collection.get(where={"source": file_path})['ids'])): # Also checks the data base just to make sure no funny business is going on
-            return jsonify({"error": "Tried uploading a file that already exists."}), 400
+        # Remove from backend/upload/
+        os.remove(file_path)
         
-        file.save(file_path)
+        split_filename = os.path.splitext(filename)
+        if (split_filename[1] == ".pdf"):
+            textracted_path = os.path.join(current_app.config['TEXTRACTED_PATH'], f"{split_filename[0]}.md")
 
-        # Sending a task to complete adding to db in the background.
-        process_file.delay(file.filename, file_path, current_app.config["TEXTRACTED_PATH"]) # <--- calling process_file from task.py
+            os.remove(textracted_path)
 
-        return jsonify({'message': 'File recieved and is being processed', 'filename': file.filename}), 202
+        logger.info(f"New collection file should not be present: {collection.peek(100)['ids']}") # after deletion you should not see the file in the database you just deleted.
+        return jsonify({'message': 'Document deleted successfully'}), 200
+    else:
+        return jsonify({'error': 'Document not found'}), 404
+    
+@bp.route('/get_models', methods=['GET'])
+def get_models_wrapper():
+    """
+    Add pydocs here :p
+    """
+    if (not ollama.ollama_health_check()):
+        logger.info("Ollama is not running")
+        return jsonify({'error': 'Ollama is not running, please make sure ollama is running on your local machine'}, 503)
+    
+    return ollama.get_models()
 
-@bp.route('/task_status/<task_id>') # made it task_id to add more scalability.
-def task_status(task_id):
-    # integrate status reports to frontend here.
-```
 
-This is how I am making my celery app.
-```
-app.config.from_mapping(
+@bp.route('/chat', methods=['POST'])
+def chat_wrapper():
+    """
+    chat an LLM response from the prompt in the request body and chunks from documents already uploaded.
+
+    Args:
+        None
+
+    Returns:
+        tuple: A tuple containing a JSON response and an HTTP status code.
+    Raises:
+        None
+    """
+
+    if (not ollama.ollama_health_check()):
+        logger.info("Ollama is not running")
+        return jsonify({'error': 'Ollama is not running, please make sure ollama is running on your local machine'}, 503)
+    
+    prompt = request.json.get('prompt')
+
+    model = request.json.get('model')
+
+    if not prompt:
+        return jsonify({'error': 'No prompt given'}), 400
+
+    try:
+        print("running search documents")
+        search_results, http_code = vector_db.search_documents(prompt)
+
+        if http_code != 200:
+            return jsonify({'error': 'Search failed'}), http_code
+        
+        # Call chat with the search results and prompt
+        return ollama.chat(search_results, prompt, model)
+    except Exception as e:
+        print("Exception chat")
+        traceback.print_exc(file=sys.stderr)
+        return jsonify({'error': f'Exception in chat process: {str(e)}'}), 500
+
+def initialize_chroma():
+    client = vector_db.get_chroma_client()
+    try:
+        # Attempt to create the default tenant and database
+        client.create_tenant("default_tenant")
+        client.create_database("default_database", "default_tenant")
+    except Exception as e:
+        # If tenant/database already exists, this will throw an exception
+        logger.info(f"Tenant/Database initialization: {str(e)}")
+    
+    # Now get or create your collection
+    collection = vector_db.get_collection()
+
+def create_app(test_config=None):
+    """
+    Creates the app.
+    """
+    app = Flask(__name__)
+    CORS(app)
+
+    # Initialize Redis client
+    app.redis_client = redis.StrictRedis(
+        host=os.getenv("REDIS_HOST", "redis://localhost:6379/0"),
+        port=6379,          # Default Redis port
+        db=0,               # Database number
+        decode_responses=True  # Optional: decode responses to strings
+    )
+
+    app.config.from_mapping(
         CHROMA_HOST=os.getenv("CHROMA_HOST", "localhost"),  # Service name if using Docker Compose
         CHROMA_PORT=os.getenv("CHROMA_PORT", "9092"),        # Port exposed by ChromaDB server
         CELERY=dict(
@@ -53,41 +371,449 @@ app.config.from_mapping(
             task_ignore_result=True,
         ),
     )
+
+    app.config.from_prefixed_env()
+
+    # Initialize Celery
+    celery_app = make_celery(app)
+    # Store celery_app as an attribute of app
+    app.celery_app = celery_app
+
+
+    if test_config is None:
+        # Load the instance config, if it exists, when not testing
+        app.config.from_pyfile('config.py', silent=True)
+    else:
+        # Load the test config if passed in
+        app.config.from_mapping(test_config)
+
+    # Set base_path to the project root directory
+    base_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+
+    # Set default configurations
+    app.config.setdefault('CHROMA_DB_PATH', os.path.join(base_path, 'chroma_db'))
+    app.config.setdefault('UPLOAD_FOLDER', os.path.join(base_path, 'uploads'))
+    app.config.setdefault('TEXTRACTED_PATH', os.path.join(base_path, 'textracted'))
+
+    # Log all app configurations
+    for key, value in app.config.items():
+        logger.debug(f"App config: {key} = {value}")
+
+    # Ensure the required directories exist
+    try:
+        os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+        os.makedirs(app.config['CHROMA_DB_PATH'], exist_ok=True)
+        os.makedirs(app.config['TEXTRACTED_PATH'], exist_ok=True)
+        logger.info("Created necessary directories")
+    except Exception as e:
+        logger.error(f"Error creating directories: {str(e)}")
+
+    # Global variables to track initialization status
+    app.nltk_ready = False
+    app.chroma_ready = False
+    app.initialization_error = None
+
+    with app.app_context():
+        try:
+            # Initialize NLTK
+            nltk.download('punkt_tab')
+            app.nltk_ready = True
+
+            # Initialize Chroma collection
+            initialize_chroma()
+            app.chroma_ready = True
+        except LookupError as le:
+            app.initialization_error = f"NLTK LookupError: {str(le)}"
+            logger.error(f"Initialization error: {str(le)}")
+        except Exception as e:
+            app.initialization_error = f"General Initialization Error: {str(e)}"
+            logger.error(f"Initialization error: {str(e)}")
+
+    app.register_blueprint(bp, url_prefix="/api/")
+
+    return app
+
+if __name__ == '__main__':
+    app = create_app()
+    port = int(os.environ.get('FLASK_RUN_PORT', 9090))
+    app.run(host='0.0.0.0', port=port, debug=False)
+
+
+__init__.py
+```
+# src/__init__.py
+
+import os
+from flask import Flask, current_app
+from flask_cors import CORS
+from celery import Celery
+from flask_socketio import SocketIO
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
+socketio_app = SocketIO(cors_allowed_origins="*",  async_mode='gevent') # Initialize SocketIO without app
+
+def make_celery(app):
+    celery = Celery(
+        app.import_name,
+        broker=app.config['CELERY_BROKER_URL'],
+        backend=app.config['CELERY_RESULT_BACKEND'],
+    )
+    celery.conf.update(app.config)
+    celery.autodiscover_tasks(['src'])  # Auto-discover tasks in 'src' package
+
+    class ContextTask(celery.Task):
+        """Ensures each task runs within the Flask app context."""
+        def __call__(self, *args, **kwargs):
+            with app.app_context():
+                return self.run(*args, **kwargs)
+    celery.Task = ContextTask
+    return celery
+
+def create_app():
+    app = Flask(__name__)
+    CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
+
+    # Load configurations
+    app.config.from_mapping(
+        CHROMA_HOST=os.getenv("CHROMA_HOST", "localhost"),
+        CHROMA_PORT=os.getenv("CHROMA_PORT", "9092"),
+        CELERY_BROKER_URL=os.getenv("REDIS_URL", "redis://localhost:6379/0"),
+        CELERY_RESULT_BACKEND=os.getenv("REDIS_URL", "redis://localhost:6379/0"),
+        UPLOAD_FOLDER=os.getenv("UPLOAD_FOLDER", "uploads"),
+        TEXTRACTED_PATH=os.getenv("TEXTRACTED_PATH", "textracted"),
+        SOCKETIO_MESSAGE_QUEUE=os.getenv("SOCKETIO_MESSAGE_QUEUE", "redis://localhost:6379/0"),
+    )
+
+    # Initialize SocketIO with the app
+    socketio_app.init_app(app, message_queue=app.config['SOCKETIO_MESSAGE_QUEUE'])
+
+    # Initialize Celery
+    celery = make_celery(app)
+    app.celery = celery  # Store celery instance in app
+
+    # Set base_path to the project root directory
+    base_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+
+    # Set default configurations
+    app.config.setdefault('CHROMA_DB_PATH', os.path.join(base_path, 'chroma_db'))
+    app.config.setdefault('UPLOAD_FOLDER', os.path.join(base_path, 'uploads'))
+    app.config.setdefault('TEXTRACTED_PATH', os.path.join(base_path, 'textracted'))
+
+    # Ensure the required directories exist
+    try:
+        os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+        os.makedirs(app.config['CHROMA_DB_PATH'], exist_ok=True)
+        os.makedirs(app.config['TEXTRACTED_PATH'], exist_ok=True)
+        app.logger.info("Created necessary directories")
+    except Exception as e:
+        app.logger.error(f"Error creating directories: {str(e)}")
+
+    # Global variables to track initialization status
+    app.nltk_ready = False
+    app.chroma_ready = False
+    app.initialization_error = None
+
+    with app.app_context():
+        try:
+            # Initialize NLTK
+            import nltk
+            nltk.download('punkt', quiet=True)
+            app.nltk_ready = True
+
+            # Initialize Chroma collection
+            from . import vector_db
+            vector_db.initialize_chroma()
+            app.chroma_ready = True
+        except LookupError as le:
+            app.initialization_error = f"NLTK LookupError: {str(le)}"
+            app.logger.error(f"Initialization error: {str(le)}")
+        except Exception as e:
+            app.initialization_error = f"General Initialization Error: {str(e)}"
+            app.logger.error(f"Initialization error: {str(e)}")
+
+    # Register blueprints or routes
+    from .main import bp as main_bp
+    app.register_blueprint(main_bp, url_prefix='/api/')
+
+    return app
+
+# Expose the celery app instance at the module level
+celery = make_celery(create_app())
+socketio = socketio_app
 ```
 
 task.py
 ```
+from celery import shared_task
+import logging
+from . import vector_db
+from . import document_chunker as chunker
+from . import socketio_app
+
+logger = logging.getLogger(__name__)
+
 @shared_task(bind=True)
 def process_file(self, file_path, textracted_path):
     """
-    Where threads start to process files and embed them into the data base.
-
-    Args:
-        self: String contains filename.
-        file_path: String contains the path of the file.
-        textracted_path: String contains the path to the textracted directory.
-
-    Returns:
-        None
+    Processes the file and embeds it into the database.
     """
-
     try:
-        # Log the start of the processing
-        logger.info(f"Starting to process file: {self}")
+        logger.info(f"Starting to process file: {file_path}")
 
-        self.update_state()
+        # Update task state
+        self.update_state(state='STARTED', meta={'status': 'Processing started'})
+
+        # Emit an event to notify the frontend
+        socketio_app.emit('task_update', {'task_id': self.request.id, 'status': 'Processing started'}, namespace='/tasks')
 
         collection = vector_db.get_collection()
-
         chunker.embed_documents([file_path], collection, textracted_path)
 
-        # Log successful processing
-        logger.info(f"Successfully processed file: {self}")
+        logger.info(f"Successfully processed file: {file_path}")
+
+        # Emit an event to notify completion
+        socketio_app.emit('task_update', {'task_id': self.request.id, 'status': 'Task completed'}, namespace='/tasks')
+
+        return {'status': 'Task completed'}
 
     except Exception as e:
-        logger.error(f"Error processing file {self}: {str(e)}")
-        # Optionally, you can raise the exception to retry the task if needed
-        # raise e
+        logger.error(f"Error processing file {file_path}: {str(e)}")
+
+        # Emit an event to notify error
+        socketio_app.emit('task_update', {'task_id': self.request.id, 'status': f'Error: {str(e)}'}, namespace='/tasks')
+
+        raise e
 ```
 
-How can I use redis to send status to the frontend. integrate this into task_status
+wsgi.py
+```
+from . import create_app, socketio_app
+
+app = create_app()
+
+if __name__ == "__main__":
+    socketio_app.run(app, host='0.0.0.0', port=9090)
+```
+frontend error
+WebSocket connection to 'ws://localhost:9090/socket.io/?EIO=4&transport=websocket' failed: WebSocket is closed before the connection is established.
+
+FileUpload.js
+```
+import React, { useState, useEffect, useCallback } from "react";
+import axios from "axios";
+import { io } from "socket.io-client";
+
+const BACKEND_URL_API = process.env.REACT_APP_BACKEND_URL
+  ? process.env.REACT_APP_BACKEND_URL + "/api"
+  : "http://localhost:9090/api";
+
+const SOCKET_URL = process.env.REACT_APP_SOCKET_URL || "http://localhost:9090";
+
+const FileUpload = ({ isBackendReady, fetchDocuments, setError }) => {
+  const [file, setFile] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadStatus, setUploadStatus] = useState("");
+  const [processingStatus, setProcessingStatus] = useState("");
+  const [socket, setSocket] = useState(null);
+
+  const handleSocketMessage = useCallback((message) => {
+    switch (message.type) {
+      case "upload_status":
+        setUploadStatus(message.status);
+        if (message.status === "Upload complete") {
+          setIsUploading(false);
+        }
+        break;
+      case "processing_status":
+        setProcessingStatus(message.status);
+        if (message.status === "Processing complete") {
+          fetchDocuments();
+        }
+        break;
+      default:
+        console.log("Received unknown message type:", message.type);
+    }
+  }, [fetchDocuments]);
+
+  useEffect(() => {
+    const newSocket = io(SOCKET_URL, {
+      transports: ['websocket'],
+      upgrade: false
+    });
+
+    newSocket.on("connect", () => {
+      console.log("Socket.IO connection established");
+    });
+
+    newSocket.on("message", (data) => {
+      handleSocketMessage(data);
+    });
+
+    newSocket.on("connect_error", (error) => {
+      console.error("Socket.IO connection error:", error);
+      setError("Socket.IO connection error");
+    });
+
+    setSocket(newSocket);
+
+    return () => {
+      newSocket.disconnect();
+    };
+  }, [handleSocketMessage, setError]);
+
+  const handleFileUpload = async (e) => {
+    e.preventDefault();
+    if (!file) return;
+    setIsUploading(true);
+    setUploadStatus("Starting upload...");
+    setProcessingStatus("");
+    setError(null);
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const response = await axios.post(`${BACKEND_URL_API}/upload`, formData);
+      const { filename } = response.data;
+      console.log("File uploaded:", filename);
+      setUploadStatus("Upload complete. Waiting for processing to start...");
+    } catch (error) {
+      console.error("Error uploading file:", error);
+      setError(
+        error.response?.data?.error || "Error uploading file. Please try again."
+      );
+      setIsUploading(false);
+    } finally {
+      setFile(null);
+    }
+  };
+
+  return (
+    <div className="mb-4">
+      <form onSubmit={handleFileUpload} className="mb-2">
+        <div className="flex items-center justify-between">
+          <input
+            type="file"
+            onChange={(e) => setFile(e.target.files[0])}
+            disabled={isUploading || !isBackendReady}
+            className="text-sm text-gray-500
+              file:mr-4 file:py-2 file:px-4
+              file:rounded-full file:border-0
+              file:text-sm file:font-semibold
+              file:bg-blue-50 file:text-blue-700
+              hover:file:bg-blue-100"
+          />
+          <button
+            type="submit"
+            disabled={!file || isUploading || !isBackendReady}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50"
+          >
+            {isUploading ? "Uploading..." : "Upload"}
+          </button>
+        </div>
+      </form>
+      {uploadStatus && (
+        <div className="mt-2 text-sm text-gray-600">Upload Status: {uploadStatus}</div>
+      )}
+      {processingStatus && (
+        <div className="mt-2 text-sm text-gray-600">Processing Status: {processingStatus}</div>
+      )}
+    </div>
+  );
+};
+
+export default FileUpload;
+```
+
+Project Hierarchy
+├── backend
+│   ├── .pytest_cache
+│   ├── chroma_db
+│   ├── extracted_images
+│   ├── logs
+│   ├── raw-documents
+│   ├── secrets
+│   ├── src
+│   │   ├── uploads
+│   │   ├── __init__.py
+│   │   ├── celery_app.py
+│   │   ├── document_chunker.py
+│   │   ├── document_textractor.py
+│   │   ├── google_calls.py
+│   │   ├── main.py
+│   │   ├── make_celery.py
+│   │   ├── ollama_calls.py
+│   │   ├── pdf_extractor.py
+│   │   ├── tasks.py
+│   │   ├── vector_db.py
+│   │   └── wsgi.py
+│   ├── test_images
+│   │   └── mystery.jpeg
+│   ├── test_upload
+│   │   ├── document.pdf
+│   │   ├── loremipsum.txt
+│   │   ├── test.pdf
+│   │   └── vision-llm.pdf
+│   ├── tests
+│   │   ├── __init__.py
+│   │   ├── test_integration.py
+│   │   └── test_main.py
+│   ├── textracted
+│   ├── uploads
+│   ├── .python-version
+│   ├── Dockerfile
+│   ├── example.env
+│   ├── permissions.txt
+│   ├── prompt.txt
+│   ├── prompt2.txt
+│   ├── pydoc-markdown.yml
+│   ├── pyproject.toml
+│   ├── run-dev-server.sh
+│   └── run-integration.sh
+├── chromadb
+│   ├── 7f50c096-2ae6-446c-a7bf-6b74ff0ed639
+│   │   ├── data_level0.bin
+│   │   ├── header.bin
+│   │   ├── length.bin
+│   │   └── link_lists.bin
+│   └── chroma.sqlite3
+├── docs
+│   ├── api.md
+│   └── example-ollama-curl.txt
+├── frontend
+│   ├── public
+│   │   ├── favicon.ico
+│   │   ├── index.html
+│   │   ├── logo192.png
+│   │   ├── logo512.png
+│   │   ├── manifest.json
+│   │   └── robots.txt
+│   ├── src
+│   │   ├── components
+│   │   │   ├── DocumentList.js
+│   │   │   ├── FileUpload.js
+│   │   │   ├── GetModels.js
+│   │   │   ├── SearchAndChat.js
+│   │   │   └── StatusMessage.js
+│   │   ├── App.css
+│   │   ├── App.js
+│   │   ├── App.test.js
+│   │   ├── index.css
+│   │   ├── index.js
+│   │   ├── logo.svg
+│   │   ├── reportWebVitals.js
+│   │   └── setupTests.js
+│   ├── Dockerfile
+│   ├── package-lock.json
+│   └── package.json
+├── .python-version
+├── README.md
+├── bugs.md
+├── docker-compose.yml
+├── notepad.txt
+└── todo.md
+
+Given the backend and frontend errors what could be wrong with the backend or frontend?

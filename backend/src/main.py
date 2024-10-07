@@ -5,6 +5,7 @@ import traceback
 import sys
 import time
 from flask import Flask, request, jsonify, Blueprint, current_app
+from . import socketio_app
 from flask_cors import CORS
 from celery import Celery, Task
 import redis
@@ -66,6 +67,7 @@ def upload_file():
 
         return jsonify({'message': 'File received and is being processed', 'task_id': task.id}), 202
 
+# If websockets fail fall back to polling at this endpoint.
 @bp.route('/task_status/<task_id>')
 def task_status(task_id):
     """
@@ -267,6 +269,9 @@ def create_app(test_config=None):
             result_backend=os.getenv("REDIS_URL", "redis://localhost:6379/0"),
             task_ignore_result=True,
         ),
+        CELERY_BROKER_URL=os.getenv("REDIS_URL", "redis://localhost:6379/0"),
+        CELERY_RESULT_BACKEND=os.getenv("REDIS_URL", "redis://localhost:6379/0"),
+        CELERY_TASK_IGNORE_RESULT=True,
     )
 
     app.config.from_prefixed_env()
@@ -329,8 +334,3 @@ def create_app(test_config=None):
     app.register_blueprint(bp, url_prefix="/api/")
 
     return app
-
-if __name__ == '__main__':
-    app = create_app()
-    port = int(os.environ.get('FLASK_RUN_PORT', 9090))
-    app.run(host='0.0.0.0', port=port, debug=False)

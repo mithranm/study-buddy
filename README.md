@@ -24,15 +24,18 @@ This was developed on a M1 Macbook Pro with 16gb RAM. Your mileage shouldn't var
 
 Running ollama is your responsibility, you can set the OLLAMA_HOST in the docker-compose.yml file. It defaults to 11434 as usual. We haven't created any executables yet, so you'll need to run the project as a Docker application.
 
+We also require poetry with python 3.11.10 for the build step in our backend/Dockerfile. This may change, but it was mostly for our sanity in not having to recalculate dependencies every single build.
+
 ## Docker Usage
 
 1. Clone this repo with ``git clone https://github.com/mithranm/study-buddy``
 2. Set the OLLAMA_HOST in docker-compose.yml to a valid Ollama instance (we really should have named it OLLAMA_URL, will be fixed in a future update). You have to do this for the backend service and celery_worker service.
 3. Rename /backend/example.env to .env, making sure you set all the required variables.
-4. Run ``docker-compose up --build `` in the project root to build for the first time.
-5. Navigate to localhost:9091 in your browser and begin!
-6. Press Ctrl+C to stop application
-7. Run ``docker-compose down `` without our with ``-v`` to either keep your documents or delete them.
+4. ``cd study-buddy/backend`` and run ``poetry install``
+5. ``cd ..`` and Run ``docker-compose up --build `` to build for the first time.
+6. Navigate to localhost:9091 in your browser and begin!
+7. Press Ctrl+C to stop application
+8. Run ``docker-compose down `` without our with ``-v`` to either keep your documents or delete them.
 
 ## Development
 

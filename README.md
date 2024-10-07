@@ -8,6 +8,14 @@ Our plans for this project is to make a fully offline and easily customizable RA
 
 ## Requirements
 
+### Cloud
+
+Yes, this contradicts what we said earlier about a fully offline RAG system. But hear us out, Google is offering llama3.2vision-90b for free. You probably can't run such a model locally, so why not make use of it?
+
+In /backend/secrets, you need to place a service-account-key.json with access to Vertex AI and set the GCP_SECRET_PATH in /backend/.env to the name of the file.
+
+This is required for uploading .pdf. We only support .txt and .pdf currently.
+
 ### Hardware
 
 This was developed on a M1 Macbook Pro with 16gb RAM. Your mileage shouldn't vary much with different hardware as we kept cross-platform support in mind and running ollama is your responsibility.
@@ -16,14 +24,17 @@ This was developed on a M1 Macbook Pro with 16gb RAM. Your mileage shouldn't var
 
 Running ollama is your responsibility, you can set the OLLAMA_HOST in the docker-compose.yml file. It defaults to 11434 as usual. We haven't created any executables yet, so you'll need to run the project as a Docker application.
 
+We also require poetry with python 3.11.10 for the build step in our backend/Dockerfile. This may change, but it was mostly for our sanity in not having to recalculate dependencies every single build.
+
 ## Docker Usage
 
 1. Clone this repo with ``git clone https://github.com/mithranm/study-buddy``
-2. Rename example.env in /frontend and /backend to .env and set the OLLAMA_HOST to a valid Ollama instance.
-3. Run ``docker-compose up --build `` in the project root to build for the first time.
-4. Navigate to localhost:9091 in your browser and begin!
-5. Press Ctrl+C to stop application
-6. Run ``docker-compose down `` without our with ``-v`` to either keep your documents or delete them.
+2. Set the OLLAMA_HOST in docker-compose.yml to a valid Ollama instance (we really should have named it OLLAMA_URL, will be fixed in a future update). You have to do this for the backend service and celery_worker service.
+3. Run ``sh docker-build.sh`` to build for the first time.
+4. Run ``docker-compose up`` with or without ``-d``
+5. Navigate to localhost:9091 in your browser and begin!
+6. Press Ctrl+C to stop application
+7. Run ``docker-compose down `` without our with ``-v`` to either keep your documents or delete them.
 
 ## Development
 

@@ -13,7 +13,7 @@ RUN apt-get update \
 # Install Poetry
 RUN pip install poetry
 
-# Copy only requirements files first to leverage Docker cache
+# Copy only dependency files first to leverage Docker cache
 COPY pyproject.toml poetry.lock ./
 
 # Configure Poetry to create virtual environment inside the project directory
@@ -23,6 +23,10 @@ RUN poetry config virtualenvs.create true \
 # Install dependencies with cache mount
 RUN --mount=type=cache,target=/root/.cache/pypoetry \
     poetry install --no-interaction --no-ansi
+
+# Copy the application source code and secrets
+COPY src/ ./src/
+COPY secrets/ ./secrets/
 
 # Update PATH to include the virtual environment binaries
 ENV PATH="/app/.venv/bin:$PATH"

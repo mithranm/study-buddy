@@ -1,0 +1,263 @@
+Project-Hierarchy
+```
+├── backend
+│   ├── chroma_db
+│   ├── secrets
+│   ├── src
+│   │   ├── __init__.py
+│   │   ├── celery_app.py
+│   │   ├── document_chunker.py
+│   │   ├── document_textractor.py
+│   │   ├── extensions.py
+│   │   ├── google_calls.py
+│   │   ├── main.py
+│   │   ├── make_celery.py
+│   │   ├── ollama_calls.py
+│   │   ├── pdf_extractor.py
+│   │   ├── tasks.py
+│   │   ├── vector_db.py
+│   │   └── wsgi.py
+│   ├── test_images
+│   │   └── mystery.jpeg
+│   ├── test_upload
+│   │   ├── document.pdf
+│   │   ├── loremipsum.txt
+│   │   ├── test.pdf
+│   │   └── vision-llm.pdf
+│   ├── tests
+│   │   ├── __init__.py
+│   │   ├── test_integration.py
+│   │   └── test_main.py
+│   ├── textracted
+│   ├── uploads
+│   ├── .python-version
+│   ├── Dockerfile
+│   ├── errorlog.txt
+│   ├── example.env
+│   ├── log.txt
+│   ├── permissions.txt
+│   ├── prompt.txt
+│   ├── prompt2.txt
+│   ├── pydoc-markdown.yml
+│   ├── pyproject.toml
+│   ├── run-dev-server.sh
+│   ├── run-integration.sh
+│   └── supervisord.conf
+├── docs
+│   ├── api.md
+│   └── example-ollama-curl.txt
+├── frontend
+│   ├── public
+│   │   ├── favicon.ico
+│   │   ├── index.html
+│   │   ├── logo192.png
+│   │   ├── logo512.png
+│   │   ├── manifest.json
+│   │   └── robots.txt
+│   ├── src
+│   │   ├── components
+│   │   │   ├── DocumentList.js
+│   │   │   ├── FileUpload.js
+│   │   │   ├── GetModels.js
+│   │   │   ├── SearchAndChat.js
+│   │   │   └── StatusMessage.js
+│   │   ├── App.css
+│   │   ├── App.js
+│   │   ├── App.test.js
+│   │   ├── index.css
+│   │   ├── index.js
+│   │   ├── logo.svg
+│   │   ├── reportWebVitals.js
+│   │   └── setupTests.js
+│   ├── Dockerfile
+│   ├── package-lock.json
+│   └── package.json
+├── .python-version
+├── README.md
+├── bugs.md
+├── docker-build.sh
+├── docker-compose.yml
+├── logs.txt
+├── notepad.txt
+└── todo.md
+```
+docker-compose.yml
+```
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "9090:9090"
+    volumes:
+      - chroma_db:/app/chroma_db
+      - textracted:/app/textracted
+      - uploads:/app/uploads
+      - ./backend/src:/app/src
+      - ./backend/secrets:/app/secrets
+      - nltk_data:/home/appuser/nltk_data
+    environment:
+      - FLASK_ENV=${FLASK_ENV:-production}
+      - FLASK_APP=src.main
+      - FLASK_RUN_PORT=9090
+      - CHROMA_DB_PATH=/app/chroma_db
+      - RAW_DOCUMENTS_PATH=/app/raw-documents
+      - UPLOAD_FOLDER=/app/uploads
+      - OLLAMA_HOST=host.docker.internal:11434
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - CHROMA_HOST=chromadb
+      - CHROMA_PORT=8000
+      - REDIS_URL=redis://redis
+      - PYTHONPATH=/app/src
+      - NLTK_DATA=/home/appuser/nltk_data
+    env_file:
+      - ./backend/.env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9090/api/status"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    depends_on:
+      redis:
+        condition: service_healthy
+      chromadb:
+        condition: service_healthy
+    networks:
+      - net
+
+  redis:
+    image: "redis:alpine"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 30s
+      retries: 50
+    networks:
+      - net
+
+  chromadb:
+    image: chromadb/chroma:0.5.11
+    volumes:
+      - chromadb_data:/chroma/chroma
+    environment:
+      - IS_PERSISTENT=TRUE
+      - PERSIST_DIRECTORY=/chroma/chroma
+      - ANONYMIZED_TELEMETRY=${ANONYMIZED_TELEMETRY:-TRUE}
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/heartbeat"]
+      interval: 5s
+      timeout: 30s
+      retries: 50
+    networks:
+      - net
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "9091:80"
+    environment:
+      - REACT_APP_BACKEND_URL=http://localhost:9090
+    depends_on:
+      - backend
+    networks:
+      - net
+
+networks:
+  net:
+
+volumes:
+  chroma_db:
+  textracted:
+  uploads:
+  chromadb_data:
+  nltk_data:
+```
+
+/backend/Dockerfile
+```
+FROM python:3.11.10-slim
+
+# Set the working directory
+WORKDIR /app
+
+# Install system dependencies and clean up in the same layer
+ENV PYTHONUNBUFFERED=1
+RUN apt-get update \
+    && apt-get -y install tesseract-ocr supervisor \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Poetry globally
+RUN pip install poetry
+
+# Create a non-root user 'appuser' with UID and GID 1000
+RUN useradd -m -u 1000 appuser
+
+# Set ownership of the working directory to 'appuser'
+RUN chown -R appuser:appuser /app
+
+# Set HOME environment variable for 'appuser'
+ENV HOME=/home/appuser
+
+# Switch to 'appuser' to perform Poetry configuration and installation
+USER appuser
+
+# Ensure Poetry cache directory exists and is writable
+RUN mkdir -p /home/appuser/.cache
+
+# Copy only dependency files first to leverage Docker cache
+COPY --chown=appuser:appuser pyproject.toml ./
+
+# Configure Poetry to create virtual environments inside the project directory
+RUN poetry config virtualenvs.create true \
+    && poetry config virtualenvs.in-project true
+
+# Install dependencies with Poetry using a cache mount for efficiency
+RUN --mount=type=cache,target=/home/appuser/.cache/pypoetry,uid=1000,gid=1000 \
+    poetry install --no-interaction --no-ansi
+
+# Set the NLTK data directory environment variable
+ENV NLTK_DATA=/home/appuser/nltk_data
+
+# Create the NLTK data directory
+RUN mkdir -p $NLTK_DATA
+
+# Download NLTK data as 'appuser' to the user-owned directory
+RUN poetry run python -c "import nltk; nltk.download('punkt', download_dir='$NLTK_DATA')"
+
+# Copy the application source code and secrets with proper ownership
+COPY --chown=appuser:appuser src/ ./src/
+COPY --chown=appuser:appuser secrets/ ./secrets/
+
+# Create the upload directory and set ownership to 'appuser'
+RUN mkdir -p /app/uploads && chown -R appuser:appuser /app/uploads
+
+# Switch back to root to run Supervisord
+USER root
+
+# Copy Supervisord configuration
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+# Set PYTHONPATH environment variable
+ENV PYTHONPATH=/app/src
+
+# Expose the port the app runs on
+EXPOSE 9090
+
+# Use Supervisord as the entrypoint
+CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+```
+
+Trying to Run Docker App
+```
+packages/werkzeug/datastructures/file_storage.py", line 125, in save
+                    backend-1   |     dst = open(dst, "wb")
+                    backend-1   |           ^^^^^^^^^^^^^^^
+                    backend-1   | PermissionError: [Errno 13] Permission denied: '  backend-1   | PermissionError: [Errno 13] Permission denied: '/app/uploads/document.pdf'
+```
+
+This error does not occur on the machine that pushed the commit to github, but it happens on machines that pull the repository. Why is that?

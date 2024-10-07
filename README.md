@@ -74,7 +74,7 @@ Please check if we have any feature branches in the repository already, and refr
 1. Navigate to /backend
 2. Run ``poetry install``
 3. run ``sh run-integration.sh``
-    - If you have a Windows machine, we aren't even sure you can develop this project. Please contact us.
+   - If you have a Windows machine, we aren't even sure you can develop this project. Please contact us.
 4. Congrats, the gunicorn server is running on port 9090.
 
 #### Frontend
@@ -88,6 +88,8 @@ Please check if we have any feature branches in the repository already, and refr
 ### Unit Testing
 
 #### Backend
+
+**IMPORTANT**: These don't work anymore and we are overwhelmed with features trying to fix everything. But we have verified the program runs as intended (for the most part)
 
 1. Navigate to /backend
 2. Make sure you have run ``poetry install`` before, run it if not.

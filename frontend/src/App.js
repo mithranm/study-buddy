@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 
 /* COMPONENTS */
@@ -20,33 +20,40 @@ export default function App() {
   const [error, setError] = useState(null);
   const [selectedModel, setSelectedModel] = useState('');
 
-  useEffect(() => {
-    const checkBackendStatus = async () => {
-      try {
-        const response = await axios.get(`${BACKEND_URL_API}/status`);
-        setBackendStatus(response.data);
-        if (response.data.nltk_ready && response.data.chroma_ready) {
-          fetchDocuments();
-        }
-      } catch (error) {
-        console.error("Error checking backend status:", error);
-        setBackendStatus((prev) => ({
-          ...prev,
-          error: "Unable to connect to the backend",
-        }));
+  const checkBackendStatus = useCallback(async () => {
+    try {
+      const response = await axios.get(`${BACKEND_URL_API}/status`, { timeout: 5000 });
+      setBackendStatus(response.data);
+      if (response.data.nltk_ready && response.data.chroma_ready) {
+        fetchDocuments();
       }
-    };
-
-    const statusInterval = setInterval(checkBackendStatus, 5000);
-    return () => clearInterval(statusInterval);
+    } catch (error) {
+      // Instead of logging the error, just set the backend as not ready
+      setBackendStatus((prev) => ({
+        ...prev,
+        nltk_ready: false,
+        chroma_ready: false,
+        error: "Backend is not accessible",
+      }));
+    }
   }, []);
+
+  useEffect(() => {
+    checkBackendStatus();
+    const intervalId = setInterval(() => {
+      if (!backendStatus.nltk_ready || !backendStatus.chroma_ready) {
+        checkBackendStatus();
+      }
+    }, 5000); // Check every 5 seconds if backend is not ready
+
+    return () => clearInterval(intervalId);
+  }, [checkBackendStatus, backendStatus.nltk_ready, backendStatus.chroma_ready]);
 
   const fetchDocuments = async () => {
     try {
       const response = await axios.get(`${BACKEND_URL_API}/documents`);
       setDocuments(response.data);
     } catch (error) {
-      console.error("Error fetching documents:", error);
       setError("Failed to fetch documents. Please try again.");
     }
   };
@@ -57,7 +64,6 @@ export default function App() {
       await axios.delete(`${BACKEND_URL_API}/documents/${filename}`);
       fetchDocuments();
     } catch (error) {
-      console.error("Error deleting document:", error);
       setError(
         error.response?.data?.error ||
         "Error deleting document. Please try again."
@@ -78,6 +84,12 @@ export default function App() {
           <h1 className="text-2xl font-bold mb-5 text-center">
             Document Management System
           </h1>
+
+          {!isBackendReady && (
+            <div className="alert alert-warning" role="alert">
+              Backend is not accessible. Please ensure the backend server is running.
+            </div>
+          )}
 
           <StatusMessage
             isBackendReady={isBackendReady}

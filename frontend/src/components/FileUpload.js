@@ -10,7 +10,6 @@ const FileUpload = ({ isBackendReady, fetchDocuments, setError }) => {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState("");
   const [taskId, setTaskId] = useState(null);  
-  const [isAlertShown, setIsAlertShown] = useState(false);  // Add this flag to prevent repeated alerts
 
   useEffect(() => {
     let pollStatusInterval;
@@ -27,10 +26,10 @@ const FileUpload = ({ isBackendReady, fetchDocuments, setError }) => {
             clearInterval(pollStatusInterval);
             setIsUploading(false);
 
-            if (state === "SUCCESS" && !isAlertShown) {
-              setIsAlertShown(true);  // Set the flag to true once the alert is shown
+            if (state === "SUCCESS") {
               alert("File uploaded and processed successfully");
               fetchDocuments();
+              setTaskId(null); // task is done so set taskid to null.
             } else if (state === "FAILURE") {
               setError("File processing failed");
             }
@@ -44,7 +43,7 @@ const FileUpload = ({ isBackendReady, fetchDocuments, setError }) => {
     }
 
     return () => clearInterval(pollStatusInterval);  
-  }, [taskId, fetchDocuments, setError, isAlertShown]);
+  }, [taskId, fetchDocuments, setError]);
 
   const handleFileUpload = async (e) => {
     e.preventDefault();
@@ -53,7 +52,6 @@ const FileUpload = ({ isBackendReady, fetchDocuments, setError }) => {
     setIsUploading(true);
     setUploadStatus("Starting upload...");
     setError(null);
-    setIsAlertShown(false);  // Reset the flag when a new upload begins
 
     const formData = new FormData();
     formData.append("file", file);

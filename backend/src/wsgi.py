@@ -1,4 +1,6 @@
-from src.main import create_app
+# src/wsgi.py
+
+from . import create_app
 
 app = create_app()
 

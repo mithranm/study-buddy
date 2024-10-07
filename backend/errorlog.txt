@@ -1,0 +1,106 @@
+[2024-10-07 01:11:30 -0400] [17330] [INFO] Starting gunicorn 23.0.0
+[2024-10-07 01:11:30 -0400] [17330] [INFO] Listening at: http://0.0.0.0:9090 (17330)
+[2024-10-07 01:11:30 -0400] [17330] [INFO] Using worker: gevent
+[2024-10-07 01:11:30 -0400] [17336] [INFO] Booting worker with pid: 17336
+[2024-10-07 01:15:32 -0400] [17330] [INFO] Handling signal: int
+[2024-10-07 01:15:32 -0400] [17336] [INFO] Worker exiting (pid: 17336)
+[2024-10-07 01:15:32 -0400] [17330] [INFO] Shutting down: Master
+[2024-10-07 01:15:37 -0400] [18374] [INFO] Starting gunicorn 23.0.0
+[2024-10-07 01:15:37 -0400] [18374] [INFO] Listening at: http://0.0.0.0:9090 (18374)
+[2024-10-07 01:15:37 -0400] [18374] [INFO] Using worker: gevent
+[2024-10-07 01:15:37 -0400] [18390] [INFO] Booting worker with pid: 18390
+[2024-10-07 01:15:38 -0400] [18390] [ERROR] Exception in worker process
+Traceback (most recent call last):
+  File "/Users/itohti/Library/Caches/pypoetry/virtualenvs/cloud-practitioner-helper-zU27oPT6-py3.11/lib/python3.11/site-packages/gunicorn/arbiter.py", line 608, in spawn_worker
+    worker.init_process()
+  File "/Users/itohti/Library/Caches/pypoetry/virtualenvs/cloud-practitioner-helper-zU27oPT6-py3.11/lib/python3.11/site-packages/gunicorn/workers/ggevent.py", line 146, in init_process
+    super().init_process()
+  File "/Users/itohti/Library/Caches/pypoetry/virtualenvs/cloud-practitioner-helper-zU27oPT6-py3.11/lib/python3.11/site-packages/gunicorn/workers/base.py", line 135, in init_process
+    self.load_wsgi()
+  File "/Users/itohti/Library/Caches/pypoetry/virtualenvs/cloud-practitioner-helper-zU27oPT6-py3.11/lib/python3.11/site-packages/gunicorn/workers/base.py", line 147, in load_wsgi
+    self.wsgi = self.app.wsgi()
+                ^^^^^^^^^^^^^^^
+  File "/Users/itohti/Library/Caches/pypoetry/virtualenvs/cloud-practitioner-helper-zU27oPT6-py3.11/lib/python3.11/site-packages/gunicorn/app/base.py", line 66, in wsgi
+    self.callable = self.load()
+                    ^^^^^^^^^^^
+  File "/Users/itohti/Library/Caches/pypoetry/virtualenvs/cloud-practitioner-helper-zU27oPT6-py3.11/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 57, in load
+    return self.load_wsgiapp()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/Users/itohti/Library/Caches/pypoetry/virtualenvs/cloud-practitioner-helper-zU27oPT6-py3.11/lib/python3.11/site-packages/gunicorn/app/wsgiapp.py", line 47, in load_wsgiapp
+    return util.import_app(self.app_uri)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/itohti/Library/Caches/pypoetry/virtualenvs/cloud-practitioner-helper-zU27oPT6-py3.11/lib/python3.11/site-packages/gunicorn/util.py", line 370, in import_app
+    mod = importlib.import_module(module)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/itohti/.pyenv/versions/3.11.10/lib/python3.11/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1126, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+  File "<frozen importlib._bootstrap>", line 1204, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1176, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1147, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 690, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 940, in exec_module
+  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+  File "/Users/itohti/Documents/study-buddy/backend/src/__init__.py", line 123, in <module>
+    check_gevent_hub()
+  File "/Users/itohti/Documents/study-buddy/backend/src/__init__.py", line 121, in check_gevent_hub
+    print("Blocked threads:", hub.blocking)
+                              ^^^^^^^^^^^^
+AttributeError: 'Hub' object has no attribute 'blocking'
+[2024-10-07 01:15:38 -0400] [18390] [INFO] Worker exiting (pid: 18390)
+[2024-10-07 01:15:39 -0400] [18374] [ERROR] Worker (pid:18390) exited with code 3
+[2024-10-07 01:15:39 -0400] [18374] [ERROR] Shutting down: Master
+[2024-10-07 01:15:39 -0400] [18374] [ERROR] Reason: Worker failed to boot.
+[2024-10-07 01:17:02 -0400] [18755] [INFO] Starting gunicorn 23.0.0
+[2024-10-07 01:17:02 -0400] [18755] [INFO] Listening at: http://0.0.0.0:9090 (18755)
+[2024-10-07 01:17:02 -0400] [18755] [INFO] Using worker: gevent
+[2024-10-07 01:17:02 -0400] [18761] [INFO] Booting worker with pid: 18761
+[2024-10-07 01:19:05 -0400] [18755] [INFO] Handling signal: int
+[2024-10-07 01:19:05 -0400] [18761] [INFO] Worker exiting (pid: 18761)
+[2024-10-07 01:19:05 -0400] [18755] [INFO] Shutting down: Master
+[2024-10-07 01:19:14 -0400] [19356] [INFO] Starting gunicorn 23.0.0
+[2024-10-07 01:19:14 -0400] [19356] [INFO] Listening at: http://0.0.0.0:9090 (19356)
+[2024-10-07 01:19:14 -0400] [19356] [INFO] Using worker: gevent
+[2024-10-07 01:19:14 -0400] [19362] [INFO] Booting worker with pid: 19362
+[2024-10-07 01:22:00 -0400] [19356] [INFO] Handling signal: int
+[2024-10-07 01:22:00 -0400] [19362] [INFO] Worker exiting (pid: 19362)
+[2024-10-07 01:22:01 -0400] [19356] [INFO] Shutting down: Master
+[2024-10-07 01:22:06 -0400] [20124] [INFO] Starting gunicorn 23.0.0
+[2024-10-07 01:22:06 -0400] [20124] [INFO] Listening at: http://0.0.0.0:9090 (20124)
+[2024-10-07 01:22:06 -0400] [20124] [INFO] Using worker: gevent
+[2024-10-07 01:22:06 -0400] [20132] [INFO] Booting worker with pid: 20132
+[2024-10-07 01:22:49 -0400] [20124] [INFO] Handling signal: int
+[2024-10-07 01:22:49 -0400] [20132] [INFO] Worker exiting (pid: 20132)
+[2024-10-07 01:22:49 -0400] [20124] [INFO] Shutting down: Master
+[2024-10-07 01:23:00 -0400] [20409] [INFO] Starting gunicorn 23.0.0
+[2024-10-07 01:23:00 -0400] [20409] [INFO] Listening at: http://0.0.0.0:9090 (20409)
+[2024-10-07 01:23:00 -0400] [20409] [INFO] Using worker: gevent
+[2024-10-07 01:23:00 -0400] [20417] [INFO] Booting worker with pid: 20417
+[2024-10-07 01:23:44 -0400] [20409] [INFO] Handling signal: int
+[2024-10-07 01:23:44 -0400] [20417] [INFO] Worker exiting (pid: 20417)
+[2024-10-07 01:23:44 -0400] [20409] [INFO] Shutting down: Master
+[2024-10-07 01:23:50 -0400] [20671] [INFO] Starting gunicorn 23.0.0
+[2024-10-07 01:23:50 -0400] [20671] [INFO] Listening at: http://0.0.0.0:9090 (20671)
+[2024-10-07 01:23:50 -0400] [20671] [INFO] Using worker: gevent
+[2024-10-07 01:23:50 -0400] [20679] [INFO] Booting worker with pid: 20679
+[2024-10-07 01:24:28 -0400] [20671] [INFO] Handling signal: int
+[2024-10-07 01:24:28 -0400] [20679] [INFO] Worker exiting (pid: 20679)
+[2024-10-07 01:24:28 -0400] [20671] [INFO] Shutting down: Master
+[2024-10-07 01:24:36 -0400] [20921] [INFO] Starting gunicorn 23.0.0
+[2024-10-07 01:24:36 -0400] [20921] [INFO] Listening at: http://0.0.0.0:9090 (20921)
+[2024-10-07 01:24:36 -0400] [20921] [INFO] Using worker: gevent
+[2024-10-07 01:24:36 -0400] [20935] [INFO] Booting worker with pid: 20935
+[2024-10-07 01:25:25 -0400] [20921] [INFO] Handling signal: int
+[2024-10-07 01:25:25 -0400] [20935] [INFO] Worker exiting (pid: 20935)
+[2024-10-07 01:25:25 -0400] [20921] [INFO] Shutting down: Master
+[2024-10-07 01:25:31 -0400] [21209] [INFO] Starting gunicorn 23.0.0
+[2024-10-07 01:25:31 -0400] [21209] [INFO] Listening at: http://0.0.0.0:9090 (21209)
+[2024-10-07 01:25:31 -0400] [21209] [INFO] Using worker: gevent
+[2024-10-07 01:25:31 -0400] [21215] [INFO] Booting worker with pid: 21215
+[2024-10-07 01:26:15 -0400] [21209] [INFO] Handling signal: int
+[2024-10-07 01:26:15 -0400] [21215] [INFO] Worker exiting (pid: 21215)
+[2024-10-07 01:26:15 -0400] [21209] [INFO] Shutting down: Master

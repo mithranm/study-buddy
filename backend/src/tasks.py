@@ -1,39 +1,36 @@
 from celery import shared_task
 import logging
-# Python file imports
 from . import vector_db
 from . import document_chunker as chunker
 
-
-logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
-#ASYNC METHODS
-@shared_task
-def process_file(filename, file_path, textracted_path):
+
+@shared_task(bind=True)
+def process_file(self, file_path, textracted_path):
     """
-    Where threads start to process files and embed them into the data base.
+    Processes the file and embeds it into the database.
 
     Args:
-        filename: String
-        collection: Database
-        textracted_path: String if the file is pdf it will need this parameter.
-
-    Returns:
-        None
+        self: The task instance.
+        file_path: Path to the uploaded file.
+        textracted_path: Path to the textracted directory.
     """
-
     try:
-        # Log the start of the processing
-        logger.info(f"Starting to process file: {filename}")
+        logger.info(f"Starting to process file: {file_path}")
+
+        # Update task state
+        self.update_state(state='STARTED', meta={'status': 'Processing started'})
 
         collection = vector_db.get_collection()
-
         chunker.embed_documents([file_path], collection, textracted_path)
 
-        # Log successful processing
-        logger.info(f"Successfully processed file: {filename}")
+        self.update_state(state='SUCCESS', meta={'status': 'Processing started'})
+
+        logger.info(f"Successfully processed file: {file_path}")
+
+        return {'status': 'Task completed'}
 
     except Exception as e:
-        logger.error(f"Error processing file {filename}: {str(e)}")
-        # Optionally, you can raise the exception to retry the task if needed
-        # raise e
+        logger.error(f"Error processing file {file_path}: {str(e)}")
+        self.update_state(state='FAILURE', meta={'status': 'Processing started'})
+        raise e

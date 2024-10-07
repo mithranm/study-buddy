@@ -11,15 +11,26 @@ const GetModels = ({ isBackendReady, onModelSelect }) => {
     const handleGetModels = useCallback(async () => {
         try {
             setError(null);
-            const response = await axios.get(`${BACKEND_URL_API}/get_models`);
+            console.log('Sending request to:', `${BACKEND_URL_API}/get_models`);
+            const response = await axios.get(`${BACKEND_URL_API}/get_models`, { timeout: 5000 });
+            console.log('Response status:', response.status);
+            console.log('Response data:', response.data);
+
+            if (response.status === 503) {
+                throw new Error('Service Unavailable (503)');
+            }
+
             setModels(response.data.models);
             if (response.data.models.length > 0 && !selectedModel) {
                 setSelectedModel(response.data.models[0]);
                 onModelSelect(response.data.models[0]);
             }
         } catch (err) {
-            setError('Failed to fetch models. Please try again.');
-            console.error('Error fetching models:', err);
+            console.error('Caught error:', err);
+            if (err.response) {
+                console.error('Error response:', err.response.status, err.response.data);
+            }
+            setError(`Failed to fetch models. Status: ${err.response?.status || 'unknown'}. Is ollama running?`);
         }
     }, [onModelSelect, selectedModel]);
 

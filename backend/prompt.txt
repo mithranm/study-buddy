@@ -1,916 +1,263 @@
-main.py:
-import os
-import nltk
-import logging
-import traceback
-import sys
-import time
-from flask import Flask, request, jsonify, Blueprint, current_app
-from flask_cors import CORS
-from celery import Celery, Task
-import redis
-
-# Project python files.
-from . import document_chunker as chunker
-from . import vector_db
-from . import ollama_calls as ollama
-from .tasks import process_file
-
-# BLUEPRINT OF API
-bp = Blueprint('study-buddy', __name__)
-
-logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger(__name__)
-
-
-# API ENDPOINT METHODS HERE
-@bp.route('/status', methods=['GET'])
-def get_status():
-    """
-    Getter method for status of backend to let any application using this interface know when its ready.
-
-    Args:
-        None
-
-    Returns:
-        json - containing nltk and chroma status variables.
-    """
-    return jsonify({
-        'nltk_ready': current_app.nltk_ready,
-        'chroma_ready': current_app.chroma_ready,
-        'error': current_app.initialization_error
-    })
-
-@bp.route('/upload', methods=['POST'])
-def upload_file():
-    """
-    Uploads a file that is chosen by the user.
-
-    This function handles all POST request to the '/upload' endpoint.
-
-    Args:
-        None
-    Returns:
-        tuple: a json of the message and the http code
-        if successful: ({'message': 'File uploaded and embedded sucessfully'}, 200)
-        if backend not ready: ({'error': 'Backend is not fully initialized yet'}, 503)
-        if theres no file to upload: ({'error': 'No file part'}, 400)
-        if filename is empty: ({'error': 'No selected file'}, 400)
-    """
-    if 'file' not in request.files:
-        return jsonify({'error': 'No file part'}), 400
-    file = request.files['file']
-    if file.filename == '':
-        return jsonify({'error': 'No selected file'}), 400
-    if file:
-        file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], file.filename)
-
-        collection = vector_db.get_collection()
-        # Checks to see if the file already exists in the upload directory to prevent from the file being chunked again in chroma db.
-
-        if(os.path.exists(file_path) and len(collection.get(where={"source": file_path})['ids'])): # Also checks the data base just to make sure no funny business is going on
-            return jsonify({"error": "Tried uploading a file that already exists."}), 400
-        
-        file.save(file_path)
-
-        # Sending a task to complete adding to db in the background.
-        process_file.delay(file.filename, file_path, current_app.config["TEXTRACTED_PATH"])
-
-        return jsonify({'message': 'File recieved and is being processed', 'filename': file.filename}), 202
-
-@bp.route('/search', methods=['POST'])
-def search_wrapper():
-    """
-    Search through submitted files to find the best matches for the given query. This is a wrapper to vector_db.search_documents()
-
-    This function handles all POST requests to the '/search' endpoint.
-
-    Args:
-        None
-    Returns:
-        tuple - a json of the data and the http code
-        if backend not ready: returns ({'error': 'Backend is fully initialized yet'}), 503)
-    """
-    query = request.json.get('query')
-    if not query:
-        return jsonify({'error': 'No query provided'}), 400
-    return vector_db.search_documents(query)
-
-@bp.route('/documents', methods=['GET'])
-def list_documents():
-    """
-    Retrieve all documents and return it back to the frontend in json format to be displayed on the screen.
-
-    This function handles all GET requests to '/documents' endpoint.
-
-    Args:
-        None
-    Returns:
-        tuple: a json file that contains data and http code
-        if successful: sends a json of the files submitted with the http code 200.
-        if backend not ready: ({error: Backend is fully initialized yet}, 503).
-
-    Raises:
-        None
-    """
-    files = os.listdir(current_app.config['UPLOAD_FOLDER'])
-    return jsonify(files)
-
-@bp.route('/documents/<filename>', methods=['DELETE'])
-def delete_document(filename):
-    """
-    Delete a document and its associated chunks from the system.
-
-    This function handles HTTP DELETE requests to remove a specific document
-    identified by its filename. It also removes the corresponding document
-    chunks from the Chroma vector store.
-
-    Args:
-        filename (str): The name of the file to be deleted.
-
-    Returns:
-        tuple: A tuple containing a JSON response and an HTTP status code.
-            - If successful: ({'message': 'Document deleted successfully'}, 200)
-            - If backend not ready: ({'error': 'Backend is not fully initialized yet'}, 503)
-            - If file not found: ({'error': 'Document not found'}, 404)
-
-    Raises:
-        None
-    """
-    file_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename) 
-    if os.path.exists(file_path):
-        # Remove document chunks from Chroma
-        collection = vector_db.get_collection()
-        collection.delete(where={"source": file_path})
-
-        # Remove from backend/upload/
-        os.remove(file_path)
-        
-        split_filename = os.path.splitext(filename)
-        if (split_filename[1] == ".pdf"):
-            textracted_path = os.path.join(current_app.config['TEXTRACTED_PATH'], f"{split_filename[0]}.md")
-
-            os.remove(textracted_path)
-
-        logger.info(f"New collection file should not be present: {collection.peek(100)['ids']}") # after deletion you should not see the file in the database you just deleted.
-        return jsonify({'message': 'Document deleted successfully'}), 200
-    else:
-        return jsonify({'error': 'Document not found'}), 404
-    
-@bp.route('/get_models', methods=['GET'])
-def get_models_wrapper():
-    """
-    Add pydocs here :p
-    """
-    if (not ollama.ollama_health_check()):
-        logger.info("Ollama is not running")
-        return jsonify({'error': 'Ollama is not running, please make sure ollama is running on your local machine'}, 503)
-    
-    return ollama.get_models()
-
-
-@bp.route('/chat', methods=['POST'])
-def chat_wrapper():
-    """
-    chat an LLM response from the prompt in the request body and chunks from documents already uploaded.
-
-    Args:
-        None
-
-    Returns:
-        tuple: A tuple containing a JSON response and an HTTP status code.
-    Raises:
-        None
-    """
-
-    if (not ollama.ollama_health_check()):
-        logger.info("Ollama is not running")
-        return jsonify({'error': 'Ollama is not running, please make sure ollama is running on your local machine'}, 503)
-    
-    prompt = request.json.get('prompt')
-
-    model = request.json.get('model')
-
-    if not prompt:
-        return jsonify({'error': 'No prompt given'}), 400
-
-    try:
-        print("running search documents")
-        search_results, http_code = vector_db.search_documents(prompt)
-
-        if http_code != 200:
-            return jsonify({'error': 'Search failed'}), http_code
-        
-        # Call chat with the search results and prompt
-        return ollama.chat(search_results, prompt, model)
-    except Exception as e:
-        print("Exception chat")
-        traceback.print_exc(file=sys.stderr)
-        return jsonify({'error': f'Exception in chat process: {str(e)}'}), 500
-    
-def celery_init_app(app: Flask) -> Celery:
-    """
-    Initialize celery app.
-    """
-    class FlaskTask(Task):
-        def __call__(self, *args: object, **kwargs: object) -> object:
-            with app.app_context():
-                return self.run(*args, **kwargs)
-
-    celery_app = Celery(app.name, task_cls=FlaskTask)
-    celery_app.config_from_object(app.config["CELERY"])
-    celery_app.set_default()
-    app.extensions["celery"] = celery_app
-    return celery_app
-
-def create_app(test_config=None):
-    """
-    Creates the app.
-    """
-    app = Flask(__name__)
-    CORS(app)
-
-    # Initialize Redis client
-    app.redis_client = redis.StrictRedis(
-        host='localhost',   # Change as necessary
-        port=6379,          # Default Redis port
-        db=0,               # Database number
-        decode_responses=True  # Optional: decode responses to strings
-    )
-
-
-    app.config.from_mapping(
-        CHROMA_SERVER_HOST="chromadb",  # Service name if using Docker Compose
-        CHROMA_SERVER_PORT=9092,        # Port exposed by ChromaDB server
-        CELERY=dict(
-            broker_url="redis://localhost:6379",
-            result_backend="redis://localhost:6379",
-            task_ignore_result=True,
-        ),
-    )
-
-    app.config.from_prefixed_env()
-    celery_init_app(app)
-
-    if test_config is None:
-        # Load the instance config, if it exists, when not testing
-        app.config.from_pyfile('config.py', silent=True)
-    else:
-        # Load the test config if passed in
-        app.config.from_mapping(test_config)
-
-    # Set base_path to the project root directory
-    base_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-
-    # Set default configurations
-    app.config.setdefault('CHROMA_DB_PATH', os.path.join(base_path, 'chroma_db'))
-    app.config.setdefault('UPLOAD_FOLDER', os.path.join(base_path, 'uploads'))
-    app.config.setdefault('TEXTRACTED_PATH', os.path.join(base_path, 'textracted'))
-
-    # Log all app configurations
-    for key, value in app.config.items():
-        logger.debug(f"App config: {key} = {value}")
-
-    # Ensure the required directories exist
-    try:
-        os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-        os.makedirs(app.config['CHROMA_DB_PATH'], exist_ok=True)
-        os.makedirs(app.config['TEXTRACTED_PATH'], exist_ok=True)
-        logger.info("Created necessary directories")
-    except Exception as e:
-        logger.error(f"Error creating directories: {str(e)}")
-
-    # Global variables to track initialization status
-    app.nltk_ready = False
-    app.chroma_ready = False
-    app.initialization_error = None
-
-    with app.app_context():
-        try:
-            # Initialize NLTK
-            nltk.download('punkt_tab')
-            app.nltk_ready = True
-
-            # Initialize Chroma collection
-            vector_db.get_collection()
-            app.chroma_ready = True
-        except LookupError as le:
-            app.initialization_error = f"NLTK LookupError: {str(le)}"
-            logger.error(f"Initialization error: {str(le)}")
-        except Exception as e:
-            app.initialization_error = f"General Initialization Error: {str(e)}"
-            logger.error(f"Initialization error: {str(e)}")
-
-    app.register_blueprint(bp, url_prefix="/api/")
-
-    return app
-
-if __name__ == '__main__':
-    app = create_app()
-    port = int(os.environ.get('FLASK_RUN_PORT', 9090))
-    app.run(host='0.0.0.0', port=port, debug=False)
-
-
-document_chunker.py:
-import os
-import re
-import io
-import uuid
-import logging
-import glob
-
-from pathlib import Path
-from typing import List
-from nltk.tokenize import sent_tokenize
-from logging.handlers import RotatingFileHandler
-from PIL import Image
-from chromadb.config import Settings
-
-import fitz  # PyMuPDF
-import pytesseract
-import chromadb
-
-from . import google_calls
-from . import document_textractor
-
-# Constants
-MAX_IMAGE_SIZE = (1000, 1000)  # Maximum width and height for images
-IMAGE_DIR_NAME = "extracted_images"  # Directory to save extracted images
-CAPTION_START = "[[IMAGE_CAPTION_START]]"
-CAPTION_END = "[[IMAGE_CAPTION_END]]"
-ALLOWED_FILE_EXTENSIONS = {'.txt', '.md', '.pdf'}  # Allowed file types
-MAX_FILE_SIZE = 50 * 1024 * 1024  # 50 MB max file size
-LOG_DIR = "logs"
-LOG_FILE = "document_chunker.log"
-MAX_LOG_SIZE = 10 * 1024 * 1024  # 10 MB
-BACKUP_COUNT = 5
-BASE_PATH = "."
-
-def setup_logging(log_to_file=True):
-    logger = logging.getLogger(__name__)
-    logger.setLevel(logging.DEBUG)
-
-    # Create formatter
-    formatter = logging.Formatter('[%(asctime)s] [%(levelname)s] %(message)s')
-
-    if log_to_file:
-        # Ensure log directory exists
-        os.makedirs(LOG_DIR, exist_ok=True)
-        log_path = os.path.join(LOG_DIR, LOG_FILE)
-
-        # Create rotating file handler
-        file_handler = RotatingFileHandler(
-            log_path, maxBytes=MAX_LOG_SIZE, backupCount=BACKUP_COUNT
-        )
-        file_handler.setFormatter(formatter)
-        logger.addHandler(file_handler)
-
-    # Always add a console handler for immediate feedback
-    console_handler = logging.StreamHandler()
-    console_handler.setFormatter(formatter)
-    logger.addHandler(console_handler)
-
-    return logger
-
-def cleanup_existing_files(base_path: str, log_file: str, image_dir: str):
-    """
-    Clean up existing files created by this project before running.
-
-    Args:
-        base_path (str): The base directory path.
-        log_file (str): The name of the log file.
-        image_dir (str): The directory for extracted images.
-    """
-    logger.info("Starting cleanup of existing project files.")
-
-    # Remove specific log file
-    log_path = os.path.join(base_path, LOG_DIR, log_file)
-    if os.path.exists(log_path):
-        os.remove(log_path)
-        logger.info(f"Removed existing log file: {log_path}")
-
-    # Remove files in the image directory, but keep the directory
-    image_path = os.path.join(base_path, image_dir)
-    if os.path.exists(image_path):
-        for file in os.listdir(image_path):
-            file_path = os.path.join(image_path, file)
-            if os.path.isfile(file_path):
-                os.remove(file_path)
-                logger.info(f"Removed existing image file: {file_path}")
-
-    # Remove ChromaDB files if they exist, but keep the directory
-    chroma_db_path = os.path.join(base_path, "chroma_db")
-    if os.path.exists(chroma_db_path):
-        for item in os.listdir(chroma_db_path):
-            item_path = os.path.join(chroma_db_path, item)
-            if os.path.isfile(item_path):
-                os.remove(item_path)
-            elif os.path.isdir(item_path):
-                for sub_item in os.listdir(item_path):
-                    sub_item_path = os.path.join(item_path, sub_item)
-                    if os.path.isfile(sub_item_path):
-                        os.remove(sub_item_path)
-                os.rmdir(item_path)
-        logger.info(f"Removed existing ChromaDB files in: {chroma_db_path}")
-
-    # Remove any existing content log files
-    content_log_pattern = os.path.join(base_path, LOG_DIR, "*_content.log")
-    for file_path in glob.glob(content_log_pattern):
-        os.remove(file_path)
-        logger.info(f"Removed existing content log file: {file_path}")
-
-    logger.info("Cleanup of project files completed.")
-
-def log_full_content(content, file_path):
-    # Ensure content log directory exists
-    os.makedirs(LOG_DIR, exist_ok=True)
-    
-    # Create a filename based on the original file's name
-    base_name = os.path.basename(file_path)
-    log_filename = f"{os.path.splitext(base_name)[0]}_content.log"
-    log_path = os.path.join(LOG_DIR, log_filename)
-    
-    # Write content to file
-    with open(log_path, 'w', encoding='utf-8') as f:
-        f.write(content)
-
-def ensure_image_dir(base_path: str) -> str:
-    """
-    Ensure the image directory exists within the given base path.
-
-    Args:
-        base_path (str): The base directory path.
-
-    Returns:
-        str: The full path to the image directory.
-    """
-    image_path = os.path.join(base_path, IMAGE_DIR_NAME)
-    os.makedirs(image_path, exist_ok=True)
-    logger.debug(f"Ensured image directory exists at: {image_path}")
-    return image_path
-
-def scale_image(image_bytes: bytes) -> bytes:
-    """
-    Scale the image to a maximum size while maintaining aspect ratio.
-
-    Args:
-        image_bytes (bytes): The original image bytes.
-
-    Returns:
-        bytes: The scaled image bytes in JPEG format.
-    """
-    try:
-        with Image.open(io.BytesIO(image_bytes)) as img:
-            img.thumbnail(MAX_IMAGE_SIZE, Image.LANCZOS)
-            output = io.BytesIO()
-            img.save(output, format='JPEG')
-            scaled_bytes = output.getvalue()
-            logger.debug("Image scaled successfully.")
-            return scaled_bytes
-    except Exception as e:
-        logger.error(f"Failed to scale image: {e}")
-        raise
-
-def chunk_document(content: str, chunk_size: int = 1000, overlap: int = 200) -> List[str]:
-    """
-    Chunks the document while respecting image captions.
-    Ensures that caption start and end markers are always in the same chunk.
-
-    Args:
-        content (str): The full text content of the document.
-        chunk_size (int): Maximum number of characters per chunk.
-        overlap (int): Number of overlapping characters between chunks.
-
-    Returns:
-        List[str]: A list of text chunks.
-    """
-    logger.debug("Starting document chunking.")
-    # Define a regex pattern to match image captions
-    caption_pattern = re.escape(CAPTION_START) + r'.*?' + re.escape(CAPTION_END)
-
-    # Split the content into parts, separating captions and other text
-    parts = re.split(f'({caption_pattern})', content, flags=re.DOTALL)
-
-    chunks = []
-    current_chunk = ""
-
-    for part in parts:
-        if re.match(caption_pattern, part):
-            # Always start a new chunk for captions if the current chunk is not empty
-            if current_chunk:
-                chunks.append(current_chunk.strip())
-                logger.debug(f"Added chunk without caption. Current chunk size: {len(current_chunk)}")
-                current_chunk = ""
-            
-            # Add the entire caption as a single chunk
-            chunks.append(part.strip())
-            logger.debug(f"Added chunk with caption. Caption length: {len(part)}")
-        else:
-            sentences = sent_tokenize(part)
-            for sentence in sentences:
-                if len(current_chunk) + len(sentence) <= chunk_size:
-                    current_chunk += sentence + " "
-                else:
-                    chunks.append(current_chunk.strip())
-                    logger.debug(f"Added chunk during sentence processing. Current chunk size: {len(current_chunk)}")
-                    # Add overlap based on characters
-                    overlap_text = current_chunk[-overlap:].strip()
-                    current_chunk = overlap_text + " " + sentence + " "
-
-    if current_chunk:
-        chunks.append(current_chunk.strip())
-        logger.debug(f"Added final chunk. Final chunk size: {len(current_chunk)}")
-
-    # Log chunk information
-    for i, chunk in enumerate(chunks):
-        if CAPTION_START in chunk and CAPTION_END in chunk:
-            logger.info(f"Chunk {i} contains complete caption.")
-        elif CAPTION_START in chunk or CAPTION_END in chunk:
-            logger.warning(f"Chunk {i} contains incomplete caption markers.")
-        else:
-            logger.info(f"Chunk {i} does not contain caption.")
-
-    logger.debug("Document chunking completed.")
-    return chunks
-
-def process_pdf_with_captions(file_path: str, textracted_path: str) -> str:
-    """
-    Processes a PDF file to extract text and images, generates captions for images,
-    and inserts captions into the extracted text.
-
-    Args:
-        file_path (str): The path to the PDF file.
-        textracted_path (str): The base path for extracted content.
-
-    Returns:
-        str: The full text content with image captions inserted.
-    """
-    logger.info(f"Starting processing of PDF: {file_path}")
-    try:
-        doc = fitz.open(file_path)
-    except Exception as e:
-        logger.error(f"Failed to open PDF file {file_path}: {e}")
-        return ""
-
-    full_text = ""
-    image_dir = ensure_image_dir(BASE_PATH)
-
-    for page_num, page in enumerate(doc, start=1):
-        logger.debug(f"Processing page {page_num}")
-        blocks = page.get_text("dict")["blocks"]
-        elements = []
-
-        for block in blocks:
-            block_type = block.get("type")
-            if block_type == 0:  # Text block
-                text = block.get("text", "").strip()
-                if text:
-                    elements.append({
-                        "type": "text",
-                        "y0": block["bbox"][1],
-                        "content": text
-                    })
-            elif block_type == 1:  # Image block
-                img = block.get("image")
-                if img is None:
-                    logger.warning(f"No image data found in image block on page {page_num}")
-                    continue
-
-                logger.debug(f"Image block on page {page_num}")
-                logger.debug(f"Type of image block: {type(img)}")
-
-                if isinstance(img, dict):
-                    xref = img.get("xref")
-                    if xref is None:
-                        logger.error(f"No 'xref' found in image block on page {page_num}")
-                        continue
-                    elements.append({
-                        "type": "image",
-                        "y0": block["bbox"][1],
-                        "xref": xref
-                    })
-                elif isinstance(img, bytes):
-                    # Handle bytes image data
-                    logger.debug(f"Image data (bytes) on page {page_num}: {img[:20]}...")  # Log first 20 bytes
-                    try:
-                        image = Image.open(io.BytesIO(img))
-                        # Save the image securely
-                        image_filename = f"{uuid.uuid4()}.jpeg"
-                        image_path = os.path.join(image_dir, image_filename)
-                        image.save(image_path, "JPEG")
-                        logger.debug(f"Saved image to {image_path}")
-
-                        # Generate caption
-                        caption = google_calls.caption_image(image_path)
-                        caption_text = f"{CAPTION_START}{caption}{CAPTION_END}"
-                        full_text += caption_text + "\n"
-                        logger.info(f"Added caption for image on page {page_num}: {caption}")
-
-                        # Perform OCR on the image
-                        ocr_text = pytesseract.image_to_string(image).strip()
-                        if ocr_text:
-                            full_text += ocr_text + "\n"
-                            logger.info(f"Added OCR text from image on page {page_num}: {ocr_text[:100]}...")
-                        else:
-                            logger.warning(f"No text extracted via OCR from image on page {page_num}")
-                    except Exception as e:
-                        logger.error(f"Failed to process image bytes on page {page_num}: {e}")
-                        full_text += f"{CAPTION_START}Image processing failed{CAPTION_END}\n"
-                else:
-                    logger.error(f"Unexpected image block format on page {page_num}: {type(img)}")
-            else:
-                logger.debug(f"Unknown block type {block_type} on page {page_num}")
-
-        # Log the number of elements found on the page
-        num_text = sum(1 for el in elements if el["type"] == "text")
-        num_images = sum(1 for el in elements if el["type"] == "image")
-        logger.debug(f"Page {page_num}: Found {num_text} text blocks and {num_images} image blocks")
-
-        # # If no text blocks, perform OCR on the entire page
-        # if num_text == 0:
-        #     logger.debug(f"No text blocks found on page {page_num}. Performing OCR on entire page.")
-        #     try:
-        #         pix = page.get_pixmap()
-        #         img_data = pix.pil_tobytes("png")
-        #         image = Image.open(io.BytesIO(img_data))
-        #         ocr_text = pytesseract.image_to_string(image).strip()
-        #         if ocr_text:
-        #             full_text += ocr_text + "\n"
-        #             logger.info(f"Added OCR text from entire page {page_num}: {ocr_text[:100]}...")
-        #         else:
-        #             logger.warning(f"No text extracted via OCR from entire page {page_num}")
-        #     except Exception as e:
-        #         logger.error(f"Failed to perform OCR on entire page {page_num}: {e}")
-
-        # Sort elements by their vertical position (y0)
-        elements.sort(key=lambda el: el["y0"])
-
-        for element in elements:
-            if element["type"] == "text":
-                full_text += element["content"] + "\n"
-                logger.debug(f"Appended text block: {element['content'][:100]}...")
-            elif element["type"] == "image":
-                xref = element["xref"]
-                try:
-                    base_image = doc.extract_image(xref)
-                    image_bytes = base_image["image"]
-                except Exception as e:
-                    logger.error(f"Failed to extract image xref {xref} on page {page_num}: {e}")
-                    full_text += f"{CAPTION_START}Image extraction failed{CAPTION_END}\n"
-                    continue
-
-                # Scale image
-                try:
-                    scaled_image_bytes = scale_image(image_bytes)
-                except Exception as e:
-                    logger.error(f"Scaling failed for image xref {xref} on page {page_num}: {e}")
-                    full_text += f"{CAPTION_START}Image scaling failed{CAPTION_END}\n"
-                    continue
-                image_filename = f"{uuid.uuid4()}.jpeg"
-                image_path = os.path.join(image_dir, image_filename)
-                try:
-                    with open(image_path, 'wb') as img_file:
-                        img_file.write(scaled_image_bytes)
-                    logger.debug(f"Saved scaled image to {image_path}")
-                except Exception as e:
-                    logger.error(f"Failed to save image {image_path} on page {page_num}: {e}")
-                    full_text += f"{CAPTION_START}Image saving failed{CAPTION_END}\n"
-                    continue
-
-                # Generate caption
-                try:
-                    caption = google_calls.caption_image(image_path)
-                    caption_text = f"{CAPTION_START}{caption}{CAPTION_END}"
-                    full_text += caption_text + "\n"
-                    logger.info(f"Added caption for image xref {xref} on page {page_num}: {caption}")
-                except Exception as e:
-                    logger.error(f"Error captioning image xref {xref} on page {page_num}: {e}")
-                    # Insert a placeholder if captioning fails
-                    full_text += f"{CAPTION_START}Image caption unavailable{CAPTION_END}\n"
-
-        logger.info(f"Processed page {page_num} of {file_path}")
-
-    logger.info(f"Processed PDF: {file_path}")
-    logger.debug(f"Full text content after processing:\n{full_text}")
-    return full_text
-
-def embed_documents(file_paths: List[str], collection: chromadb.Collection, textracted_path: str) -> None:
-    """
-    Populates a ChromaDB collection with embeddings from an array of documents.
-
-    Args:
-        file_paths (List[str]): A list of file paths to the documents.
-        collection (chromadb.Collection): The ChromaDB collection to populate.
-        textracted_path (str): The path to the textracted output.
-
-    Returns:
-        None
-    """
-    logger.info("Starting embedding of documents.")
-    all_chunks = []
-    all_ids = []
-    all_metadatas = []
-
-    for file_path in file_paths:
-        file_extension = Path(file_path).suffix.lower()
-
-        # Security: Validate file extension
-        if file_extension not in ALLOWED_FILE_EXTENSIONS:
-            logger.warning(f"Skipping unsupported file type {file_extension} for file {file_path}.")
-            continue
-
-        # Security: Validate file size
-        try:
-            file_size = os.path.getsize(file_path)
-            if file_size > MAX_FILE_SIZE:
-                logger.warning(f"Skipping file {file_path} due to size {file_size} exceeding limit.")
-                continue
-        except Exception as e:
-            logger.error(f"Could not get file size for {file_path}: {e}")
-            continue
-
-        content = ""
-
-        if file_extension in ['.txt', '.md']:
-            try:
-                with open(file_path, 'r', encoding='utf-8') as file:
-                    content = file.read()
-                logger.debug(f"Read content from text file: {file_path}")
-            except Exception as e:
-                logger.error(f"Failed to read text file {file_path}: {e}")
-                continue
-        elif file_extension == '.pdf':
-            content = process_pdf_with_captions(file_path, textracted_path)
-        else:
-            try:
-                # Implement your own file_to_markdown conversion if needed
-                converted_path = document_textractor.file_to_markdown(file_path, textracted_path)
-                with open(converted_path, 'r', encoding='utf-8') as file:
-                    content = file.read()
-                logger.debug(f"Converted file to markdown and read content: {converted_path}")
-            except Exception as e:
-                logger.error(f"Skipping {file_path}: {str(e)}")
-                continue
-
-        if not content.strip():
-            logger.warning(f"No content extracted from {file_path}. Skipping chunking.")
-            continue
-        log_full_content(content, file_path)
-        logger.info(f"Content before chunking for {file_path}:\n{content[:100]}")
-        chunks = chunk_document(content)
-
-        if not chunks:
-            logger.warning(f"No chunks created from {file_path}. Skipping embedding.")
-            continue
-
-        # Log and verify chunks contain captions
-        for i, chunk in enumerate(chunks):
-            if CAPTION_START in chunk and CAPTION_END in chunk:
-                logger.info(f"Chunk {i} from {file_path} contains caption.")
-            else:
-                logger.info(f"Chunk {i} from {file_path} does not contain caption.")
-
-        all_chunks.extend(chunks)
-        all_ids.extend([f"{Path(file_path).stem}_{i}" for i in range(len(chunks))])
-        all_metadatas.extend([{"source": file_path} for _ in chunks])
-
-    if not all_chunks:
-        logger.warning("No chunks to add to ChromaDB collection.")
-        return
-
-    logger.info(f"Adding {len(all_chunks)} chunks to ChromaDB collection.")
-    try:
-        collection.add(
-            documents=all_chunks,
-            ids=all_ids,
-            metadatas=all_metadatas
-        )
-        logger.info("Finished adding chunks to ChromaDB collection.")
-    except Exception as e:
-        logger.error(f"Failed to add chunks to ChromaDB collection: {e}")
-
-def main():
-    # Setup logging first
-    global logger
-    logger = setup_logging(log_to_file=True)
-
-    # Perform cleanup before running
-    cleanup_existing_files(BASE_PATH, LOG_FILE, IMAGE_DIR_NAME)
-
-    # Initialize ChromaDB client
-    client = chromadb.PersistentClient(path="./chroma_db")
-
-    # Create or get a collection
-    collection = client.get_or_create_collection(name="documents")
-
-    # Define paths
-    textracted_path = "./textracted"
-    file_paths = ["./test_upload/document.pdf"]
-
-    # Embed documents
-    embed_documents(file_paths, collection, textracted_path)
-
-if __name__ == "__main__":
-    main()
-else:
-    # For when the module is imported
-    logger = setup_logging(log_to_file=False)
-
-tasks.py:
-from celery import shared_task
-import logging
-# Python file imports
-from . import vector_db
-from . import document_chunker as chunker
-
-
-logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger(__name__)
-#ASYNC METHODS
-@shared_task
-def process_file(filename, file_path, textracted_path):
-    """
-    Where threads start to process files and embed them into the data base.
-
-    Args:
-        filename: String
-        collection: Database
-        textracted_path: String if the file is pdf it will need this parameter.
-
-    Returns:
-        None
-    """
-
-    try:
-        # Log the start of the processing
-        logger.info(f"Starting to process file: {filename}")
-
-        collection = vector_db.get_collection()
-
-        chunker.embed_documents([file_path], collection, textracted_path)
-
-        # Log successful processing
-        logger.info(f"Successfully processed file: {filename}")
-
-    except Exception as e:
-        logger.error(f"Error processing file {filename}: {str(e)}")
-        # Optionally, you can raise the exception to retry the task if needed
-        # raise e
-
-
-I am running this shell script in my terminal:
-#!/bin/bash
-
-# Start Gunicorn in the background
-poetry run gunicorn --bind 0.0.0.0:9090 src.wsgi:app &
-GUNICORN_PID=$!
-echo "Started Gunicorn with PID $GUNICORN_PID"
-
-# Start Celery Worker in the background
-poetry run celery -A src.make_celery.celery_app worker --loglevel=INFO &
-CELERY_PID=$!
-echo "Started Celery with PID $CELERY_PID"
-
-# Function to handle termination
-terminate() {
-    echo "Terminating processes..."
-    kill $CHROMADB_PID $GUNICORN_PID $CELERY_PID
-    exit 0
-}
-
-# Trap CTRL+C and other termination signals
-trap terminate SIGINT SIGTERM
-
-# Wait for all processes to finish
-wait $CHROMADB_PID $GUNICORN_PID $CELERY_PID
-
-And I am recieving this error when uploading a document:
-Break on __THE_PROCESS_HAS_FORKED_AND_YOU_CANNOT_USE_THIS_COREFOUNDATION_FUNCTIONALITY___YOU_MUST_EXEC__() to debug.
-The process has forked and you cannot use this CoreFoundation functionality safely. You MUST exec().
-Break on __THE_PROCESS_HAS_FORKED_AND_YOU_CANNOT_USE_THIS_COREFOUNDATION_FUNCTIONALITY___YOU_MUST_EXEC__() to debug.
-The process has forked and you cannot use this CoreFoundation functionality safely. You MUST exec().
-Break on __THE_PROCESS_HAS_FORKED_AND_YOU_CANNOT_USE_THIS_COREFOUNDATION_FUNCTIONALITY___YOU_MUST_EXEC__() to debug.
-The process has forked and you cannot use this CoreFoundation functionality safely. You MUST exec().
-Break on __THE_PROCESS_HAS_FORKED_AND_YOU_CANNOT_USE_THIS_COREFOUNDATION_FUNCTIONALITY___YOU_MUST_EXEC__() to debug.
-The process has forked and you cannot use this CoreFoundation functionality safely. You MUST exec().
-Break on __THE_PROCESS_HAS_FORKED_AND_YOU_CANNOT_USE_THIS_COREFOUNDATION_FUNCTIONALITY___YOU_MUST_EXEC__() to debug.
-The process has forked and you cannot use this CoreFoundation functionality safely. You MUST exec().
-Break on __THE_PROCESS_HAS_FORKED_AND_YOU_CANNOT_USE_THIS_COREFOUNDATION_FUNCTIONALITY___YOU_MUST_EXEC__() to debug.
-The process has forked and you cannot use this CoreFoundation functionality safely. You MUST exec().
-Break on __THE_PROCESS_HAS_FORKED_AND_YOU_CANNOT_USE_THIS_COREFOUNDATION_FUNCTIONALITY___YOU_MUST_EXEC__() to debug.
-objc[71776]: +[__NSPlaceholderSet initialize] may have been in progress in another thread when fork() was called.
-objc[71776]: +[__NSPlaceholderSet initialize] may have been in progress in another thread when fork() was called. We cannot safely call it or ignore it in the fork() child process. Crashing instead. Set a breakpoint on objc_initializeAfterForkError to debug.
-[2024-10-05 19:13:18,763: ERROR/MainProcess] Process 'ForkPoolWorker-8' pid:71776 exited with 'signal 6 (SIGABRT)'
-[2024-10-05 19:13:18,776: ERROR/MainProcess] Task handler raised error: WorkerLostError('Worker exited prematurely: signal 6 (SIGABRT) Job: 0.')
-Traceback (most recent call last):
-  File "/Users/itohti/Library/Caches/pypoetry/virtualenvs/cloud-practitioner-helper-zU27oPT6-py3.11/lib/python3.11/site-packages/billiard/pool.py", line 1265, in mark_as_worker_lost
-    raise WorkerLostError(
-billiard.einfo.ExceptionWithTraceback: 
-"""
-Traceback (most recent call last):
-  File "/Users/itohti/Library/Caches/pypoetry/virtualenvs/cloud-practitioner-helper-zU27oPT6-py3.11/lib/python3.11/site-packages/billiard/pool.py", line 1265, in mark_as_worker_lost
-    raise WorkerLostError(
-billiard.exceptions.WorkerLostError: Worker exited prematurely: signal 6 (SIGABRT) Job: 0.
-"""
-
-What does this error indicate?
+Project-Hierarchy
+```
+├── backend
+│   ├── chroma_db
+│   ├── secrets
+│   ├── src
+│   │   ├── __init__.py
+│   │   ├── celery_app.py
+│   │   ├── document_chunker.py
+│   │   ├── document_textractor.py
+│   │   ├── extensions.py
+│   │   ├── google_calls.py
+│   │   ├── main.py
+│   │   ├── make_celery.py
+│   │   ├── ollama_calls.py
+│   │   ├── pdf_extractor.py
+│   │   ├── tasks.py
+│   │   ├── vector_db.py
+│   │   └── wsgi.py
+│   ├── test_images
+│   │   └── mystery.jpeg
+│   ├── test_upload
+│   │   ├── document.pdf
+│   │   ├── loremipsum.txt
+│   │   ├── test.pdf
+│   │   └── vision-llm.pdf
+│   ├── tests
+│   │   ├── __init__.py
+│   │   ├── test_integration.py
+│   │   └── test_main.py
+│   ├── textracted
+│   ├── uploads
+│   ├── .python-version
+│   ├── Dockerfile
+│   ├── errorlog.txt
+│   ├── example.env
+│   ├── log.txt
+│   ├── permissions.txt
+│   ├── prompt.txt
+│   ├── prompt2.txt
+│   ├── pydoc-markdown.yml
+│   ├── pyproject.toml
+│   ├── run-dev-server.sh
+│   ├── run-integration.sh
+│   └── supervisord.conf
+├── docs
+│   ├── api.md
+│   └── example-ollama-curl.txt
+├── frontend
+│   ├── public
+│   │   ├── favicon.ico
+│   │   ├── index.html
+│   │   ├── logo192.png
+│   │   ├── logo512.png
+│   │   ├── manifest.json
+│   │   └── robots.txt
+│   ├── src
+│   │   ├── components
+│   │   │   ├── DocumentList.js
+│   │   │   ├── FileUpload.js
+│   │   │   ├── GetModels.js
+│   │   │   ├── SearchAndChat.js
+│   │   │   └── StatusMessage.js
+│   │   ├── App.css
+│   │   ├── App.js
+│   │   ├── App.test.js
+│   │   ├── index.css
+│   │   ├── index.js
+│   │   ├── logo.svg
+│   │   ├── reportWebVitals.js
+│   │   └── setupTests.js
+│   ├── Dockerfile
+│   ├── package-lock.json
+│   └── package.json
+├── .python-version
+├── README.md
+├── bugs.md
+├── docker-build.sh
+├── docker-compose.yml
+├── logs.txt
+├── notepad.txt
+└── todo.md
+```
+docker-compose.yml
+```
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "9090:9090"
+    volumes:
+      - chroma_db:/app/chroma_db
+      - textracted:/app/textracted
+      - uploads:/app/uploads
+      - ./backend/src:/app/src
+      - ./backend/secrets:/app/secrets
+      - nltk_data:/home/appuser/nltk_data
+    environment:
+      - FLASK_ENV=${FLASK_ENV:-production}
+      - FLASK_APP=src.main
+      - FLASK_RUN_PORT=9090
+      - CHROMA_DB_PATH=/app/chroma_db
+      - RAW_DOCUMENTS_PATH=/app/raw-documents
+      - UPLOAD_FOLDER=/app/uploads
+      - OLLAMA_HOST=host.docker.internal:11434
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - CHROMA_HOST=chromadb
+      - CHROMA_PORT=8000
+      - REDIS_URL=redis://redis
+      - PYTHONPATH=/app/src
+      - NLTK_DATA=/home/appuser/nltk_data
+    env_file:
+      - ./backend/.env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9090/api/status"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    depends_on:
+      redis:
+        condition: service_healthy
+      chromadb:
+        condition: service_healthy
+    networks:
+      - net
+
+  redis:
+    image: "redis:alpine"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 30s
+      retries: 50
+    networks:
+      - net
+
+  chromadb:
+    image: chromadb/chroma:0.5.11
+    volumes:
+      - chromadb_data:/chroma/chroma
+    environment:
+      - IS_PERSISTENT=TRUE
+      - PERSIST_DIRECTORY=/chroma/chroma
+      - ANONYMIZED_TELEMETRY=${ANONYMIZED_TELEMETRY:-TRUE}
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/heartbeat"]
+      interval: 5s
+      timeout: 30s
+      retries: 50
+    networks:
+      - net
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "9091:80"
+    environment:
+      - REACT_APP_BACKEND_URL=http://localhost:9090
+    depends_on:
+      - backend
+    networks:
+      - net
+
+networks:
+  net:
+
+volumes:
+  chroma_db:
+  textracted:
+  uploads:
+  chromadb_data:
+  nltk_data:
+```
+
+/backend/Dockerfile
+```
+FROM python:3.11.10-slim
+
+# Set the working directory
+WORKDIR /app
+
+# Install system dependencies and clean up in the same layer
+ENV PYTHONUNBUFFERED=1
+RUN apt-get update \
+    && apt-get -y install tesseract-ocr supervisor \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Poetry globally
+RUN pip install poetry
+
+# Create a non-root user 'appuser' with UID and GID 1000
+RUN useradd -m -u 1000 appuser
+
+# Set ownership of the working directory to 'appuser'
+RUN chown -R appuser:appuser /app
+
+# Set HOME environment variable for 'appuser'
+ENV HOME=/home/appuser
+
+# Switch to 'appuser' to perform Poetry configuration and installation
+USER appuser
+
+# Ensure Poetry cache directory exists and is writable
+RUN mkdir -p /home/appuser/.cache
+
+# Copy only dependency files first to leverage Docker cache
+COPY --chown=appuser:appuser pyproject.toml ./
+
+# Configure Poetry to create virtual environments inside the project directory
+RUN poetry config virtualenvs.create true \
+    && poetry config virtualenvs.in-project true
+
+# Install dependencies with Poetry using a cache mount for efficiency
+RUN --mount=type=cache,target=/home/appuser/.cache/pypoetry,uid=1000,gid=1000 \
+    poetry install --no-interaction --no-ansi
+
+# Set the NLTK data directory environment variable
+ENV NLTK_DATA=/home/appuser/nltk_data
+
+# Create the NLTK data directory
+RUN mkdir -p $NLTK_DATA
+
+# Download NLTK data as 'appuser' to the user-owned directory
+RUN poetry run python -c "import nltk; nltk.download('punkt', download_dir='$NLTK_DATA')"
+
+# Copy the application source code and secrets with proper ownership
+COPY --chown=appuser:appuser src/ ./src/
+COPY --chown=appuser:appuser secrets/ ./secrets/
+
+# Create the upload directory and set ownership to 'appuser'
+RUN mkdir -p /app/uploads && chown -R appuser:appuser /app/uploads
+
+# Switch back to root to run Supervisord
+USER root
+
+# Copy Supervisord configuration
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+# Set PYTHONPATH environment variable
+ENV PYTHONPATH=/app/src
+
+# Expose the port the app runs on
+EXPOSE 9090
+
+# Use Supervisord as the entrypoint
+CMD ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+```
+
+Trying to Run Docker App
+```
+packages/werkzeug/datastructures/file_storage.py", line 125, in save
+                    backend-1   |     dst = open(dst, "wb")
+                    backend-1   |           ^^^^^^^^^^^^^^^
+                    backend-1   | PermissionError: [Errno 13] Permission denied: '  backend-1   | PermissionError: [Errno 13] Permission denied: '/app/uploads/document.pdf'
+```
+
+This error does not occur on the machine that pushed the commit to github, but it happens on machines that pull the repository. Why is that?
